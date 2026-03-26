@@ -1,0 +1,58 @@
+name: Deploy Client
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      run: npm install
+    - name: Run tests
+      run: npm test -- --run
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: crymall/portfolio-client:${{ github.sha }}
+        platforms: linux/amd64
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+
+    - name: Activate Kubeconfig
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+        chmod 600 $HOME/.kube/config
+
+    - name: Deploy to Kubernetes
+      run: |
+        sed -i 's|crymall/portfolio-client:latest|crymall/portfolio-client:${{ github.sha }}|g' k8s/client-deployment.yaml
+        
+        kubectl apply -f k8s/
+        
+        # Restart and verify
+        kubectl rollout restart deployment/portfolio-client
+        kubectl rollout status deployment/portfolio-client

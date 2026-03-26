@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Jacquard 12';
+  src: url('./assets/fonts/Jacquard12-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Libertinus Mono';
+  src: url('./assets/fonts/LibertinusMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@theme {
+  --color-dark: #060a08;
+  --color-grey: #7d7e75;
+  --color-lightGrey: #b0b2b8;
+  --color-lightestGrey: #cfd6ea;
+  --color-primary: #210130;
+  --color-accent: #10511d;
+
+  --font-mono: "Libertinus Mono", monospace;
+  --font-gothic: "Jacquard 12", cursive;
+}
+
+@layer base {
+  html {
+    font-variant-emoji: text;
+  }
+
+  [data-theme="canteen"] {
+    --color-dark: #2a1b15;
+    --color-grey: #9c9482;
+    --color-lightGrey: #dcd5ca;
+    --color-lightestGrey: #f2ebd9;
+    --color-primary: #6b3e2e;
+    --color-accent: #b2b67f;
+  }
+}
+
+@layer utilities {
+  .text-shadow-hard-dark {
+    text-shadow: 2px 2px 0 #060a08;
+  }
+
+  .text-shadow-hard-grey {
+    text-shadow: 2px 2px 0 #7d7e75;
+  }
+
+  .text-shadow-hard-lightGrey {
+    text-shadow: 2px 2px 0 #b0b2b8;
+  }
+
+  .text-shadow-hard-lightestGrey {
+    text-shadow: 2px 2px 0 #cfd6ea;
+  }
+
+  .text-shadow-hard-primary {
+    text-shadow: 2px 2px 0 #210130;
+  }
+
+  .text-shadow-hard-accent {
+    text-shadow: 2px 2px 0 #02290a;
+  }
+
+  .text-shadow-hard-accent {
+    text-shadow: 2px 2px 0 #02290a;
+  }
+}
