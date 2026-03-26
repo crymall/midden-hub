@@ -1,17 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import AuthProvider from "./context/auth/AuthProvider";
-import DataProvider from "./context/data/DataProvider";
-import Dashboard from "./pages/Dashboard";
-import RequireNotGuest from "./components/gateways/RequireNotGuest";
-import { navMeta } from "./utils/constants";
-import Loading from "./pages/Loading";
+import AuthProvider from "@shared/core/context/auth/AuthProvider";
+import DataProvider from "@shared/core/context/data/DataProvider";
+import Dashboard from "@shared/core/pages/Dashboard";
+import RequireNotGuest from "@shared/core/gateways/RequireNotGuest";
+import { navMeta } from "@shared/core/utils/constants";
+import Loading from "@shared/ui/components/Loading";
 
-const Login = lazy(() => import("./pages/Login"));
+const Login = lazy(() => import("@shared/core/pages/Login"));
 const Explorer = lazy(() => import("./pages/Explorer"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Experiments = lazy(() => import("./pages/Experiments"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+const NotFound = lazy(() => import("@shared/core/pages/NotFound"));
+
+console.log("BANANA")
 
 function App() {
   return (

@@ -1,7 +1,7 @@
 import { Button } from "@headlessui/react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import MobileBurgerMenu from "./MobileBurgerMenu";
-import Can from "./gateways/Can";
+import Can from '../../core/gateways/Can';
 
 const Header = ({ user, logout, title, titleLink, navLinks }) => {
   const navigate = useNavigate();

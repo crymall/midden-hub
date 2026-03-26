@@ -1,4 +1,4 @@
-import useAuth from "../../context/auth/useAuth";
+import useAuth from "../context/auth/useAuth";
 
 const Can = ({ perform, children, not }) => {
   const { user } = useAuth();
