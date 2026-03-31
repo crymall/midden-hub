@@ -86,8 +86,16 @@ const CanteenHome = () => {
             <li className="flex items-start gap-2">
               <span className="text-accent">•</span>
               <span>
-                Made by a <a href="https://www.reedgaines.com" target="_blank" className="text-accent hover:underline">solo developer</a> for personal use. Open source, open
-                beta, open to suggestions.
+                Made by a{" "}
+                <a
+                  href="https://www.reedgaines.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  solo developer
+                </a>{" "}
+                for personal use. Open source, open beta, open to suggestions.
               </span>
             </li>
           </ul>

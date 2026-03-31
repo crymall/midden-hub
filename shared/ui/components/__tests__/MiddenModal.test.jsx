@@ -2,7 +2,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import MiddenModal from "../MiddenModal";
 
-// eslint-disable-next-line no-undef
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}

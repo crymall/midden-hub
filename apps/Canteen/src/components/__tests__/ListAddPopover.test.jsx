@@ -4,7 +4,6 @@ import ListAddPopover from "../ListAddPopover";
 import useData from "@shared/core/context/data/useData";
 import useAuth from "@shared/core/context/auth/useAuth";
 
-// eslint-disable-next-line no-undef
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}

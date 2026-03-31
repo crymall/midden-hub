@@ -2,7 +2,6 @@ import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import DurationInput from "../DurationInput";
 
-// eslint-disable-next-line no-undef
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}

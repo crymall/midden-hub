@@ -31,7 +31,6 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-// eslint-disable-next-line no-undef
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}

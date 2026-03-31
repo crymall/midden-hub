@@ -153,7 +153,7 @@ const ListAddPopover = ({
                           value={{ action: "create" }}
                           className="data-focus:bg-accent text-lightestGrey cursor-pointer px-2 py-1 text-sm font-bold italic select-none data-focus:text-white"
                         >
-                          Create "{query}"
+                          {`Create "${query}"`}
                         </ComboboxOption>
                       )}
                   </ComboboxOptions>

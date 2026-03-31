@@ -470,7 +470,7 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
                                 value={{ action: "create", name: ing.name }}
                                 className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-focus:text-white"
                               >
-                                Create "{ing.name}"
+                                {`Create "${ing.name}"`}
                               </ComboboxOption>
                             )}
                         </ComboboxOptions>
@@ -557,7 +557,7 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
             <p className="text-lightestGrey mb-6 font-mono">
               Are you sure you want to create the ingredient{" "}
               <span className="text-accent font-bold">
-                "{pendingIngredientName}"
+                {`"${pendingIngredientName}"`}
               </span>
               ?
             </p>

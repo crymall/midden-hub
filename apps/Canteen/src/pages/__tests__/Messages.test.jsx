@@ -21,7 +21,6 @@ vi.mock("@shared/ui/components/MiddenCard", () => ({
   default: ({ children, className }) => <div className={className}>{children}</div>,
 }));
 
-// eslint-disable-next-line no-undef
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}

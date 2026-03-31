@@ -16,7 +16,6 @@ vi.mock("@shared/ui/components/MiddenModal", () => ({
     ) : null,
 }));
 
-// eslint-disable-next-line no-undef
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}

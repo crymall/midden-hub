@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
 import { Button, Field, Input, Label } from "@headlessui/react";
 import useAuth from "../context/auth/useAuth";
 

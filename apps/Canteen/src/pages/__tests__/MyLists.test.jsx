@@ -18,7 +18,6 @@ vi.mock("react-router-dom", async () => {
 vi.mock("@shared/core/context/data/useData");
 vi.mock("@shared/core/context/auth/useAuth");
 
-// eslint-disable-next-line no-undef
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
