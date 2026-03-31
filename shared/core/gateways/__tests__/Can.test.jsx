@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import Can from "../Can";
-import useAuth from "../../../context/auth/useAuth";
-import { PERMISSIONS } from "../../../utils/constants";
+import useAuth from "../../context/auth/useAuth";
+import { PERMISSIONS } from "../../utils/constants";
 
-vi.mock("../../../context/auth/useAuth");
+vi.mock("../../context/auth/useAuth");
 
 describe("Can Gateway", () => {
   it("renders children if user has permission", () => {

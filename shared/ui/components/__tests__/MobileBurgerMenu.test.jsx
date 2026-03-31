@@ -13,7 +13,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("../gateways/Can", () => ({
+vi.mock("../../../core/gateways/Can", () => ({
   default: ({ perform, children }) => {
     return perform === "allowed" ? <>{children}</> : null;
   },

@@ -13,8 +13,6 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Experiments = lazy(() => import("./pages/Experiments"));
 const NotFound = lazy(() => import("@shared/core/pages/NotFound"));
 
-console.log("BANANA")
-
 function App() {
   return (
     <BrowserRouter>

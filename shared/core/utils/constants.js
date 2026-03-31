@@ -17,21 +17,21 @@ export const navMeta = {
   },
   canteen: {
     title: "Canteen",
-    titleLink: "/applications/canteen",
+    titleLink: "/",
     navLinks: [
       {
-        to: "/applications/canteen/recipes",
+        to: "/recipes",
         label: "Recipe Search",
         ariaLabel: "recipe-search",
       },
       {
-        to: "/applications/canteen/user/:userId",
+        to: "/user/:userId",
         label: "My Profile",
         ariaLabel: "my-profile",
         requiredPermission: PERMISSIONS.writeData,
       },
       {
-        to: "/applications/canteen/messages",
+        to: "/messages",
         label: "Messages",
         ariaLabel: "messages",
         requiredPermission: PERMISSIONS.writeData,
@@ -44,7 +44,7 @@ export const explorerLinkList = [
   {
     label: "Canteen",
     symbol: "🍔",
-    to: "/applications/canteen",
+    to: import.meta.env.VITE_CANTEEN_URL,
   },
   {
     label: "Experiments",

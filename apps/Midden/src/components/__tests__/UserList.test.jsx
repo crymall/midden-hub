@@ -2,13 +2,13 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import UserList from "../UserList";
-import useData from "../../context/data/useData";
-import useAuth from "../../context/auth/useAuth";
+import useData from "@shared/core/context/data/useData";
+import useAuth from "@shared/core/context/auth/useAuth";
 
-vi.mock("../../context/data/useData");
-vi.mock("../../context/auth/useAuth");
+vi.mock("@shared/core/context/data/useData");
+vi.mock("@shared/core/context/auth/useAuth");
 
-vi.mock("../../utils/constants", () => ({
+vi.mock("@shared/core/utils/constants", () => ({
   ROLES: { Admin: 1, Editor: 2 },
 }));
 

@@ -11,6 +11,8 @@ export default defineConfig({
     },
   },
   server: {
+      port: 5174,
+      strictPort: true,
       proxy: {
         '/iam': {
           target: 'http://localhost:3000',

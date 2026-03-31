@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect } from "vitest";
 import Experiments from "../Experiments";
-import { experimentLinkList } from "../../utils/constants";
+import { experimentLinkList } from "@shared/core/utils/constants";
 
 describe("Experiments Component", () => {
   it("renders all experiment links", () => {

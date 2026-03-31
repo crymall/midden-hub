@@ -2,12 +2,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Settings from "../Settings";
-import useAuth from "../../context/auth/useAuth";
-import useData from "../../context/data/useData";
-import { PERMISSIONS } from "../../utils/constants";
+import useAuth from "@shared/core/context/auth/useAuth";
+import useData from "@shared/core/context/data/useData";
+import { PERMISSIONS } from "@shared/core/utils/constants";
 
-vi.mock("../../context/auth/useAuth");
-vi.mock("../../context/data/useData");
+vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/context/data/useData");
 
 vi.mock("../../components/UserList", () => ({
   default: () => <div data-testid="user-list">User List Component</div>,

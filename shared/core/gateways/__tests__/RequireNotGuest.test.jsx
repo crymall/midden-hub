@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route, useLocation } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import RequireNotGuest from "../RequireNotGuest";
-import useAuth from "../../../context/auth/useAuth";
+import useAuth from "../../context/auth/useAuth";
 
-vi.mock("../../../context/auth/useAuth");
+vi.mock("../../context/auth/useAuth");
 
 describe("RequireNotGuest Gateway", () => {
   it("renders outlet content if user is authenticated and not guest", () => {

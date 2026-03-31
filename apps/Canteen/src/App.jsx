@@ -1,23 +1,26 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AuthProvider from "./context/auth/AuthProvider";
-import DataProvider from "./context/data/DataProvider";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
-import RequireNotGuest from "./components/gateways/RequireNotGuest";
-import { navMeta } from "./utils/constants";
+import { Suspense, lazy } from "react";
+import AuthProvider from "@shared/core/context/auth/AuthProvider";
+import DataProvider from "@shared/core/context/data/DataProvider";
+import Dashboard from "@shared/core/pages/Dashboard";
+import Login from "@shared/core/pages/Login";
+import NotFound from "@shared/core/pages/NotFound";
+import RequireNotGuest from "@shared/core/gateways/RequireNotGuest";
+import { navMeta } from "@shared/core/utils/constants";
+import Loading from "@shared/ui/components/Loading";
 
-const CanteenHome = lazy(() => import("./pages/Canteen/CanteenHome"));
-const RecipeSearch = lazy(() => import("./pages/Canteen/RecipeSearch"));
-const RecipeDetail = lazy(() => import("./pages/Canteen/RecipeDetail"));
-const NewRecipe = lazy(() => import("./pages/Canteen/NewRecipe"));
-const EditRecipe = lazy(() => import("./pages/Canteen/EditRecipe"));
-const MyLists = lazy(() => import("./pages/Canteen/MyLists"));
-const ListView = lazy(() => import("./pages/Canteen/ListView"));
-const UserProfile = lazy(() => import("./pages/Canteen/UserProfile"));
-const Messages = lazy(() => import("./pages/Canteen/Messages"));
-const Conversation = lazy(() => import("./pages/Canteen/Conversation"));
+const CanteenHome = lazy(() => import("./pages/CanteenHome"));
+const RecipeSearch = lazy(() => import("./pages/RecipeSearch"));
+const RecipeDetail = lazy(() => import("./pages/RecipeDetail"));
+const NewRecipe = lazy(() => import("./pages/NewRecipe"));
+const EditRecipe = lazy(() => import("./pages/EditRecipe"));
+const MyLists = lazy(() => import("./pages/MyLists"));
+const ListView = lazy(() => import("./pages/ListView"));
+const UserProfile = lazy(() => import("./pages/UserProfile"));
+const Messages = lazy(() => import("./pages/Messages"));
+const Conversation = lazy(() => import("./pages/Conversation"));
 const FollowerFollowingLists = lazy(
-  () => import("./pages/Canteen/FollowerFollowingLists"),
+  () => import("./pages/FollowerFollowingLists"),
 );
 
 function App() {
@@ -25,31 +28,33 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <DataProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
+          <Suspense fallback={<Loading />}>
+            <Routes>
+              <Route path="/login" element={<Login />} />
 
-            <Route
-              path="/"
-              element={<Dashboard navMeta={navMeta.canteen} />}
-            >
-              <Route index element={<CanteenHome />} />
-              <Route path="recipes" element={<RecipeSearch />} />
-              <Route path="recipes/:id" element={<RecipeDetail />} />
-              <Route path="user/:id" element={<UserProfile />} />
+              <Route path="/" element={<Dashboard navMeta={navMeta.canteen} />}>
+                <Route index element={<CanteenHome />} />
+                <Route path="recipes" element={<RecipeSearch />} />
+                <Route path="recipes/:id" element={<RecipeDetail />} />
+                <Route path="user/:id" element={<UserProfile />} />
 
-              <Route element={<RequireNotGuest />}>
-                <Route path="recipes/new" element={<NewRecipe />} />
-                <Route path="recipes/:id/edit" element={<EditRecipe />} />
-                <Route path="my-lists" element={<MyLists />} />
-                <Route path="my-lists/:id" element={<ListView />} />
-                <Route path="messages" element={<Messages />} />
-                <Route path="messages/:id" element={<Conversation />} />
-                <Route path="user/:id/network" element={<FollowerFollowingLists />} />
+                <Route element={<RequireNotGuest />}>
+                  <Route path="recipes/new" element={<NewRecipe />} />
+                  <Route path="recipes/:id/edit" element={<EditRecipe />} />
+                  <Route path="my-lists" element={<MyLists />} />
+                  <Route path="my-lists/:id" element={<ListView />} />
+                  <Route path="messages" element={<Messages />} />
+                  <Route path="messages/:id" element={<Conversation />} />
+                  <Route
+                    path="user/:id/network"
+                    element={<FollowerFollowingLists />}
+                  />
+                </Route>
+
+                <Route path="*" element={<NotFound />} />
               </Route>
-
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
+            </Routes>
+          </Suspense>
         </DataProvider>
       </AuthProvider>
     </BrowserRouter>
