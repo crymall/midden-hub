@@ -12,7 +12,7 @@ import {
 import useData from "@shared/core/context/data/useData";
 
 const RecipeFilter = ({ onFilter }) => {
-  const { tags, getTags } = useData();
+  const { tags = [], getTags } = useData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
 
