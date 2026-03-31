@@ -21,7 +21,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: canteen-service
+  name: canteen-client
 spec:
   type: ClusterIP
   selector:

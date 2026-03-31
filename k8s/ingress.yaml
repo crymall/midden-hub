@@ -6,6 +6,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
+  ingressClassName: nginx
   tls:
   - hosts:
     - midden.reedgaines.com
@@ -29,6 +30,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: canteen-service
+            name: canteen-client
             port:
               number: 80
