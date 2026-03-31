@@ -63,5 +63,5 @@ jobs:
 
       - name: Update Deployments with new SHA
         run: |
-          kubectl set image deployment/midden-client-deployment midden-client=crymall/midden-client:${{ github.sha }}
-          kubectl set image deployment/canteen-client-deployment canteen-client=crymall/canteen-client:${{ github.sha }}
+          kubectl set image deployment/midden-client midden-client=crymall/midden-client:${{ github.sha }}
+          kubectl set image deployment/canteen-client canteen-client=crymall/canteen-client:${{ github.sha }}
