@@ -1,6 +1,5 @@
 import { useState, useEffect, useEffectEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import AuthContext from "./AuthContext";
 import * as iamApi from "../../services/iamApi";
 
@@ -10,51 +9,29 @@ const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const processToken = (token) => {
+  const verifyUser = useEffectEvent(async () => {
     try {
-      if (!token) {
-        localStorage.removeItem("token");
-        setUser(null);
-        return;
-      }
-
-      const decoded = jwtDecode(token);
-
-      if (decoded.exp * 1000 < Date.now()) {
-        localStorage.removeItem("token");
-        setUser(null);
-      } else {
-        localStorage.setItem("token", token);
-        setUser({ ...decoded, token });
-      }
-    } catch {
-      localStorage.removeItem("token");
+      const data = await iamApi.verify();
+      setUser(data.user);
+    } catch (error) {
       setUser(null);
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const checkToken = useEffectEvent(processToken);
-  const showPage = useEffectEvent(() => setLoading(false));
+  });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    checkToken(token);
-    showPage();
+    verifyUser();
   }, []);
 
   const login = async (username, password) => {
     const data = await iamApi.login(username, password);
-    if (data.token) {
-      processToken(data.token);
-      const origin = location.state?.from?.pathname || "/";
-      navigate(origin);
-    }
     return data;
   };
 
   const verifyLogin = async (userId, code) => {
     const data = await iamApi.verify2FA(userId, code);
-    processToken(data.token);
+    setUser(data.user);
 
     const origin = location.state?.from?.pathname || "/";
     navigate(origin);
@@ -66,8 +43,9 @@ const AuthProvider = ({ children }) => {
     return await iamApi.register(username, email, password);
   };
 
-  const logout = () => {
-    processToken(null);
+  const logout = async () => {
+    await iamApi.logout();
+    setUser(null);
   };
 
   const value = {

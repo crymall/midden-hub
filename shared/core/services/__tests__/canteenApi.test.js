@@ -35,34 +35,6 @@ describe("canteenApi", () => {
     mockPatch.mockResolvedValue({ data: {} });
   });
 
-  describe("Interceptors", () => {
-    it("adds Authorization header when token is present", async () => {
-      vi.resetModules();
-      await import("../canteenApi");
-
-      const interceptor = mockUse.mock.calls[0][0];
-      const config = { headers: {} };
-      
-      vi.spyOn(Storage.prototype, 'getItem').mockReturnValue('test-token');
-      
-      const result = interceptor(config);
-      expect(result.headers.Authorization).toBe('Bearer test-token');
-    });
-
-    it("does not add Authorization header when token is missing", async () => {
-      vi.resetModules();
-      await import("../canteenApi");
-
-      const interceptor = mockUse.mock.calls[0][0];
-      const config = { headers: {} };
-      
-      vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null);
-      
-      const result = interceptor(config);
-      expect(result.headers.Authorization).toBeUndefined();
-    });
-  });
-
   describe("Recipes", () => {
     it("fetchRecipes calls get with correct params", async () => {
       await api.fetchRecipes(10, 5, ['tag1'], ['ing1'], 'soup');

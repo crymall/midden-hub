@@ -2,18 +2,8 @@ import axios from 'axios';
 
 const iamApi = axios.create({
   baseURL: '/iam/',
+  withCredentials: true,
 });
-
-iamApi.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export const login = async (username, password) => {
   const response = await iamApi.post('/login', { username, password });
@@ -30,8 +20,23 @@ export const register = async (username, email, password) => {
   return response.data;
 };
 
+export const verify = async () => {
+  const response = await iamApi.get('/verify');
+  return response.data;
+};
+
+export const logout = async () => {
+  const response = await iamApi.post('/logout');
+  return response.data;
+};
+
 export const fetchUsers = async () => {
   const response = await iamApi.get('/users');
+  return response.data;
+};
+
+export const fetchUser = async (userId) => {
+  const response = await iamApi.get(`/users/${userId}`);
   return response.data;
 };
 

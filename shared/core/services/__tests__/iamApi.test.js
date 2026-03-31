@@ -32,34 +32,6 @@ describe("iamApi", () => {
     mockDelete.mockResolvedValue({ data: {} });
   });
 
-  describe("Interceptors", () => {
-    it("adds Authorization header when token is present", async () => {
-      vi.resetModules();
-      await import("../iamApi");
-
-      const interceptor = mockUse.mock.calls[0][0];
-      const config = { headers: {} };
-      
-      vi.spyOn(Storage.prototype, 'getItem').mockReturnValue('test-token');
-      
-      const result = interceptor(config);
-      expect(result.headers.Authorization).toBe('Bearer test-token');
-    });
-
-    it("does not add Authorization header when token is missing", async () => {
-      vi.resetModules();
-      await import("../iamApi");
-
-      const interceptor = mockUse.mock.calls[0][0];
-      const config = { headers: {} };
-      
-      vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null);
-      
-      const result = interceptor(config);
-      expect(result.headers.Authorization).toBeUndefined();
-    });
-  });
-
   describe("Auth", () => {
     it("login calls post with credentials", async () => {
       await api.login("user", "pass");
@@ -75,12 +47,27 @@ describe("iamApi", () => {
       await api.register("user", "email@test.com", "pass");
       expect(mockPost).toHaveBeenCalledWith("/register", { username: "user", email: "email@test.com", password: "pass" });
     });
+
+    it("verify calls get", async () => {
+      await api.verify();
+      expect(mockGet).toHaveBeenCalledWith("/verify");
+    });
+
+    it("logout calls post", async () => {
+      await api.logout();
+      expect(mockPost).toHaveBeenCalledWith("/logout");
+    });
   });
 
   describe("Users", () => {
     it("fetchUsers calls get", async () => {
       await api.fetchUsers();
       expect(mockGet).toHaveBeenCalledWith("/users");
+    });
+
+    it("fetchUser calls get with user id", async () => {
+      await api.fetchUser("u1");
+      expect(mockGet).toHaveBeenCalledWith("/users/u1");
     });
 
     it("updateUserRole calls patch", async () => {

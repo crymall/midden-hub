@@ -7,6 +7,7 @@ import { ROLES } from "../../utils/constants";
 export const DataProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
+  const [authedUserDetails, setAuthedUserDetails] = useState(null);
 
   const [recipes, setRecipes] = useState([]);
   const [recipesLoading, setRecipesLoading] = useState(false);
@@ -65,6 +66,16 @@ export const DataProvider = ({ children }) => {
       console.error("Update user role failed", err);
     }
   };
+
+  const getAuthedUserDetails = useCallback(async (userId) => {
+    try {
+      const data = await iamApi.fetchUser(userId);
+      setAuthedUserDetails(data);
+    } catch (err) {
+      console.error("Fetch authed user details failed", err);
+      setAuthedUserDetails(null);
+    }
+  }, []);
 
   const getRecipes = useCallback(
     async (limit = 50, offset = 0, filters = {}) => {
@@ -447,6 +458,8 @@ export const DataProvider = ({ children }) => {
         fetchUsers,
         deleteUser,
         updateUserRole,
+        authedUserDetails,
+        getAuthedUserDetails,
         recipes,
         recipesLoading,
         currentRecipe,

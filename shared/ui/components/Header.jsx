@@ -1,7 +1,7 @@
 import { Button } from "@headlessui/react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import MobileBurgerMenu from "./MobileBurgerMenu";
-import Can from '../../core/gateways/Can';
+import Can from "../../core/gateways/Can";
 
 const Header = ({ user, logout, title, titleLink, navLinks }) => {
   const navigate = useNavigate();
@@ -43,33 +43,24 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
       <span className="hidden text-white md:block">
         <strong>{user?.username}</strong>
       </span>
-      <Button
-        onClick={() => navigate("/settings")}
-        aria-label="Settings"
-        className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
-      >
-        🛠
-      </Button>
-      {title !== "Midden" && (
-        <Button
-          onClick={() => navigate("/")}
-          aria-label="Back to Midden"
-          className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
-        >
-          ⬆
-        </Button>
-      )}
       {title === "Midden" && (
         <Button
-          onClick={() => {
-            logout();
-          }}
-          aria-label="Logout"
+          onClick={() => navigate("/settings")}
+          aria-label="Settings"
           className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
         >
-          🚪→
+          🛠
         </Button>
       )}
+      <Button
+        onClick={() => {
+          logout();
+        }}
+        aria-label="Logout"
+        className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
+      >
+        🚪→
+      </Button>
     </>
   );
 

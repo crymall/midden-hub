@@ -18,15 +18,19 @@ import { PERMISSIONS } from "@shared/core/utils/constants";
 
 const Settings = () => {
   const { user } = useAuth();
-  const { fetchUsers } = useData();
+  const { fetchUsers, getAuthedUserDetails, authedUserDetails } = useData();
   const { writeUsers } = PERMISSIONS;
 
 
   useEffect(() => {
-    if (user && user.permissions.includes(writeUsers)) {
-      fetchUsers();
+    if (user) {
+      getAuthedUserDetails(user.id);
+      if (user.permissions.includes(writeUsers)) {
+        fetchUsers();
+      }
     }
-  }, [fetchUsers, user, writeUsers]);
+  }, [user, getAuthedUserDetails, fetchUsers, writeUsers]);
+
 
   return (
     <MiddenCard>
@@ -66,7 +70,7 @@ const Settings = () => {
                   Email
                 </Label>
                 <Input
-                  value={user.email || ""}
+                  value={authedUserDetails?.user?.email || ""}
                   readOnly
                   className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
                 />

@@ -114,6 +114,40 @@ describe("DataProvider", () => {
     expect(result.current.users.find((u) => u.id === "1").role).toBe("ADMIN");
   });
 
+  it("fetches authed user details and updates state", async () => {
+    const mockUserDetails = { id: "1", email: "test@user.com" };
+    iamApi.fetchUser.mockResolvedValue(mockUserDetails);
+
+    const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+    const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+    await act(async () => {
+      await result.current.getAuthedUserDetails("1");
+    });
+
+    expect(result.current.authedUserDetails).toEqual(mockUserDetails);
+    expect(iamApi.fetchUser).toHaveBeenCalledWith("1");
+  });
+
+  it("handles fetch authed user details error gracefully", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    iamApi.fetchUser.mockRejectedValue(new Error("Fetch failed"));
+
+    const wrapper = ({ children }) => <DataProvider>{children}</DataProvider>;
+    const { result } = renderHook(() => useContext(DataContext), { wrapper });
+
+    await act(async () => {
+      await result.current.getAuthedUserDetails("1");
+    });
+
+    expect(result.current.authedUserDetails).toBeNull();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Fetch authed user details failed",
+      expect.any(Error),
+    );
+    consoleSpy.mockRestore();
+  });
+
   it("handles deleteUser error gracefully", async () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     iamApi.deleteUser.mockRejectedValue(new Error("Delete failed"));
