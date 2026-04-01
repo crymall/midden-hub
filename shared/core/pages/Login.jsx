@@ -10,6 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
 
@@ -32,7 +33,7 @@ export default function Login() {
           }
           break;
         case "2fa":
-          await verifyLogin(userId, code);
+          await verifyLogin(userId, code, rememberMe);
           break;
         case "register":
           await register(username, email, password);
@@ -52,6 +53,7 @@ export default function Login() {
     setMode(mode);
     setError("");
     setInfo("");
+    setRememberMe(false);
   };
 
   const headerText =
@@ -108,7 +110,21 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-6 md:space-y-4">
           {mode === "2fa" ? (
-            pageInput("Verification Code", "text", "123456", code, setCode)
+            <>
+              {pageInput("Verification Code", "text", "123456", code, setCode)}
+              <Field className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="size-4 cursor-pointer"
+                />
+                <Label htmlFor="rememberMe" className="cursor-pointer text-sm font-bold">
+                  Remember This Device
+                </Label>
+              </Field>
+            </>
           ) : (
             <>
               {pageInput("Username", "text", "Your username", username, setUsername)}

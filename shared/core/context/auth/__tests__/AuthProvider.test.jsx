@@ -89,10 +89,10 @@ describe("AuthProvider", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
-      await result.current.verifyLogin("user1", "123456");
+      await result.current.verifyLogin("user1", "123456", true);
     });
 
-    expect(iamApi.verify2FA).toHaveBeenCalledWith("user1", "123456");
+    expect(iamApi.verify2FA).toHaveBeenCalledWith("user1", "123456", true);
     expect(result.current.user?.username).toBe("verifiedUser");
     expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
   });

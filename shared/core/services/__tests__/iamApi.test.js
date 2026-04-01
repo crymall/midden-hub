@@ -38,9 +38,9 @@ describe("iamApi", () => {
       expect(mockPost).toHaveBeenCalledWith("/login", { username: "user", password: "pass" });
     });
 
-    it("verify2FA calls post with code", async () => {
-      await api.verify2FA("u1", "123456");
-      expect(mockPost).toHaveBeenCalledWith("/verify-2fa", { userId: "u1", code: "123456" });
+    it("verify2FA calls post with code and rememberMe", async () => {
+      await api.verify2FA("u1", "123456", true);
+      expect(mockPost).toHaveBeenCalledWith("/verify-2fa", { userId: "u1", code: "123456", rememberMe: true });
     });
 
     it("register calls post with user details", async () => {

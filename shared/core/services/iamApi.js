@@ -10,8 +10,8 @@ export const login = async (username, password) => {
   return response.data;
 };
 
-export const verify2FA = async (userId, code) => {
-  const response = await iamApi.post('/verify-2fa', { userId, code });
+export const verify2FA = async (userId, code, rememberMe = false) => {
+  const response = await iamApi.post('/verify-2fa', { userId, code, rememberMe });
   return response.data;
 };
 

@@ -29,8 +29,8 @@ const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const verifyLogin = async (userId, code) => {
-    const data = await iamApi.verify2FA(userId, code);
+  const verifyLogin = async (userId, code, rememberMe) => {
+    const data = await iamApi.verify2FA(userId, code, rememberMe);
     setUser(data.user);
 
     const origin = location.state?.from?.pathname || "/";

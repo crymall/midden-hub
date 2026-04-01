@@ -87,6 +87,56 @@ describe("Login Component", () => {
       expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
     });
     expect(screen.getByLabelText(/verification code/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/remember this device/i)).toBeInTheDocument();
+  });
+
+  it("submits 2FA code with rememberMe checked", async () => {
+    const user = userEvent.setup();
+    mockLogin.mockResolvedValue({ userId: "123", message: "Enter code" });
+
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    await user.type(screen.getByLabelText(/username/i), "testuser");
+    await user.type(screen.getByLabelText(/password/i), "password123");
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/verification code/i), "123456");
+    await user.click(screen.getByLabelText(/remember this device/i));
+    await user.click(screen.getByRole("button", { name: /^verify$/i }));
+
+    expect(mockVerifyLogin).toHaveBeenCalledWith("123", "123456", true);
+  });
+
+  it("submits 2FA code with rememberMe unchecked by default", async () => {
+    const user = userEvent.setup();
+    mockLogin.mockResolvedValue({ userId: "123", message: "Enter code" });
+
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    await user.type(screen.getByLabelText(/username/i), "testuser");
+    await user.type(screen.getByLabelText(/password/i), "password123");
+    await user.click(screen.getByRole("button", { name: /^login$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByLabelText(/verification code/i), "123456");
+    await user.click(screen.getByRole("button", { name: /^verify$/i }));
+
+    expect(mockVerifyLogin).toHaveBeenCalledWith("123", "123456", false);
   });
 
   it("displays error message on login failure", async () => {
