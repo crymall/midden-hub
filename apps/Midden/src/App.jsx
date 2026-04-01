@@ -12,6 +12,7 @@ const Explorer = lazy(() => import("./pages/Explorer"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Experiments = lazy(() => import("./pages/Experiments"));
 const NotFound = lazy(() => import("@shared/core/pages/NotFound"));
+const About = lazy(() => import("./pages/About"));
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
 
               <Route path="/" element={<Dashboard navMeta={navMeta.midden} />}>
                 <Route index element={<Explorer />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/experiments" element={<Experiments />} />
                 <Route element={<RequireNotGuest />}>
                   <Route path="/settings" element={<Settings />} />

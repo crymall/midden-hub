@@ -19,6 +19,7 @@ vi.mock("@shared/ui/components/Header", () => ({ default: () => <div>Header Comp
 vi.mock("../pages/Explorer", () => ({ default: () => <div>Explorer Page</div> }));
 vi.mock("../pages/Settings", () => ({ default: () => <div>Settings Page</div> }));
 vi.mock("../pages/Experiments", () => ({ default: () => <div>Experiments Page</div> }));
+vi.mock("../pages/About", () => ({ default: () => <div>About Page</div> }));
 
 describe("App Routing", () => {
   beforeEach(() => {
@@ -69,6 +70,14 @@ describe("App Routing", () => {
     useAuth.mockReturnValue({ user: { username: "testuser" } });
     render(<App />);
     expect(await screen.findByText("Experiments Page")).toBeInTheDocument();
+  });
+
+  it("renders About page", async () => {
+    window.history.pushState({}, "About", "/about");
+    useAuth.mockReturnValue({ user: { username: "testuser" } });
+    render(<App />);
+    expect(screen.getByText("Header Component")).toBeInTheDocument();
+    expect(await screen.findByText("About Page")).toBeInTheDocument();
   });
 
   it("renders 404 for unknown routes when authenticated", async () => {

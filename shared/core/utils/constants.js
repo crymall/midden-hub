@@ -13,7 +13,7 @@ export const navMeta = {
   midden: {
     title: "Midden",
     titleLink: "/",
-    navLinks: [{ to: "/", label: "About", ariaLabel: "about" }],
+    navLinks: [{ to: "/about", label: "About", ariaLabel: "about" }],
   },
   canteen: {
     title: "Canteen",
