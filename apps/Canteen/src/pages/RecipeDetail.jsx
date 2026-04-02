@@ -53,7 +53,7 @@ const RecipeDetail = () => {
 
   useEffect(() => {
     if (user) {
-      getUserLists(user.id);
+      getUserLists(user.canteenId);
     }
   }, [user, getUserLists]);
 
@@ -83,13 +83,13 @@ const RecipeDetail = () => {
   }
 
   const isLiked = currentRecipe.likes?.some(
-    (like) => like.user_id === user?.id,
+    (like) => like.user_id === user?.canteenId,
   );
 
   const isOwner =
     user &&
     currentRecipe.author &&
-    String(user.id) === String(currentRecipe.author.id);
+    String(user.canteenId) === String(currentRecipe.author.id);
 
   const handleLike = () => {
     toggleRecipeLike(currentRecipe.id, isLiked);

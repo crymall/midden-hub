@@ -31,7 +31,7 @@ describe("Conversation", () => {
   const mockMarkMessagesAsRead = vi.fn();
   const mockCanteenApi = { fetchUser: mockFetchUser };
 
-  const defaultUser = { id: "1", username: "TestUser" };
+  const defaultUser = { id: "iam1", canteenId: "1", username: "TestUser" };
   const mockConversation = [
     {
       id: 1,

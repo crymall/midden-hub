@@ -60,8 +60,8 @@ const UserProfile = () => {
       }
       getRelationshipCounts(id);
 
-      if (currentUser && String(currentUser.id) !== String(id)) {
-        canteenApi.fetchFollowers(id, 1, 0, currentUser.id).then((res) => {
+      if (currentUser && String(currentUser.canteenId) !== String(id)) {
+        canteenApi.fetchFollowers(id, 1, 0, currentUser.canteenId).then((res) => {
           setIsFollowing(res?.length > 0);
         }).catch(console.error);
       }
@@ -108,7 +108,7 @@ const UserProfile = () => {
   const isOwnProfile =
     currentUser &&
     viewedUser &&
-    String(currentUser.id) === String(viewedUser.id);
+    String(currentUser.canteenId) === String(viewedUser.id);
 
   const handleFollowToggle = async () => {
     if (isFollowing) {

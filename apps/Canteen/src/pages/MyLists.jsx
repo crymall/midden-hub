@@ -38,7 +38,7 @@ const MyLists = () => {
         setFetchingListsFalseEvent();
       } else {
         setFetchingListsTrueEvent();
-        getUserLists(user.id, limit, (page - 1) * limit).finally(() =>
+        getUserLists(user.canteenId, limit, (page - 1) * limit).finally(() =>
           setFetchingListsFalseEvent(),
         );
       }
@@ -50,7 +50,7 @@ const MyLists = () => {
     setCreatingList(true);
     try {
       await canteenApi.createList(name);
-      await getUserLists(user.id, limit, (page - 1) * limit);
+      await getUserLists(user.canteenId, limit, (page - 1) * limit);
       setIsCreateModalOpen(false);
     } catch (error) {
       console.error("Failed to create list", error);
@@ -68,7 +68,7 @@ const MyLists = () => {
   const confirmDeleteList = async () => {
     try {
       await canteenApi.deleteList(listToDelete);
-      await getUserLists(user.id, limit, (page - 1) * limit);
+      await getUserLists(user.canteenId, limit, (page - 1) * limit);
       setListToDelete(null);
     } catch (error) {
       console.error("Failed to delete list", error);

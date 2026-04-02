@@ -25,7 +25,7 @@ global.ResizeObserver = class ResizeObserver {
 describe("ShareRecipePopover", () => {
   const mockGetFriends = vi.fn();
   const mockSendMessage = vi.fn();
-  const mockUser = { id: "user123" };
+  const mockUser = { id: "iam123", canteenId: "user123" };
   const mockRecipe = {
     id: "recipe456",
     title: "Spicy Noodles",

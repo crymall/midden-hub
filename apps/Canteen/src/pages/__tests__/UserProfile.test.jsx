@@ -40,7 +40,7 @@ describe("UserProfile", () => {
   const mockGetViewedUser = vi.fn();
   const mockGetRelationshipCounts = vi.fn();
 
-  const defaultUser = { id: "1", username: "TestUser" };
+  const defaultUser = { id: "iam1", canteenId: "1", username: "TestUser" };
   const viewedUser = { id: "2", username: "ViewedUser" };
 
   const defaultContext = {
@@ -170,7 +170,7 @@ describe("UserProfile", () => {
   });
 
   it("shows 'Manage My Lists' only for own profile", async () => {
-    useAuth.mockReturnValue({ user: { id: 2, username: "ViewedUser" } });
+    useAuth.mockReturnValue({ user: { id: "iam2", canteenId: "2", username: "ViewedUser" } });
     renderComponent("2");
 
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
@@ -183,7 +183,7 @@ describe("UserProfile", () => {
   });
 
   it("does not show 'Manage My Lists' for other profiles", async () => {
-    useAuth.mockReturnValue({ user: { id: 1, username: "OtherUser" } });
+    useAuth.mockReturnValue({ user: { id: "iam1", canteenId: "1", username: "OtherUser" } });
     renderComponent("2");
 
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
@@ -196,7 +196,7 @@ describe("UserProfile", () => {
   });
 
   it("renders create buttons for own profile", async () => {
-    useAuth.mockReturnValue({ user: { id: 2, username: "ViewedUser" } });
+    useAuth.mockReturnValue({ user: { id: "iam2", canteenId: "2", username: "ViewedUser" } });
     renderComponent("2");
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
@@ -205,7 +205,7 @@ describe("UserProfile", () => {
   });
 
   it("opens create list modal", async () => {
-    useAuth.mockReturnValue({ user: { id: 2, username: "ViewedUser" } });
+    useAuth.mockReturnValue({ user: { id: "iam2", canteenId: "2", username: "ViewedUser" } });
     renderComponent("2");
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
@@ -260,7 +260,7 @@ describe("UserProfile", () => {
     });
 
     it("displays follower and following counts as links to network page for own profile", async () => {
-      useAuth.mockReturnValue({ user: { id: "2", username: "ViewedUser" } });
+      useAuth.mockReturnValue({ user: { id: "iam2", canteenId: "2", username: "ViewedUser" } });
       useData.mockReturnValue({
         ...defaultContext,
         relationshipCounts: { followers: 1, following: 2 },

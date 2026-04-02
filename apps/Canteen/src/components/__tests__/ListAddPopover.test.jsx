@@ -24,7 +24,7 @@ describe("ListAddPopover", () => {
     createList: mockCreateList,
   };
 
-  const defaultUser = { id: "user123" };
+  const defaultUser = { id: "iam123", canteenId: "user123" };
   const defaultLists = [
     { id: "list1", name: "Favorites", updated_at: "2023-01-01" },
     { id: "list2", name: "To Cook", updated_at: "2023-01-02" },
@@ -37,7 +37,7 @@ describe("ListAddPopover", () => {
     hoistComboboxList: mockHoistComboboxList,
     comboboxListsLastFetched: Date.now(),
     currentComboboxQuery: "",
-    comboboxListsUserId: defaultUser.id,
+    comboboxListsUserId: defaultUser.canteenId,
   };
 
   beforeEach(() => {
@@ -68,7 +68,7 @@ describe("ListAddPopover", () => {
       render(<ListAddPopover recipeId="recipe1" />);
       const button = screen.getByText("+ Add");
       fireEvent.mouseEnter(button);
-      expect(mockGetComboboxLists).toHaveBeenCalledWith(defaultUser.id);
+      expect(mockGetComboboxLists).toHaveBeenCalledWith(defaultUser.canteenId);
     });
 
     it("fetches lists on hover if current query is not empty (search results)", () => {
@@ -80,7 +80,7 @@ describe("ListAddPopover", () => {
       render(<ListAddPopover recipeId="recipe1" />);
       const button = screen.getByText("+ Add");
       fireEvent.mouseEnter(button);
-      expect(mockGetComboboxLists).toHaveBeenCalledWith(defaultUser.id);
+      expect(mockGetComboboxLists).toHaveBeenCalledWith(defaultUser.canteenId);
     });
 
     it("fetches lists on hover if data belongs to a different user", () => {
@@ -92,7 +92,7 @@ describe("ListAddPopover", () => {
       render(<ListAddPopover recipeId="recipe1" />);
       const button = screen.getByText("+ Add");
       fireEvent.mouseEnter(button);
-      expect(mockGetComboboxLists).toHaveBeenCalledWith(defaultUser.id);
+      expect(mockGetComboboxLists).toHaveBeenCalledWith(defaultUser.canteenId);
     });
   });
 

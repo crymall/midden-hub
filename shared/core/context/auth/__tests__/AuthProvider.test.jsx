@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AuthProvider from "../AuthProvider";
 import AuthContext from "../AuthContext";
 import * as iamApi from "../../../services/iamApi";
+import * as canteenApi from "../../../services/canteenApi";
 
 vi.mock("react-router-dom", () => ({
   useNavigate: vi.fn(),
@@ -19,6 +20,10 @@ vi.mock("../../../services/iamApi", () => ({
   logout: vi.fn(),
 }));
 
+vi.mock("../../../services/canteenApi", () => ({
+  fetchMe: vi.fn(),
+}));
+
 describe("AuthProvider", () => {
   const mockNavigate = vi.fn();
   const mockLocation = { pathname: "/dashboard", state: { from: { pathname: "/dashboard" } } };
@@ -28,6 +33,7 @@ describe("AuthProvider", () => {
     useNavigate.mockReturnValue(mockNavigate);
     useLocation.mockReturnValue(mockLocation);
     iamApi.verify.mockRejectedValue(new Error("Unauthorized"));
+    canteenApi.fetchMe.mockResolvedValue({ id: "canteen-123" });
   });
 
   it("initializes with loading true then false", async () => {
@@ -40,12 +46,15 @@ describe("AuthProvider", () => {
   it("verifies user on initial load and sets user", async () => {
     const mockUser = { username: "verifiedUser" };
     iamApi.verify.mockResolvedValue({ user: mockUser });
+    canteenApi.fetchMe.mockResolvedValue({ id: "canteen1" });
 
     const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
     const { result } = renderHook(() => useContext(AuthContext), { wrapper });
 
     await waitFor(() => expect(result.current.user?.username).toBe("verifiedUser"));
+    expect(result.current.user?.canteenId).toBe("canteen1");
     expect(iamApi.verify).toHaveBeenCalled();
+    expect(canteenApi.fetchMe).toHaveBeenCalled();
   });
 
   it("sets user to null if verification fails", async () => {
@@ -82,6 +91,7 @@ describe("AuthProvider", () => {
   it("handles verifyLogin (2FA) success", async () => {
     const mockUser = { username: "verifiedUser" };
     iamApi.verify2FA.mockResolvedValue({ user: mockUser });
+    canteenApi.fetchMe.mockResolvedValue({ id: "canteen1" });
 
     const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
     const { result } = renderHook(() => useContext(AuthContext), { wrapper });
@@ -93,7 +103,9 @@ describe("AuthProvider", () => {
     });
 
     expect(iamApi.verify2FA).toHaveBeenCalledWith("user1", "123456", true);
+    expect(canteenApi.fetchMe).toHaveBeenCalled();
     expect(result.current.user?.username).toBe("verifiedUser");
+    expect(result.current.user?.canteenId).toBe("canteen1");
     expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
   });
 

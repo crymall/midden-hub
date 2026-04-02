@@ -213,6 +213,11 @@ describe("canteenApi", () => {
       await api.fetchUser("u1");
       expect(mockGet).toHaveBeenCalledWith("/users/u1");
     });
+
+    it("fetchMe calls get", async () => {
+      await api.fetchMe();
+      expect(mockGet).toHaveBeenCalledWith("/users/me");
+    });
   });
 
   describe("Relationships", () => {

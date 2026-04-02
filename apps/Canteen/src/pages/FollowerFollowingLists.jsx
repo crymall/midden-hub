@@ -40,9 +40,9 @@ const FollowerFollowingLists = () => {
       const followingOffset = activeTab === "following" ? (page - 1) * limit : 0;
 
       Promise.all([
-        getFollowers(user.id, followersLimit, followersOffset),
-        getFollowing(user.id, followingLimit, followingOffset),
-        getRelationshipCounts(user.id)
+        getFollowers(user.canteenId, followersLimit, followersOffset),
+        getFollowing(user.canteenId, followingLimit, followingOffset),
+        getRelationshipCounts(user.canteenId)
       ]).finally(() => setLoading(false));
     }
   }, [user, activeTab, page, limit, getFollowers, getFollowing, getRelationshipCounts]);
@@ -55,9 +55,9 @@ const FollowerFollowingLists = () => {
     }
     
     if (user) {
-      getFollowing(user.id, limit, 0);
-      getFollowers(user.id, limit, 0);
-      getRelationshipCounts(user.id);
+      getFollowing(user.canteenId, limit, 0);
+      getFollowers(user.canteenId, limit, 0);
+      getRelationshipCounts(user.canteenId);
     }
   };
 
@@ -70,7 +70,7 @@ const FollowerFollowingLists = () => {
     return null;
   }
 
-  if (String(user.id) !== String(id)) {
+  if (String(user.canteenId) !== String(id)) {
     return <Navigate to={`/user/${id}`} replace />;
   }
 
@@ -79,7 +79,7 @@ const FollowerFollowingLists = () => {
       <div className="mb-6">
         <div className="flex items-center gap-4">
           <Link
-            to={`/user/${user.id}`}
+            to={`/user/${user.canteenId}`}
             className="text-white hover:text-accent text-3xl leading-none transition-colors focus:outline-none"
             aria-label="Go back to profile"
           >

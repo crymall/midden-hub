@@ -176,6 +176,11 @@ export const fetchUsers = async (limit, offset) => {
   return response.data;
 };
 
+export const fetchMe = async () => {
+  const response = await canteenApi.get("/users/me");
+  return response.data;
+};
+
 export const fetchUser = async (id) => {
   const response = await canteenApi.get(`/users/${id}`);
   return response.data;

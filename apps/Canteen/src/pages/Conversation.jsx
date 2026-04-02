@@ -43,7 +43,7 @@ const Conversation = () => {
     if (currentConversation.length > 0 && user) {
       const unreadIds = currentConversation
         .filter(
-          (msg) => String(msg.receiver_id) === String(user.id) && !msg.is_read,
+          (msg) => String(msg.receiver_id) === String(user.canteenId) && !msg.is_read,
         )
         .map((msg) => msg.id);
 
@@ -100,7 +100,7 @@ const Conversation = () => {
           </div>
         )}
         {displayConversation.map((msg) => {
-          const isMe = String(msg.sender_id) === String(user.id);
+          const isMe = String(msg.sender_id) === String(user.canteenId);
           return (
             <div
               key={msg.id}

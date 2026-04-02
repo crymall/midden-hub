@@ -42,10 +42,10 @@ const ListAddPopover = ({
     const STALE_TIME = 60 * 1000;
     const isStale = Date.now() - comboboxListsLastFetched > STALE_TIME;
     const isSearchData = currentComboboxQuery !== "";
-    const isDifferentUser = comboboxListsUserId !== user?.id;
+    const isDifferentUser = comboboxListsUserId !== user?.canteenId;
 
     if (user && (isStale || isSearchData || isDifferentUser)) {
-      getComboboxLists(user.id);
+      getComboboxLists(user.canteenId);
     }
   };
 
@@ -86,7 +86,7 @@ const ListAddPopover = ({
     e.preventDefault();
     try {
       const response = await canteenApi.createList(newListName);
-      await getComboboxLists(user.id, newListName);
+      await getComboboxLists(user.canteenId, newListName);
       if (response?.id) {
         handleAddToList(response.id);
       }
@@ -101,9 +101,9 @@ const ListAddPopover = ({
     const val = event.target.value;
     setQuery(val);
     if (val) {
-      getComboboxLists(user.id, val);
+      getComboboxLists(user.canteenId, val);
     } else {
-      getComboboxLists(user.id, "");
+      getComboboxLists(user.canteenId, "");
     }
   };
 

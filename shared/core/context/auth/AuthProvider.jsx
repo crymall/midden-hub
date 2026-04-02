@@ -2,6 +2,7 @@ import { useState, useEffect, useEffectEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthContext from "./AuthContext";
 import * as iamApi from "../../services/iamApi";
+import * as canteenApi from "../../services/canteenApi";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -12,7 +13,14 @@ const AuthProvider = ({ children }) => {
   const verifyUser = useEffectEvent(async () => {
     try {
       const data = await iamApi.verify();
-      setUser(data.user);
+      let canteenId = null;
+      try {
+        const canteenUser = await canteenApi.fetchMe();
+        canteenId = canteenUser?.id;
+      } catch (err) {
+        console.error("Failed to fetch Canteen user", err);
+      }
+      setUser({ ...data.user, canteenId });
     } catch {
       setUser(null);
     } finally {
@@ -31,7 +39,16 @@ const AuthProvider = ({ children }) => {
 
   const verifyLogin = async (userId, code, rememberMe) => {
     const data = await iamApi.verify2FA(userId, code, rememberMe);
-    setUser(data.user);
+    
+    let canteenId = null;
+    try {
+      const canteenUser = await canteenApi.fetchMe();
+      canteenId = canteenUser?.id;
+    } catch (err) {
+      console.error("Failed to fetch Canteen user", err);
+    }
+
+    setUser({ ...data.user, canteenId });
 
     const origin = location.state?.from?.pathname || "/";
     navigate(origin);

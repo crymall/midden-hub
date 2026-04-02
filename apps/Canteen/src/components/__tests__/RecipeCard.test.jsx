@@ -20,7 +20,7 @@ vi.mock("../ListAddPopover", () => ({
 }));
 
 describe("RecipeCard", () => {
-  const mockUser = { id: "user123" };
+  const mockUser = { id: "iam123", canteenId: "user123" };
 
   const defaultContext = {
   };

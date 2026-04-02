@@ -44,7 +44,7 @@ const ShareRecipePopover = ({
 
   const ensureFriendsLoaded = () => {
     if (user && !friendsLoadedRef.current) {
-      getFriends(user.id);
+      getFriends(user.canteenId);
       friendsLoadedRef.current = true;
     }
   };

@@ -29,7 +29,7 @@ describe("CanteenHome", () => {
   });
 
   it("renders correctly", () => {
-    useAuth.mockReturnValue({ user: { id: "1" } });
+    useAuth.mockReturnValue({ user: { id: "iam1", canteenId: "1" } });
     render(
       <MemoryRouter>
         <CanteenHome />
@@ -54,7 +54,7 @@ describe("CanteenHome", () => {
   });
 
   it("does not render the 'Login or Register' button when user is authenticated", () => {
-    useAuth.mockReturnValue({ user: { id: "1" } });
+    useAuth.mockReturnValue({ user: { id: "iam1", canteenId: "1" } });
     render(
       <MemoryRouter>
         <CanteenHome />

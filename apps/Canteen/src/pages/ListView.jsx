@@ -38,7 +38,7 @@ const ListView = () => {
     if (user) {
       if (!currentList) {
         setListFetchNotCompletedEvent();
-        getUserLists(user.id).finally(() => setListFetchCompletedEvent());
+        getUserLists(user.canteenId).finally(() => setListFetchCompletedEvent());
       } else {
         setListFetchCompletedEvent();
       }

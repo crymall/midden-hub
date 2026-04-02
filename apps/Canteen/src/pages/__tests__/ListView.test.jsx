@@ -37,7 +37,7 @@ vi.mock("../../components/RecipeList", () => ({
 describe("ListView", () => {
   const mockGetUserLists = vi.fn().mockResolvedValue([]);
   const mockGetListRecipes = vi.fn().mockResolvedValue([]);
-  const mockUser = { id: "user123" };
+  const mockUser = { id: "iam123", canteenId: "user123" };
 
   const defaultContext = {
     userLists: [],

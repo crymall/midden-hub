@@ -19,14 +19,14 @@ const Messages = () => {
 
   const handleInteraction = () => {
     if (!hasFetchedFriends.current && user) {
-      getFriends(user.id, 50, 0, searchQuery);
+      getFriends(user.canteenId, 50, 0, searchQuery);
       hasFetchedFriends.current = true;
     }
   };
 
   useEffect(() => {
     if (hasFetchedFriends.current && user) {
-      getFriends(user.id, 50, 0, searchQuery);
+      getFriends(user.canteenId, 50, 0, searchQuery);
     }
   }, [searchQuery, user, getFriends]);
 
@@ -94,12 +94,12 @@ const Messages = () => {
         ) : (
           threads.map((thread) => {
             const isUnread =
-              String(thread.sender_id) !== String(user?.id) && !thread.is_read;
+              String(thread.sender_id) !== String(user?.canteenId) && !thread.is_read;
 
             let threadContent = thread.content;
             if (thread.recipe_id) {
               const senderName =
-                String(thread.sender_id) === String(user?.id)
+                String(thread.sender_id) === String(user?.canteenId)
                   ? "You"
                   : thread.other_username;
               threadContent = `${senderName} shared a recipe${
