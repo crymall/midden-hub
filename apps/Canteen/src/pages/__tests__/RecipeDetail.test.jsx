@@ -89,7 +89,7 @@ describe("RecipeDetail", () => {
     tags: [{ id: "1", name: "TestTag" }],
   };
 
-  const mockUser = { id: "user1", username: "testuser" };
+  const mockUser = { id: "iam1", canteenId: "user1", username: "testuser" };
 
   const defaultContext = {
     currentRecipe: mockRecipe,
@@ -174,7 +174,7 @@ describe("RecipeDetail", () => {
   });
 
   it("renders edit and delete buttons in popover for owner", async () => {
-    useAuth.mockReturnValue({ user: { id: "u1", username: "chef_test" } });
+    useAuth.mockReturnValue({ user: { id: "iam1", canteenId: "u1", username: "chef_test" } });
     render(<RecipeDetail />);
 
     const optionsBtn = screen.getByRole("button", { name: "Options" });
@@ -194,7 +194,7 @@ describe("RecipeDetail", () => {
   });
 
   it("does not render options popover for non-owner", () => {
-    useAuth.mockReturnValue({ user: { id: "user1", username: "testuser" } });
+    useAuth.mockReturnValue({ user: { id: "iam1", canteenId: "user1", username: "testuser" } });
     render(<RecipeDetail />);
     expect(
       screen.queryByRole("button", { name: "Options" }),
@@ -209,7 +209,7 @@ describe("RecipeDetail", () => {
       ...defaultContext,
       deleteRecipe: mockDeleteRecipe,
     });
-    useAuth.mockReturnValue({ user: { id: "u1", username: "chef_test" } });
+    useAuth.mockReturnValue({ user: { id: "iam1", canteenId: "u1", username: "chef_test" } });
 
     render(<RecipeDetail />);
 

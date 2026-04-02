@@ -34,7 +34,7 @@ describe("MyLists", () => {
     createList: mockCreateList,
   };
 
-  const defaultUser = { id: "user1" };
+  const defaultUser = { id: "iam1", canteenId: "user1" };
   const defaultLists = [
     { id: "l1", name: "Favorites" },
     { id: "l2", name: "Weekly" },

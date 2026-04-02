@@ -30,7 +30,7 @@ global.ResizeObserver = class ResizeObserver {
 describe("Messages", () => {
   const mockGetThreads = vi.fn();
 
-  const mockUser = { id: "1", username: "TestUser" };
+  const mockUser = { id: "iam1", canteenId: "1", username: "TestUser" };
 
   const mockThreads = [
     {

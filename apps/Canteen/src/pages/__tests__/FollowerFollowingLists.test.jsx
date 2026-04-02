@@ -31,7 +31,7 @@ describe("FollowerFollowingLists", () => {
   const mockUnfollowUser = vi.fn().mockResolvedValue({});
   const mockGetRelationshipCounts = vi.fn().mockResolvedValue({});
 
-  const defaultUser = { id: "1", username: "testuser" };
+  const defaultUser = { id: "iam1", canteenId: "1", username: "testuser" };
 
   beforeEach(() => {
     vi.clearAllMocks();
