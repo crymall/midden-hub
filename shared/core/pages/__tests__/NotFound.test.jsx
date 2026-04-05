@@ -20,7 +20,7 @@ describe("NotFound Component", () => {
         <NotFound />
       </MemoryRouter>
     );
-    const link = screen.getByRole("link", { name: /return to midden/i });
+    const link = screen.getByRole("link", { name: /return home/i });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "/");
   });
