@@ -4,6 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  publicDir: path.resolve(__dirname, '../../shared/ui/assets'),
   resolve: {
     alias: {
       '@shared/core': path.resolve(__dirname, '../../shared/core'),
@@ -12,13 +13,13 @@ export default defineConfig({
   },
   server: {
       proxy: {
-        '/iam': {
+        '^/iam(/|$)': {
           target: 'http://localhost:3000',
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/iam/, ''),
         },
-        '/canteen': {
+        '^/canteen(/|$)': {
           target: 'http://localhost:3001',
           changeOrigin: true,
           secure: false,

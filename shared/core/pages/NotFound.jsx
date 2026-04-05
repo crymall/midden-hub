@@ -13,7 +13,7 @@ const NotFound = () => {
           to="/"
           className="text-lightestGrey text-lg underline hover:text-white"
         >
-          Return to Midden
+          Return Home
         </Link>
       </div>
     </MiddenCard>
