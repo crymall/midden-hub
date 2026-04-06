@@ -80,10 +80,10 @@ const FollowerFollowingLists = () => {
         <div className="flex items-center gap-4">
           <Link
             to={`/user/${user.canteenId}`}
-            className="text-white hover:text-accent text-3xl leading-none transition-colors focus:outline-none"
+            className="text-white hover:text-accent text-3xl leading-none font-icons icon transition-colors focus:outline-none"
             aria-label="Go back to profile"
           >
-            ←
+            D
           </Link>
           <h2 className="font-gothic text-4xl font-bold text-white">My Network</h2>
         </div>

@@ -197,7 +197,7 @@ describe("ListView", () => {
     renderWithRouter("1", ["/lists/1"], 0);
 
     expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
-    expect(screen.getByText("← Back to My Lists")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Go back to My Lists" })).toBeInTheDocument();
 
     await act(async () => {
       await Promise.resolve();

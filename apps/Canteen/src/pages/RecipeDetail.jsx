@@ -127,10 +127,10 @@ const RecipeDetail = () => {
                 {hasHistory && (
                   <button
                     onClick={() => navigate(-1)}
-                    className="hover:text-accent mt-0.5 text-2xl leading-none text-white transition-colors focus:outline-none"
+                    className="hover:text-accent mt-0.5 text-3xl leading-none text-white font-icons icon transition-colors focus:outline-none"
                     aria-label="Go back"
                   >
-                    ←
+                    D
                   </button>
                 )}
                 <div className="flex flex-col gap-0">
@@ -198,10 +198,10 @@ const RecipeDetail = () => {
                 {isOwner && (
                   <Popover className="max-sm:static sm:relative">
                     <PopoverButton
-                      className="bg-grey hover:bg-lightGrey text-dark flex h-8 w-8 items-center justify-center px-0 text-lg font-bold transition-colors"
+                      className="bg-grey hover:bg-lightGrey text-dark flex h-8 w-8 items-center justify-center px-0 text-lg font-icons icon transition-colors"
                       aria-label="Options"
                     >
-                      ⋮
+                      Z
                     </PopoverButton>
                     <PopoverPanel className="bg-dark border-grey absolute top-full z-10 mt-2 flex w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col gap-2 border p-2 shadow-lg max-sm:right-0 max-sm:left-0 max-sm:mx-auto sm:right-0 sm:w-32">
                       <Link

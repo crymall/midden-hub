@@ -71,9 +71,10 @@ const ListView = () => {
           </p>
           <Link
             to="/my-lists"
+            state={!hasHistory ? { hideBack: true } : null}
             className="text-accent font-bold hover:underline"
           >
-            ← Back to My Lists
+            <span className={"font-icons icon"}>D</span> Back to My Lists
           </Link>
         </div>
       </MiddenCard>
@@ -84,29 +85,28 @@ const ListView = () => {
     <MiddenCard>
       <div className="mb-6">
         <div className="flex items-center gap-4">
-          {hasHistory && (
+          {hasHistory ? (
             <button
               onClick={() => navigate(-1)}
-              className="text-white hover:text-accent text-3xl leading-none transition-colors focus:outline-none"
+              className="text-white hover:text-accent text-3xl font-icons icon leading-none transition-colors focus:outline-none"
               aria-label="Go back"
             >
-              ←
+              D
             </button>
+          ) : (
+            <Link
+              to="/my-lists"
+              state={{ hideBack: true }}
+              className="text-white hover:text-accent text-3xl font-icons icon leading-none transition-colors focus:outline-none"
+              aria-label="Go back to My Lists"
+            >
+              D
+            </Link>
           )}
           <h2 className="font-gothic text-4xl font-bold text-white">
             {currentList?.name || "Loading List..."}
           </h2>
         </div>
-        {!hasHistory && (
-          <div className="mt-2 flex flex-col gap-2">
-            <Link
-              to="/my-lists"
-              className="text-lightGrey hover:text-white font-mono text-sm transition-colors"
-            >
-              ← Back to My Lists
-            </Link>
-          </div>
-        )}
       </div>
 
       <RecipeList

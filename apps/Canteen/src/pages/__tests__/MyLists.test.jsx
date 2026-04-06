@@ -160,4 +160,15 @@ describe("MyLists", () => {
     await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
     expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
   });
+
+  it("does not render back button if navigated with hideBack state", async () => {
+    render(
+      <MemoryRouter initialEntries={["/lists/1", { pathname: "/my-lists", state: { hideBack: true } }]} initialIndex={1}>
+        <MyLists />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
+  });
 });

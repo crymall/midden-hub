@@ -30,7 +30,7 @@ const PaginationControls = ({
           onClick={() => onPageChange(page - 1)}
           className="hover:text-lightestGrey text-xl font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
-          ← Prev
+          <span className="font-icons icon">D</span> Prev
         </Button>
         <span className="text-lightestGrey font-mono">Page {page}</span>
         <Button
@@ -38,7 +38,7 @@ const PaginationControls = ({
           onClick={() => onPageChange(page + 1)}
           className="hover:text-lightestGrey text-xl font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Next →
+          Next <span className="font-icons icon">B</span>
         </Button>
       </div>
     </div>

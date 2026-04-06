@@ -72,7 +72,7 @@ const RecipeFilter = ({ onFilter }) => {
                     ? "Select tags..."
                     : `${selectedTags.length} tag${selectedTags.length !== 1 ? "s" : ""} selected`}
                 </span>
-                <span className="ml-2">▼</span>
+                <span className="ml-2 font-icons icon">C</span>
               </PopoverButton>
               <PopoverPanel className="bg-dark border-grey absolute z-10 mt-1 max-h-60 w-full overflow-auto border p-2 shadow-xl">
                 <div className="flex flex-col gap-2">

@@ -14,7 +14,7 @@ const MyLists = () => {
   const { userLists, getUserLists, canteenApi } = useData();
   const navigate = useNavigate();
   const location = useLocation();
-  const hasHistory = location.key !== "default";
+  const hasHistory = location.key !== "default" && !location.state?.hideBack;
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [creatingList, setCreatingList] = useState(false);
   const [fetchingLists, setFetchingLists] = useState(userLists.length === 0);
@@ -91,10 +91,10 @@ const MyLists = () => {
           {hasHistory && (
             <button
               onClick={() => navigate(-1)}
-              className="text-white hover:text-accent text-3xl leading-none transition-colors focus:outline-none"
+              className="text-white hover:text-accent text-3xl font-icons icon leading-none transition-colors focus:outline-none"
               aria-label="Go back"
             >
-              ←
+              D
             </button>
           )}
           <h2 className="font-gothic text-4xl font-bold text-white">My Lists</h2>

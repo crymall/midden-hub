@@ -20,13 +20,13 @@ describe("PaginationControls", () => {
 
   it("calls onPageChange with correct value when Prev is clicked", () => {
     render(<PaginationControls {...defaultProps} />);
-    fireEvent.click(screen.getByText("← Prev"));
+    fireEvent.click(screen.getByText("Prev"));
     expect(defaultProps.onPageChange).toHaveBeenCalledWith(1);
   });
 
   it("calls onPageChange with correct value when Next is clicked", () => {
     render(<PaginationControls {...defaultProps} />);
-    fireEvent.click(screen.getByText("Next →"));
+    fireEvent.click(screen.getByText("Next"));
     expect(defaultProps.onPageChange).toHaveBeenCalledWith(3);
   });
 
@@ -38,18 +38,18 @@ describe("PaginationControls", () => {
 
   it("disables Prev button on page 1", () => {
     render(<PaginationControls {...defaultProps} page={1} />);
-    expect(screen.getByText("← Prev")).toBeDisabled();
+    expect(screen.getByText("Prev")).toBeDisabled();
   });
 
   it("disables Next button when isNextDisabled is true", () => {
     render(<PaginationControls {...defaultProps} isNextDisabled={true} />);
-    expect(screen.getByText("Next →")).toBeDisabled();
+    expect(screen.getByText("Next")).toBeDisabled();
   });
 
   it("disables buttons when loading", () => {
     render(<PaginationControls {...defaultProps} loading={true} />);
-    expect(screen.getByText("← Prev")).toBeDisabled();
-    expect(screen.getByText("Next →")).toBeDisabled();
+    expect(screen.getByText("Prev")).toBeDisabled();
+    expect(screen.getByText("Next")).toBeDisabled();
   });
 
   it("resets page to 1 when limit changes (logic handled by parent usually, but verifying event)", () => {

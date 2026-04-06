@@ -17,7 +17,7 @@ const AppCard = ({ to, symbol, label, description }) => {
   const isExternal = to.startsWith("http");
 
   const wrapperClass = clsx(
-    "relative group text-white",
+    "relative group text-white hover:text-lightestGrey transition-all",
     "w-full flex flex-col bg-white/5 sm:bg-transparent",
     "sm:aspect-square sm:flex-col sm:items-center sm:justify-center sm:hover:bg-opacity-90 sm:hover:z-50",
     "sm:w-30 md:w-46",
@@ -29,7 +29,7 @@ const AppCard = ({ to, symbol, label, description }) => {
   );
 
   const symbolClass = clsx(
-    "text-3xl mr-6",
+    "text-3xl font-icons icon mr-6 text-shadow-hard-grey",
     "sm:mr-0 sm:text-4xl sm:mb-2",
     "md:text-5xl",
   );
@@ -96,7 +96,7 @@ const AppCard = ({ to, symbol, label, description }) => {
             isExpanded ? "Collapse description" : "Expand description"
           }
         >
-          <span className="text-xl">{isExpanded ? "▲" : "▼"}</span>
+          <span className="text-xl font-icons icon">{isExpanded ? "A" : "C"}</span>
         </button>
       )}
       </div>

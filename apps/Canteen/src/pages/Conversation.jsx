@@ -81,9 +81,9 @@ const Conversation = () => {
       <div className="border-grey bg-primary/10 flex items-center gap-4 border-b p-4">
         <Link
           to="/messages"
-          className="text-white hover:text-accent text-xl transition-colors"
+          className="text-white hover:text-accent font-icons icon text-2xl transition-colors"
         >
-          ←
+          D
         </Link>
         <h3 className="font-mono text-lg font-bold text-white">
           {otherUser?.username || "Chat"}

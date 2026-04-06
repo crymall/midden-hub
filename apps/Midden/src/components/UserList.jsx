@@ -70,7 +70,7 @@ const UserList = () => {
                 </td>
                 <td className="px-4 py-3 text-sm whitespace-nowrap">
                   <Button
-                    className="border border-red-800 bg-red-950 px-2 py-1 text-base transition-colors hover:bg-red-900 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="border border-red-800 bg-red-950 px-2 py-1 text-base font-icons transition-colors hover:bg-red-900 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={isDisabled}
                     aria-label="Delete User"
                     onClick={() => {
@@ -83,7 +83,7 @@ const UserList = () => {
                       }
                     }}
                   >
-                    ❌
+                    S
                   </Button>
                 </td>
               </tr>

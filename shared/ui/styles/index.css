@@ -6,19 +6,31 @@
 @source "../../../apps/Canteen/src";
 
 @font-face {
-  font-family: 'Jacquard 12';
-  src: url('../assets/fonts/Jacquard12-Regular.ttf') format('truetype');
+  font-family: "Jacquard 12";
+  src: url("../assets/fonts/Jacquard12-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: none;
+}
+
+@font-face {
+  font-family: "Libertinus Mono";
+  src: url("../assets/fonts/LibertinusMono-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Libertinus Mono';
-  src: url('../assets/fonts/LibertinusMono-Regular.ttf') format('truetype');
+  font-family: "Midden Icons";
+  src: url("../assets/fonts/MiddenIcons.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: none;
 }
 
 @theme {
@@ -31,6 +43,7 @@
 
   --font-mono: "Libertinus Mono", monospace;
   --font-gothic: "Jacquard 12", cursive;
+  --font-icons: "Midden Icons", monospace;
 }
 
 @layer base {
@@ -48,32 +61,23 @@
   }
 }
 
-@layer utilities {
-  .text-shadow-hard-dark {
-    text-shadow: 2px 2px 0 #060a08;
-  }
+@utility icon {
+  --tw-leading: 1;
+  line-height: 1;
+}
 
-  .text-shadow-hard-grey {
-    text-shadow: 2px 2px 0 #7d7e75;
-  }
+@utility text-shadow-hard-dark {
+  text-shadow: 2px 2px 0 #060a08;
+}
 
-  .text-shadow-hard-lightGrey {
-    text-shadow: 2px 2px 0 #b0b2b8;
-  }
+@utility text-shadow-hard-grey {
+  text-shadow: 2px 2px 0 #7d7e75;
+}
 
-  .text-shadow-hard-lightestGrey {
-    text-shadow: 2px 2px 0 #cfd6ea;
-  }
+@utility text-shadow-hard-lightGrey {
+  text-shadow: 2px 2px 0 #b0b2b8;
+}
 
-  .text-shadow-hard-primary {
-    text-shadow: 2px 2px 0 #210130;
-  }
-
-  .text-shadow-hard-accent {
-    text-shadow: 2px 2px 0 #02290a;
-  }
-
-  .text-shadow-hard-accent {
-    text-shadow: 2px 2px 0 #02290a;
-  }
+@utility text-shadow-hard-lightestGrey {
+  text-shadow: 2px 2px 0 #cfd6ea;
 }

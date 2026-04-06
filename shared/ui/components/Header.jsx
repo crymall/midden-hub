@@ -47,9 +47,10 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
         <Button
           onClick={() => navigate("/settings")}
           aria-label="Settings"
-          className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
+          title="Settings"
+          className="bg-grey hover:bg-lightGrey font-icons text-dark text-shadow-hard-lightGrey hover:text-shadow-hard-grey icon px-3 py-1.5 pt-2 text-2xl transition-all"
         >
-          🛠
+          T
         </Button>
       )}
       <Button
@@ -57,9 +58,10 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
           logout();
         }}
         aria-label="Logout"
-        className="bg-grey hover:bg-lightGrey text-dark px-3 py-1 text-2xl transition-colors"
+        title="Logout"
+        className="bg-grey hover:bg-lightGrey font-icons text-dark icon px-2 pr-3 pb-0.5 pt-1.5 text-3xl tracking-tighter text-shadow-hard-lightGrey hover:text-shadow-hard-grey transition-all"
       >
-        🚪→
+        uJ
       </Button>
     </>
   );
@@ -75,7 +77,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
 
         <h1
           onClick={() => navigate(titleLink)}
-          className="font-gothic hover:text-lightestGrey text-shadow-hard-grey cursor-pointer text-3xl tracking-wide text-white transition-colors text-shadow-lg sm:text-5xl"
+          className="font-gothic hover:text-lightestGrey text-shadow-hard-grey cursor-pointer text-3xl tracking-wide text-white transition-colors sm:text-5xl"
         >
           {title}
         </h1>
