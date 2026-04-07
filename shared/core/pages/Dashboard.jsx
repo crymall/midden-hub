@@ -1,6 +1,6 @@
 import { useLayoutEffect, Suspense } from "react";
 import { Outlet } from "react-router-dom";
-import useAuth from "../context/auth/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import Header from "../../ui/components/Header";
 import Loading from "../../ui/components/Loading";
 

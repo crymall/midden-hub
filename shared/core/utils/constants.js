@@ -1,7 +1,6 @@
 export const ROLES = {
   Admin: 1,
-  Editor: 2,
-  Viewer: 3,
+  Editor: 2
 };
 
 export const PERMISSIONS = {

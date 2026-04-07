@@ -4,9 +4,11 @@ import { MemoryRouter } from "react-router-dom";
 import RecipeSearch from "../RecipeSearch";
 import useData from "@shared/core/context/data/useData";
 import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth as useHooksAuth } from "@shared/core/hooks/useAuth";
 
 vi.mock("@shared/core/context/data/useData");
 vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
   default: ({ children }) => <div data-testid="midden-card">{children}</div>,
@@ -75,6 +77,7 @@ describe("RecipeSearch", () => {
       setRecipesCacheInvalid: vi.fn(),
     });
     useAuth.mockReturnValue({ user: { permissions: [] } });
+    useHooksAuth.mockReturnValue({ user: { permissions: [] } });
   });
 
   it("fetches recipes on mount if cache is empty", () => {
@@ -204,6 +207,7 @@ describe("RecipeSearch", () => {
 
   it("renders create button when user has permission", () => {
     useAuth.mockReturnValue({ user: { permissions: ["write_data"] } });
+    useHooksAuth.mockReturnValue({ user: { permissions: ["write_data"] } });
     render(
       <MemoryRouter>
         <RecipeSearch />
@@ -220,6 +224,7 @@ describe("RecipeSearch", () => {
 
   it("does not render create button when user lacks permission", () => {
     useAuth.mockReturnValue({ user: { permissions: [] } });
+    useHooksAuth.mockReturnValue({ user: { permissions: [] } });
     render(
       <MemoryRouter>
         <RecipeSearch />

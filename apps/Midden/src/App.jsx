@@ -1,7 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import AuthProvider from "@shared/core/context/auth/AuthProvider";
-import DataProvider from "@shared/core/context/data/DataProvider";
 import Dashboard from "@shared/core/pages/Dashboard";
 import RequireNotGuest from "@shared/core/gateways/RequireNotGuest";
 import { navMeta } from "@shared/core/utils/constants";
@@ -17,25 +15,21 @@ const About = lazy(() => import("./pages/About"));
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <DataProvider>
-          <Suspense fallback={<Loading />}>
-            <Routes>
-              <Route path="/login" element={<Login />} />
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
 
-              <Route path="/" element={<Dashboard navMeta={navMeta.midden} />}>
-                <Route index element={<Explorer />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/experiments" element={<Experiments />} />
-                <Route element={<RequireNotGuest />}>
-                  <Route path="/settings" element={<Settings />} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </DataProvider>
-      </AuthProvider>
+          <Route path="/" element={<Dashboard navMeta={navMeta.midden} />}>
+            <Route index element={<Explorer />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/experiments" element={<Experiments />} />
+            <Route element={<RequireNotGuest />}>
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

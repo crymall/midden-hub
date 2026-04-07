@@ -1,15 +1,24 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import Can from "../Can";
-import useAuth from "../../context/auth/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import { PERMISSIONS } from "../../utils/constants";
 
-vi.mock("../../context/auth/useAuth");
+vi.mock("../../hooks/useAuth");
 
 describe("Can Gateway", () => {
+  it("renders loading component when isLoading is true", () => {
+    useAuth.mockReturnValue({ isLoading: true, user: null });
+
+    render(<Can perform={PERMISSIONS.writeUsers}>Content</Can>);
+    
+    expect(screen.getByText("Verifying permissions...")).toBeInTheDocument();
+  });
+
   it("renders children if user has permission", () => {
     useAuth.mockReturnValue({
       user: { permissions: [PERMISSIONS.writeUsers] },
+      isLoading: false,
     });
 
     render(
@@ -23,6 +32,7 @@ describe("Can Gateway", () => {
   it("does not render children if user lacks permission", () => {
     useAuth.mockReturnValue({
       user: { permissions: [] },
+      isLoading: false,
     });
 
     render(
@@ -34,7 +44,7 @@ describe("Can Gateway", () => {
   });
 
   it("returns null if no user is logged in", () => {
-    useAuth.mockReturnValue({ user: null });
+    useAuth.mockReturnValue({ user: null, isLoading: false });
     const { container } = render(<Can perform="any">Content</Can>);
     expect(container).toBeEmptyDOMElement();
   });

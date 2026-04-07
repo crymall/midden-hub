@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import App from "../App";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
 
 vi.mock("@shared/core/context/auth/AuthProvider", () => ({
   default: ({ children }) => <>{children}</>,
@@ -10,7 +10,7 @@ vi.mock("@shared/core/context/data/DataProvider", () => ({
   default: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/core/pages/Login", () => ({ default: () => <div>Login Page</div> }));
 vi.mock("@shared/core/pages/NotFound", () => ({ default: () => <div>NotFound Page</div> }));

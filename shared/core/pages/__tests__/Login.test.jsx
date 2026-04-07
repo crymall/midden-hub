@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Login from "../Login";
-import useAuth from "../../context/auth/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 
-vi.mock("../../context/auth/useAuth");
+vi.mock("../../hooks/useAuth");
 
 describe("Login Component", () => {
   const mockLogin = vi.fn();
@@ -66,7 +66,7 @@ describe("Login Component", () => {
     await user.type(screen.getByLabelText(/password/i), "password123");
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
-    expect(mockLogin).toHaveBeenCalledWith("testuser", "password123");
+    expect(mockLogin).toHaveBeenCalledWith({ username: "testuser", password: "password123" });
   });
 
   it("transitions to 2FA mode when login requires it", async () => {
@@ -112,7 +112,7 @@ describe("Login Component", () => {
     await user.click(screen.getByLabelText(/remember this device/i));
     await user.click(screen.getByRole("button", { name: /^verify$/i }));
 
-    expect(mockVerifyLogin).toHaveBeenCalledWith("123", "123456", true);
+    expect(mockVerifyLogin).toHaveBeenCalledWith({ userId: "123", code: "123456", rememberMe: true });
   });
 
   it("submits 2FA code with rememberMe unchecked by default", async () => {
@@ -136,7 +136,7 @@ describe("Login Component", () => {
     await user.type(screen.getByLabelText(/verification code/i), "123456");
     await user.click(screen.getByRole("button", { name: /^verify$/i }));
 
-    expect(mockVerifyLogin).toHaveBeenCalledWith("123", "123456", false);
+    expect(mockVerifyLogin).toHaveBeenCalledWith({ userId: "123", code: "123456", rememberMe: false });
   });
 
   it("displays error message on login failure", async () => {

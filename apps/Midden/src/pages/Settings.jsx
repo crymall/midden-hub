@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   Tab,
   TabGroup,
@@ -9,27 +8,32 @@ import {
   Label,
   Input,
 } from "@headlessui/react";
-import useAuth from "@shared/core/context/auth/useAuth";
-import useData from "@shared/core/context/data/useData";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@shared/core/hooks/useAuth";
 import UserList from "../components/UserList";
 import Can from "@shared/core/gateways/Can";
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import { PERMISSIONS } from "@shared/core/utils/constants";
+import { fetchUsers, fetchUser } from "@shared/core/services/iamApi";
 
 const Settings = () => {
   const { user } = useAuth();
-  const { fetchUsers, getAuthedUserDetails, authedUserDetails } = useData();
   const { writeUsers } = PERMISSIONS;
 
+  const { data: users, isLoading: usersLoading } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => fetchUsers(),
+    enabled: !!user && user.permissions?.includes(writeUsers),
+  });
 
-  useEffect(() => {
-    if (user) {
-      getAuthedUserDetails(user.id);
-      if (user.permissions.includes(writeUsers)) {
-        fetchUsers();
-      }
-    }
-  }, [user, getAuthedUserDetails, fetchUsers, writeUsers]);
+  const { data: userEmail } = useQuery({
+    queryKey: ["userEmail", user?.id],
+    queryFn: async () => {
+      const { user: completeLoggedInUser } = await fetchUser(user.id);
+      return completeLoggedInUser.email;
+    },
+    enabled: !!user?.id,
+  });
 
 
   return (
@@ -70,7 +74,7 @@ const Settings = () => {
                   Email
                 </Label>
                 <Input
-                  value={authedUserDetails?.user?.email || ""}
+                value={userEmail || ""}
                   readOnly
                   className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
                 />
@@ -83,7 +87,7 @@ const Settings = () => {
               <h2 className="mb-4 font-mono text-xl font-bold text-white">
                 User Admin
               </h2>
-              <UserList />
+              <UserList users={users} isLoading={usersLoading} />
             </TabPanel>
           </Can>
         </TabPanels>

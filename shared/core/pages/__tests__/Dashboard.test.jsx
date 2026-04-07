@@ -3,10 +3,10 @@ import { lazy } from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import Dashboard from "../Dashboard";
-import useAuth from "../../context/auth/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import { navMeta } from "../../utils/constants";
 
-vi.mock("../../context/auth/useAuth");
+vi.mock("../../hooks/useAuth");
 
 describe("Dashboard Component", () => {
   it("renders the header with user information", () => {
