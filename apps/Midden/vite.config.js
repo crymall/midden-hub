@@ -1,30 +1,30 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
-  publicDir: path.resolve(__dirname, '../../shared/ui/assets'),
+  publicDir: path.resolve(__dirname, "../../shared/ui/assets"),
   resolve: {
     alias: {
-      '@shared/core': path.resolve(__dirname, '../../shared/core'),
-      '@shared/ui': path.resolve(__dirname, '../../shared/ui'),
+      "@shared/core": path.resolve(__dirname, "../../shared/core"),
+      "@shared/ui": path.resolve(__dirname, "../../shared/ui"),
     },
   },
   server: {
-      proxy: {
-        '^/iam(/|$)': {
-          target: 'http://localhost:3000',
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path.replace(/^\/iam/, ''),
-        },
-        '^/canteen(/|$)': {
-          target: 'http://localhost:3001',
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path.replace(/^\/canteen/, ''),
-        },
+    proxy: {
+      "^/iam(/|$)": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/iam/, ""),
+      },
+      "^/canteen(/|$)": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/canteen/, ""),
       },
     },
+  },
 });

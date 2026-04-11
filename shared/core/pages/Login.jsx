@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Field, Input, Label } from "@headlessui/react";
-import useAuth from "../context/auth/useAuth";
+
+import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const [mode, setMode] = useState("login");
@@ -25,7 +26,7 @@ export default function Login() {
       switch (mode) {
         case "login":
           {
-            const data = await login(username, password);
+            const data = await login({ username, password });
             if (data.token) return;
             setUserId(data.userId);
             setInfo(data.message || "Enter the code sent to your email.");
@@ -33,10 +34,10 @@ export default function Login() {
           }
           break;
         case "2fa":
-          await verifyLogin(userId, code, rememberMe);
+          await verifyLogin({ userId, code, rememberMe });
           break;
         case "register":
-          await register(username, email, password);
+          await register({ username, email, password });
           setInfo("Registration successful! Please log in.");
           setMode("login");
           setPassword("");
@@ -57,14 +58,9 @@ export default function Login() {
   };
 
   const headerText =
-    mode === "2fa"
-      ? "2-Factor Verification"
-      : mode === "register"
-        ? "Create Account"
-        : "Log In";
+    mode === "2fa" ? "2-Factor Verification" : mode === "register" ? "Create Account" : "Log In";
 
-  const submitButtonText =
-    mode === "2fa" ? "Verify" : mode === "register" ? "Register" : "Login";
+  const submitButtonText = mode === "2fa" ? "Verify" : mode === "register" ? "Register" : "Login";
 
   const pageInput = (label, type, placeholder, value, onInputChange) => (
     <Field>
@@ -145,8 +141,7 @@ export default function Login() {
             {mode === "register" &&
               pageButton("Already have an account? Login", () => setCleanMode("login"))}
 
-            {mode === "2fa" &&
-              pageButton("Back to Login", () => setCleanMode("login"))}
+            {mode === "2fa" && pageButton("Back to Login", () => setCleanMode("login"))}
 
             {mode === "login" && pageButton("Create Account", () => setCleanMode("register"))}
           </div>

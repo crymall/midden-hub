@@ -1,124 +1,116 @@
-import { useEffect, useState, useRef } from "react";
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import {
+  createList,
+  fetchFollowers,
+  fetchRelationshipCounts,
+  fetchUser,
+  fetchUserLists,
+  fetchUserRecipes,
+  followUser,
+  unfollowUser,
+} from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
-import RecipeList from "../components/RecipeList";
+import CreateListModal from "../components/CreateListModal";
 import ListList from "../components/ListList";
 import PaginationControls from "../components/PaginationControls";
-import CreateListModal from "../components/CreateListModal";
+import RecipeList from "../components/RecipeList";
 
 const UserProfile = () => {
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user: currentUser } = useAuth();
-  const {
-    canteenApi,
-    getUserProfileRecipes,
-    userProfileRecipes,
-    getUserLists,
-    userLists,
-    recipesLoading,
-    relationshipCounts,
-    getRelationshipCounts,
-    followUser,
-    unfollowUser,
-    viewedUser,
-    viewedUserLoading,
-    getViewedUser,
-  } = useData();
+  const queryClient = useQueryClient();
   const activeTab = searchParams.get("tab") === "lists" ? "lists" : "recipes";
   const [isCreateListOpen, setIsCreateListOpen] = useState(false);
-  const [creatingList, setCreatingList] = useState(false);
-  const [fetchFailed, setFetchFailed] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
 
   const [recipePage, setRecipePage] = useState(1);
   const [recipeLimit, setRecipeLimit] = useState(20);
   const [listPage, setListPage] = useState(1);
   const [listLimit, setListLimit] = useState(20);
-  const [listsLoading, setListsLoading] = useState(false);
 
-  const fetchedRecipesRef = useRef(null);
-  const fetchedListsRef = useRef(null);
+  const {
+    data: viewedUser,
+    isLoading: viewedUserLoading,
+    isError: fetchFailed,
+  } = useQuery({
+    queryKey: ["user", id],
+    queryFn: () => fetchUser(id),
+    enabled: !!id,
+    retry: false,
+  });
 
-  useEffect(() => {
-    fetchedRecipesRef.current = null;
-    fetchedListsRef.current = null;
-    setRecipePage(1);
-    setListPage(1);
-  }, [id]);
+  const { data: relationshipCounts } = useQuery({
+    queryKey: ["relationshipCounts", id],
+    queryFn: () => fetchRelationshipCounts(id),
+    enabled: !!id,
+  });
 
-  useEffect(() => {
-    if (id) {
-      if (String(viewedUser?.id) !== String(id)) {
-        setFetchFailed(false);
-        getViewedUser(id).then((res) => {
-          if (!res) setFetchFailed(true);
-        });
-      }
-      getRelationshipCounts(id);
+  const { data: isFollowingCheck = [] } = useQuery({
+    queryKey: ["isFollowing", id, currentUser?.canteenId],
+    queryFn: () => fetchFollowers(id, 1, 0, currentUser?.canteenId),
+    enabled: !!id && !!currentUser && String(currentUser.canteenId) !== String(id),
+  });
+  const isFollowing = isFollowingCheck.length > 0;
 
-      if (currentUser && String(currentUser.canteenId) !== String(id)) {
-        canteenApi.fetchFollowers(id, 1, 0, currentUser.canteenId).then((res) => {
-          setIsFollowing(res?.length > 0);
-        }).catch(console.error);
-      }
-    }
-  }, [id, viewedUser?.id, getViewedUser, getRelationshipCounts, currentUser, canteenApi]);
+  const { data: userProfileRecipes = [], isLoading: recipesLoading } = useQuery({
+    queryKey: ["userProfileRecipes", id, { page: recipePage, limit: recipeLimit }],
+    queryFn: () => fetchUserRecipes(id, recipeLimit, (recipePage - 1) * recipeLimit),
+    enabled: !!id && activeTab === "recipes",
+  });
 
-  useEffect(() => {
-    if (id && activeTab === "recipes") {
-      if (fetchedRecipesRef.current === id && recipePage === 1) {
-        return;
-      }
-      getUserProfileRecipes(id, recipeLimit, (recipePage - 1) * recipeLimit);
-      fetchedRecipesRef.current = id;
-    }
-  }, [id, recipePage, recipeLimit, getUserProfileRecipes, activeTab]);
+  const { data: userLists = [], isLoading: listsLoading } = useQuery({
+    queryKey: ["userLists", id, { page: listPage, limit: listLimit }],
+    queryFn: () => fetchUserLists(id, listLimit, (listPage - 1) * listLimit),
+    enabled: !!id && activeTab === "lists",
+  });
 
-  useEffect(() => {
-    if (id && activeTab === "lists") {
-      if (fetchedListsRef.current === id && listPage === 1) {
-        return;
-      }
-      setListsLoading(true);
-      getUserLists(id, listLimit, (listPage - 1) * listLimit).finally(() => {
-        setListsLoading(false);
-        fetchedListsRef.current = id;
-      });
-    }
-  }, [id, listPage, listLimit, getUserLists, activeTab]);
-
-  const handleCreateList = async (name) => {
-    setCreatingList(true);
-    try {
-      await canteenApi.createList(name);
-      await getUserLists(id, listLimit, (listPage - 1) * listLimit);
+  const createListMutation = useMutation({
+    mutationFn: (name) => createList(name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userLists", id] });
+      queryClient.invalidateQueries({ queryKey: ["comboboxLists"] });
       setIsCreateListOpen(false);
       setSearchParams({ tab: "lists" });
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Failed to create list", error);
-    } finally {
-      setCreatingList(false);
-    }
+    },
+  });
+
+  const handleCreateList = (name) => {
+    createListMutation.mutate(name);
   };
 
   const isOwnProfile =
-    currentUser &&
-    viewedUser &&
-    String(currentUser.canteenId) === String(viewedUser.id);
+    currentUser && viewedUser && String(currentUser.canteenId) === String(viewedUser.id);
 
-  const handleFollowToggle = async () => {
-    if (isFollowing) {
-      await unfollowUser(id);
-      setIsFollowing(false);
-    } else {
-      await followUser(id);
-      setIsFollowing(true);
-    }
-    getRelationshipCounts(id);
+  const toggleFollowMutation = useMutation({
+    mutationFn: async () => {
+      if (isFollowing) {
+        await unfollowUser(id);
+      } else {
+        await followUser(id);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["isFollowing", id, currentUser?.canteenId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["relationshipCounts", id] });
+      queryClient.invalidateQueries({
+        queryKey: ["following", currentUser?.canteenId],
+      });
+    },
+  });
+
+  const handleFollowToggle = () => {
+    toggleFollowMutation.mutate();
   };
 
   const switchTab = (tab) => {
@@ -126,13 +118,11 @@ const UserProfile = () => {
     setSearchParams(newParams);
   };
 
-  if (viewedUserLoading || (String(viewedUser?.id) !== String(id) && !fetchFailed)) {
+  if (viewedUserLoading) {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
-          <p className="text-lightestGrey animate-pulse font-mono text-xl">
-            Loading profile...
-          </p>
+          <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading profile...</p>
         </div>
       </MiddenCard>
     );
@@ -191,10 +181,11 @@ const UserProfile = () => {
           {!isOwnProfile && currentUser && (
             <Button
               onClick={handleFollowToggle}
+              disabled={toggleFollowMutation.isPending}
               className={`px-3 py-1 text-sm font-bold transition-colors ${
                 isFollowing
                   ? "border-grey text-lightGrey hover:border-lightestGrey hover:text-white border bg-transparent"
-                  : "bg-accent hover:bg-accent/80 text-white"
+                  : "bg-accent hover:bg-accent/80 text-white disabled:opacity-50"
               }`}
             >
               {isFollowing ? "Unfollow" : "Follow"}
@@ -221,21 +212,13 @@ const UserProfile = () => {
       <div className="border-grey mb-6 flex border-b">
         <button
           onClick={() => switchTab("recipes")}
-          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${
-            activeTab === "recipes"
-              ? "border-accent text-accent border-b-2"
-              : "text-lightGrey hover:text-white"
-          }`}
+          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${activeTab === "recipes" ? "border-accent text-accent border-b-2" : "text-lightGrey hover:text-white"}`}
         >
           Recipes
         </button>
         <button
           onClick={() => switchTab("lists")}
-          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${
-            activeTab === "lists"
-              ? "border-accent text-accent border-b-2"
-              : "text-lightGrey hover:text-white"
-          }`}
+          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${activeTab === "lists" ? "border-accent text-accent border-b-2" : "text-lightGrey hover:text-white"}`}
         >
           Lists
         </button>
@@ -291,7 +274,7 @@ const UserProfile = () => {
         isOpen={isCreateListOpen}
         onClose={() => setIsCreateListOpen(false)}
         onCreate={handleCreateList}
-        loading={creatingList}
+        loading={createListMutation.isPending}
       />
     </MiddenCard>
   );

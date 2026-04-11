@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import MobileBurgerMenu from "../MobileBurgerMenu";
 
 const mockNavigate = vi.fn();
@@ -28,7 +29,7 @@ describe("MobileBurgerMenu Component", () => {
     render(
       <MemoryRouter>
         <MobileBurgerMenu {...defaultProps} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("≡")).toBeInTheDocument();
     expect(screen.queryByText("X")).not.toBeInTheDocument();
@@ -39,7 +40,7 @@ describe("MobileBurgerMenu Component", () => {
     render(
       <MemoryRouter>
         <MobileBurgerMenu {...defaultProps} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.click(screen.getByText("≡"));
@@ -51,7 +52,7 @@ describe("MobileBurgerMenu Component", () => {
     render(
       <MemoryRouter>
         <MobileBurgerMenu {...defaultProps} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.click(screen.getByText("≡"));
@@ -64,14 +65,12 @@ describe("MobileBurgerMenu Component", () => {
   });
 
   it("renders navigation links", async () => {
-    const navLinks = [
-      { to: "/test", label: "Test Link", ariaLabel: "Test" },
-    ];
+    const navLinks = [{ to: "/test", label: "Test Link", ariaLabel: "Test" }];
     const user = userEvent.setup();
     render(
       <MemoryRouter>
         <MobileBurgerMenu {...defaultProps} navLinks={navLinks} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.click(screen.getByText("≡"));
@@ -80,13 +79,17 @@ describe("MobileBurgerMenu Component", () => {
 
   it("renders restricted link when permission is allowed", async () => {
     const navLinks = [
-      { to: "/restricted", label: "Restricted Link", requiredPermission: "allowed" },
+      {
+        to: "/restricted",
+        label: "Restricted Link",
+        requiredPermission: "allowed",
+      },
     ];
     const user = userEvent.setup();
     render(
       <MemoryRouter>
         <MobileBurgerMenu {...defaultProps} navLinks={navLinks} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.click(screen.getByText("≡"));
@@ -95,13 +98,17 @@ describe("MobileBurgerMenu Component", () => {
 
   it("does not render restricted link when permission is denied", async () => {
     const navLinks = [
-      { to: "/restricted", label: "Restricted Link", requiredPermission: "denied" },
+      {
+        to: "/restricted",
+        label: "Restricted Link",
+        requiredPermission: "denied",
+      },
     ];
     const user = userEvent.setup();
     render(
       <MemoryRouter>
         <MobileBurgerMenu {...defaultProps} navLinks={navLinks} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.click(screen.getByText("≡"));
@@ -110,14 +117,12 @@ describe("MobileBurgerMenu Component", () => {
   });
 
   it("closes the menu after navigation", async () => {
-    const navLinks = [
-      { to: "/destination", label: "Go There", ariaLabel: "Go There" },
-    ];
+    const navLinks = [{ to: "/destination", label: "Go There", ariaLabel: "Go There" }];
     const user = userEvent.setup();
     render(
       <MemoryRouter initialEntries={["/"]}>
         <MobileBurgerMenu {...defaultProps} navLinks={navLinks} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.click(screen.getByText("≡"));

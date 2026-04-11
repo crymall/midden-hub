@@ -1,64 +1,78 @@
-import { useEffect, useEffectEvent, useState } from "react";
-import { useSearchParams, Link, useParams, Navigate } from "react-router-dom";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useState } from "react";
+import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import {
+  fetchFollowers,
+  fetchFollowing,
+  fetchRelationshipCounts,
+  followUser,
+  unfollowUser,
+} from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import CanteenUserList from "../components/CanteenUserList";
 
 const FollowerFollowingLists = () => {
   const { user } = useAuth();
-  const { 
-    followers, 
-    following, 
-    getFollowers, 
-    getFollowing, 
-    relationshipCounts,
-    getRelationshipCounts,
-    followUser, 
-    unfollowUser 
-  } = useData();
-  
   const { id } = useParams();
+
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const activeTab = searchParams.get("tab") === "following" ? "following" : "followers";
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
-  
-  const setLoadingEffect = useEffectEvent(() => {
-    setLoading(true);
+
+  const followersLimit = activeTab === "followers" ? limit : 50;
+  const followersOffset = activeTab === "followers" ? (page - 1) * limit : 0;
+  const followingLimit = activeTab === "following" ? limit : 50;
+  const followingOffset = activeTab === "following" ? (page - 1) * limit : 0;
+
+  const { data: followers = [], isLoading: followersLoading } = useQuery({
+    queryKey: ["followers", user?.canteenId, { limit: followersLimit, offset: followersOffset }],
+    queryFn: () => fetchFollowers(user.canteenId, followersLimit, followersOffset),
+    enabled: !!user,
   });
 
-  useEffect(() => {
-    if (user) {
-      setLoadingEffect();
-      
-      const followersLimit = activeTab === "followers" ? limit : 50;
-      const followersOffset = activeTab === "followers" ? (page - 1) * limit : 0;
-      const followingLimit = activeTab === "following" ? limit : 50;
-      const followingOffset = activeTab === "following" ? (page - 1) * limit : 0;
+  const { data: following = [], isLoading: followingLoading } = useQuery({
+    queryKey: ["following", user?.canteenId, { limit: followingLimit, offset: followingOffset }],
+    queryFn: () => fetchFollowing(user.canteenId, followingLimit, followingOffset),
+    enabled: !!user,
+  });
 
-      Promise.all([
-        getFollowers(user.canteenId, followersLimit, followersOffset),
-        getFollowing(user.canteenId, followingLimit, followingOffset),
-        getRelationshipCounts(user.canteenId)
-      ]).finally(() => setLoading(false));
-    }
-  }, [user, activeTab, page, limit, getFollowers, getFollowing, getRelationshipCounts]);
+  const { data: relationshipCounts } = useQuery({
+    queryKey: ["relationshipCounts", user?.canteenId],
+    queryFn: () => fetchRelationshipCounts(user.canteenId),
+    enabled: !!user,
+  });
 
-  const handleFollowToggle = async (targetUserId, isFollowing) => {
-    if (isFollowing) {
-      await unfollowUser(targetUserId);
-    } else {
-      await followUser(targetUserId);
-    }
-    
-    if (user) {
-      getFollowing(user.canteenId, limit, 0);
-      getFollowers(user.canteenId, limit, 0);
-      getRelationshipCounts(user.canteenId);
-    }
+  const loading = followersLoading || followingLoading;
+
+  const { mutate: mutateToggleFollow } = useMutation({
+    mutationFn: async ({ targetUserId, isFollowing }) => {
+      if (isFollowing) {
+        await unfollowUser(targetUserId);
+      } else {
+        await followUser(targetUserId);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["following", user?.canteenId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["followers", user?.canteenId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["relationshipCounts", user?.canteenId],
+      });
+    },
+  });
+
+  const handleFollowToggle = (targetUserId, isFollowing) => {
+    mutateToggleFollow({ targetUserId, isFollowing });
   };
 
   const switchTab = (tab) => {
@@ -92,21 +106,13 @@ const FollowerFollowingLists = () => {
       <div className="border-grey mb-6 flex border-b">
         <button
           onClick={() => switchTab("followers")}
-          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${
-            activeTab === "followers"
-              ? "border-accent text-accent border-b-2"
-              : "text-lightGrey hover:text-white"
-          }`}
+          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${activeTab === "followers" ? "border-accent text-accent border-b-2" : "text-lightGrey hover:text-white"}`}
         >
           Followers ({relationshipCounts?.followers || 0})
         </button>
         <button
           onClick={() => switchTab("following")}
-          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${
-            activeTab === "following"
-              ? "border-accent text-accent border-b-2"
-              : "text-lightGrey hover:text-white"
-          }`}
+          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${activeTab === "following" ? "border-accent text-accent border-b-2" : "text-lightGrey hover:text-white"}`}
         >
           Following ({relationshipCounts?.following || 0})
         </button>

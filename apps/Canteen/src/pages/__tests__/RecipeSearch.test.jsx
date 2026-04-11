@@ -1,12 +1,15 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import RecipeSearch from "../RecipeSearch";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@shared/core/context/data/useData");
-vi.mock("@shared/core/context/auth/useAuth");
+import { useAuth } from "@shared/core/hooks/useAuth";
+import * as canteenApi from "@shared/core/services/canteenApi";
+
+import RecipeSearch from "../RecipeSearch";
+
+vi.mock("@shared/core/services/canteenApi");
+vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
   default: ({ children }) => <div data-testid="midden-card">{children}</div>,
@@ -26,24 +29,14 @@ vi.mock("../../components/RecipeList", () => ({
 
 vi.mock("../../components/RecipeFilter", () => ({
   default: ({ onFilter }) => (
-    <button
-      data-testid="filter-btn"
-      onClick={() => onFilter({ title: "Test Filter" })}
-    >
+    <button data-testid="filter-btn" onClick={() => onFilter({ title: "Test Filter" })}>
       Apply Filter
     </button>
   ),
 }));
 
 vi.mock("../../components/PaginationControls", () => ({
-  default: ({
-    page,
-    limit,
-    onPageChange,
-    onLimitChange,
-    loading,
-    isNextDisabled,
-  }) => (
+  default: ({ page, limit, onPageChange, onLimitChange, loading, isNextDisabled }) => (
     <div data-testid="pagination-controls">
       <span data-testid="page-val">{page}</span>
       <span data-testid="limit-val">{limit}</span>
@@ -63,207 +56,159 @@ vi.mock("@shared/core/utils/constants", () => ({
 }));
 
 describe("RecipeSearch", () => {
-  const mockGetRecipes = vi.fn();
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useData.mockReturnValue({
-      recipes: [],
-      recipesLoading: false,
-      getRecipes: mockGetRecipes,
-      recipesCacheInvalid: false,
-      setRecipesCacheInvalid: vi.fn(),
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
     });
+    canteenApi.fetchRecipes.mockResolvedValue([]);
     useAuth.mockReturnValue({ user: { permissions: [] } });
   });
 
-  it("fetches recipes on mount if cache is empty", () => {
+  const renderComponent = () =>
     render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
-    );
-    expect(mockGetRecipes).toHaveBeenCalledWith(20, 0, {});
-  });
-
-  it("does not fetch recipes on mount if cache exists", () => {
-    useData.mockReturnValue({
-      recipes: [{ id: 1, title: "Cached Recipe" }],
-      recipesLoading: false,
-      getRecipes: mockGetRecipes,
-      recipesCacheInvalid: false,
-    });
-
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
-    );
-    expect(mockGetRecipes).not.toHaveBeenCalled();
-  });
-
-  it("fetches recipes on mount if cache exists but recipesCacheInvalid is true", () => {
-    const mockSetRecipesCacheInvalid = vi.fn();
-    useData.mockReturnValue({
-      recipes: [{ id: 1, title: "Cached Recipe" }],
-      recipesLoading: false,
-      getRecipes: mockGetRecipes,
-      recipesCacheInvalid: true,
-      setRecipesCacheInvalid: mockSetRecipesCacheInvalid,
-    });
-
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
-    );
-    expect(mockGetRecipes).toHaveBeenCalledWith(20, 0, {});
-    expect(mockSetRecipesCacheInvalid).toHaveBeenCalledWith(false);
-  });
-
-  it("handles pagination interactions", () => {
-    useData.mockReturnValue({
-      recipes: Array.from({ length: 20 }, (_, i) => ({ id: i + 1 })),
-      recipesLoading: false,
-      getRecipes: mockGetRecipes,
-    });
-
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <RecipeSearch />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
 
-    expect(screen.getByTestId("page-val")).toHaveTextContent("1");
-
-    fireEvent.click(screen.getByText("Next"));
-    expect(mockGetRecipes).toHaveBeenCalledWith(20, 20, {});
-    expect(screen.getByTestId("page-val")).toHaveTextContent("2");
-
-    fireEvent.click(screen.getByText("Prev"));
-    expect(mockGetRecipes).toHaveBeenCalledWith(20, 0, {});
-    expect(screen.getByTestId("page-val")).toHaveTextContent("1");
-  });
-
-  it("handles limit change", () => {
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
-    );
-
-    const input = screen.getByTestId("limit-input");
-    fireEvent.change(input, { target: { value: "50" } });
-    expect(mockGetRecipes).toHaveBeenCalledWith(50, 0, {});
-  });
-
-  it("handles filter application", () => {
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
-    );
-
-    const filterBtn = screen.getByTestId("filter-btn");
-    fireEvent.click(filterBtn);
-
-    expect(mockGetRecipes).toHaveBeenCalledWith(20, 0, {
-      title: "Test Filter",
+  it("fetches recipes on mount", async () => {
+    renderComponent();
+    await waitFor(() => {
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        20,
+        0,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
     });
   });
 
-  it("passes correct disabled state to pagination controls", () => {
-    useData.mockReturnValue({
-      recipes: Array.from({ length: 10 }, (_, i) => ({ id: i + 1 })), // 10 < 20 (default limit for pagination)
-      recipesLoading: false,
-      getRecipes: mockGetRecipes,
+  it("handles pagination interactions", async () => {
+    canteenApi.fetchRecipes.mockResolvedValue(
+      Array.from({ length: 20 }, (_, i) => ({ id: i + 1 })),
+    );
+
+    renderComponent();
+
+    await waitFor(() => expect(screen.getByTestId("page-val")).toHaveTextContent("1"));
+
+    await act(async () => fireEvent.click(screen.getByText("Next")));
+    await waitFor(() => {
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        20,
+        20,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
+      expect(screen.getByTestId("page-val")).toHaveTextContent("2");
     });
 
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
-    );
-    expect(screen.getByTestId("next-disabled-val")).toHaveTextContent("true");
-  });
-
-  it("passes correct loading state to pagination controls", () => {
-    useData.mockReturnValue({
-      recipes: [],
-      recipesLoading: true,
-      getRecipes: mockGetRecipes,
+    await act(async () => fireEvent.click(screen.getByText("Prev")));
+    await waitFor(() => {
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        20,
+        0,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
+      expect(screen.getByTestId("page-val")).toHaveTextContent("1");
     });
-
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
-    );
-    expect(screen.getByTestId("loading-val")).toHaveTextContent("true");
   });
 
-  it("renders create button when user has permission", () => {
+  it("handles limit change", async () => {
+    renderComponent();
+
+    const input = await screen.findByTestId("limit-input");
+    await act(async () => fireEvent.change(input, { target: { value: "50" } }));
+    await waitFor(() =>
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        50,
+        0,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      ),
+    );
+  });
+
+  it("handles filter application", async () => {
+    renderComponent();
+
+    const filterBtn = await screen.findByTestId("filter-btn");
+    await act(async () => fireEvent.click(filterBtn));
+
+    await waitFor(() =>
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        20,
+        0,
+        undefined,
+        undefined,
+        "Test Filter",
+        undefined,
+      ),
+    );
+  });
+
+  it("passes correct disabled state to pagination controls", async () => {
+    canteenApi.fetchRecipes.mockResolvedValue(
+      Array.from({ length: 10 }, (_, i) => ({ id: i + 1 })),
+    );
+
+    renderComponent();
+    await waitFor(() => expect(screen.getByTestId("next-disabled-val")).toHaveTextContent("true"));
+  });
+
+  it("passes correct loading state to pagination controls", async () => {
+    canteenApi.fetchRecipes.mockImplementation(() => new Promise(() => {})); // Hang to simulate loading state
+
+    renderComponent();
+    await waitFor(() => expect(screen.getByTestId("loading-val")).toHaveTextContent("true"));
+  });
+
+  it("renders create button when user has permission", async () => {
     useAuth.mockReturnValue({ user: { permissions: ["write_data"] } });
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
-    );
+    renderComponent();
 
     const createBtn = screen.getByText("+ Recipe");
     expect(createBtn).toBeInTheDocument();
-    expect(createBtn.closest("a")).toHaveAttribute(
-      "href",
-      "/recipes/new",
-    );
+    expect(createBtn.closest("a")).toHaveAttribute("href", "/recipes/new");
   });
 
-  it("does not render create button when user lacks permission", () => {
+  it("does not render create button when user lacks permission", async () => {
     useAuth.mockReturnValue({ user: { permissions: [] } });
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
-    );
+    renderComponent();
 
     expect(screen.queryByText("+ Recipe")).not.toBeInTheDocument();
   });
 
-  it("shows search specific empty message when filters are active", () => {
-    useData.mockReturnValue({
-      recipes: [],
-      recipesLoading: false,
-      getRecipes: mockGetRecipes,
-    });
+  it("shows search specific empty message when filters are active", async () => {
+    renderComponent();
 
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
+    const filterBtn = await screen.findByTestId("filter-btn");
+    await act(async () => fireEvent.click(filterBtn));
+
+    await waitFor(() =>
+      expect(screen.getByText("No recipes found matching your search.")).toBeInTheDocument(),
     );
-
-    const filterBtn = screen.getByTestId("filter-btn");
-    fireEvent.click(filterBtn);
-
-    expect(
-      screen.getByText("No recipes found matching your search."),
-    ).toBeInTheDocument();
   });
 
-  it("shows default empty message when no filters are active", () => {
-    useData.mockReturnValue({
-      recipes: [],
-      recipesLoading: false,
-      getRecipes: mockGetRecipes,
-    });
+  it("shows default empty message when no filters are active", async () => {
+    renderComponent();
 
-    render(
-      <MemoryRouter>
-        <RecipeSearch />
-      </MemoryRouter>,
+    await waitFor(() =>
+      expect(screen.getByText("No recipes found in the canteen.")).toBeInTheDocument(),
     );
-    expect(
-      screen.getByText("No recipes found in the canteen."),
-    ).toBeInTheDocument();
   });
 });

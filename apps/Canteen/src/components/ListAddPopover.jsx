@@ -1,19 +1,22 @@
 import { useState } from "react";
 import {
   Button,
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
   Field,
-  Label,
   Input,
+  Label,
   Popover,
   PopoverButton,
   PopoverPanel,
-  Combobox,
-  ComboboxInput,
-  ComboboxOptions,
-  ComboboxOption,
 } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { addRecipeToList, createList, fetchUserLists } from "@shared/core/services/canteenApi";
+
 import MiddenModal from "@shared/ui/components/MiddenModal";
 
 const ListAddPopover = ({
@@ -24,30 +27,17 @@ const ListAddPopover = ({
   label = "+ Add",
 }) => {
   const { user } = useAuth();
-  const {
-    canteenApi,
-    comboboxLists,
-    getComboboxLists,
-    hoistComboboxList,
-    comboboxListsLastFetched,
-    currentComboboxQuery,
-    comboboxListsUserId,
-  } = useData();
+  const queryClient = useQueryClient();
   const [isCreateListOpen, setIsCreateListOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [newListName, setNewListName] = useState("");
   const [addListMessage, setAddListMessage] = useState("");
 
-  const ensureListsLoaded = () => {
-    const STALE_TIME = 60 * 1000;
-    const isStale = Date.now() - comboboxListsLastFetched > STALE_TIME;
-    const isSearchData = currentComboboxQuery !== "";
-    const isDifferentUser = comboboxListsUserId !== user?.canteenId;
-
-    if (user && (isStale || isSearchData || isDifferentUser)) {
-      getComboboxLists(user.canteenId);
-    }
-  };
+  const { data: comboboxLists = [] } = useQuery({
+    queryKey: ["comboboxLists", user?.canteenId, query],
+    queryFn: () => fetchUserLists(user.canteenId, 50, 0, query),
+    enabled: !!user,
+  });
 
   const handleComboboxChange = (value, close) => {
     if (typeof value === "object" && value?.action === "create") {
@@ -55,56 +45,53 @@ const ListAddPopover = ({
       setIsCreateListOpen(true);
       close();
     } else if (value?.id) {
-      handleAddToList(value.id);
+      addToListMutation.mutate(value.id);
       close();
     }
   };
 
-  const handleAddToList = async (listId) => {
-    try {
-      await canteenApi.addRecipeToList(listId, recipeId);
+  const addToListMutation = useMutation({
+    mutationFn: (listId) => addRecipeToList(listId, recipeId),
+    onSuccess: () => {
       setAddListMessage("Added!");
-      hoistComboboxList(listId);
-
-      setTimeout(() => {
-        setAddListMessage("");
-      }, 1500);
-    } catch (error) {
+      queryClient.invalidateQueries({ queryKey: ["comboboxLists"] });
+      queryClient.invalidateQueries({ queryKey: ["userLists"] });
+      setTimeout(() => setAddListMessage(""), 1500);
+    },
+    onError: (error) => {
       console.error(error);
       if (error.response && error.response.status === 409) {
         setAddListMessage("Already in list.");
       } else {
         setAddListMessage("Failed.");
       }
-      setTimeout(() => {
-        setAddListMessage("");
-      }, 1500);
-    }
-  };
+      setTimeout(() => setAddListMessage(""), 1500);
+    },
+  });
 
-  const handleCreateList = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await canteenApi.createList(newListName);
-      await getComboboxLists(user.canteenId, newListName);
+  const createListMutation = useMutation({
+    mutationFn: (name) => createList(name),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["comboboxLists"] });
+      queryClient.invalidateQueries({ queryKey: ["userLists"] });
       if (response?.id) {
-        handleAddToList(response.id);
+        addToListMutation.mutate(response.id);
       }
       setIsCreateListOpen(false);
       setNewListName("");
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error(error);
-    }
+    },
+  });
+
+  const handleCreateList = (e) => {
+    e.preventDefault();
+    createListMutation.mutate(newListName);
   };
 
   const handleQueryChange = (event) => {
-    const val = event.target.value;
-    setQuery(val);
-    if (val) {
-      getComboboxLists(user.canteenId, val);
-    } else {
-      getComboboxLists(user.canteenId, "");
-    }
+    setQuery(event.target.value);
   };
 
   return (
@@ -112,19 +99,13 @@ const ListAddPopover = ({
       <Popover className={className}>
         {({ close }) => (
           <>
-            <PopoverButton
-              onMouseEnter={ensureListsLoaded}
-              className={`focus:outline-none ${buttonClassName}`}
-            >
+            <PopoverButton className={`focus:outline-none ${buttonClassName}`}>
               {addListMessage || label}
             </PopoverButton>
             <PopoverPanel
               className={`bg-dark border-grey absolute z-50 w-64 border p-2 shadow-xl ${panelClassName}`}
             >
-              <Combobox
-                onChange={(value) => handleComboboxChange(value, close)}
-                immediate
-              >
+              <Combobox onChange={(value) => handleComboboxChange(value, close)} immediate>
                 <ComboboxInput
                   className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-1 text-sm focus:outline-none"
                   placeholder="Search or create list..."
@@ -145,10 +126,7 @@ const ListAddPopover = ({
                       </ComboboxOption>
                     ))}
                     {query.length > 0 &&
-                      !comboboxLists.some(
-                        (l) =>
-                          l.name.toLowerCase() === query.toLowerCase(),
-                      ) && (
+                      !comboboxLists.some((l) => l.name.toLowerCase() === query.toLowerCase()) && (
                         <ComboboxOption
                           value={{ action: "create" }}
                           className="data-focus:bg-accent text-lightestGrey cursor-pointer px-2 py-1 text-sm font-bold italic select-none data-focus:text-white"
@@ -169,34 +147,35 @@ const ListAddPopover = ({
         onClose={() => setIsCreateListOpen(false)}
         title="Create New List"
       >
-            <form onSubmit={handleCreateList} className="flex flex-col gap-4">
-              <Field>
-                <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-                  List Name
-                </Label>
-                <Input
-                  required
-                  value={newListName}
-                  onChange={(e) => setNewListName(e.target.value)}
-                  className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
-                />
-              </Field>
-              <div className="mt-2 flex justify-end gap-2">
-                <Button
-                  type="button"
-                  onClick={() => setIsCreateListOpen(false)}
-                  className="text-lightGrey px-4 py-2 font-bold hover:text-white"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white"
-                >
-                  Create & Add
-                </Button>
-              </div>
-            </form>
+        <form onSubmit={handleCreateList} className="flex flex-col gap-4">
+          <Field>
+            <Label className="text-lightestGrey mb-1 block text-sm font-bold">List Name</Label>
+            <Input
+              required
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+              className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
+            />
+          </Field>
+          <div className="mt-2 flex justify-end gap-2">
+            <Button
+              type="button"
+              onClick={() => setIsCreateListOpen(false)}
+              className="text-lightGrey px-4 py-2 font-bold hover:text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={createListMutation.isPending || addToListMutation.isPending}
+              className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
+            >
+              {createListMutation.isPending || addToListMutation.isPending
+                ? "Adding..."
+                : "Create & Add"}
+            </Button>
+          </div>
+        </form>
       </MiddenModal>
     </>
   );

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 
@@ -53,9 +53,7 @@ const AppCard = ({ to, symbol, label, description }) => {
         alignRight ? "right-0 translate-x-4" : "left-0 -translate-x-4",
       )}
     >
-      <p className="md:text-base text-dark text-left font-mono text-sm">
-        {description}
-      </p>
+      <p className="md:text-base text-dark text-left font-mono text-sm">{description}</p>
     </div>
   );
 
@@ -71,11 +69,7 @@ const AppCard = ({ to, symbol, label, description }) => {
     : { to };
 
   return (
-    <div
-      ref={cardRef}
-      className={wrapperClass}
-      onMouseEnter={handleMouseEnter}
-    >
+    <div ref={cardRef} className={wrapperClass} onMouseEnter={handleMouseEnter}>
       <div className="flex w-full">
         <LinkComponent
           {...linkProps}
@@ -85,20 +79,18 @@ const AppCard = ({ to, symbol, label, description }) => {
           {content}
         </LinkComponent>
 
-      {description && (
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            setIsExpanded(!isExpanded);
-          }}
-          className="flex items-center justify-center px-6 text-lightestGrey hover:text-white hover:bg-white/10 sm:hidden transition-colors"
-          aria-label={
-            isExpanded ? "Collapse description" : "Expand description"
-          }
-        >
-          <span className="text-xl font-icons icon">{isExpanded ? "A" : "C"}</span>
-        </button>
-      )}
+        {description && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setIsExpanded(!isExpanded);
+            }}
+            className="flex items-center justify-center px-6 text-lightestGrey hover:text-white hover:bg-white/10 sm:hidden transition-colors"
+            aria-label={isExpanded ? "Collapse description" : "Expand description"}
+          >
+            <span className="text-xl font-icons icon">{isExpanded ? "A" : "C"}</span>
+          </button>
+        )}
       </div>
 
       {mobileDescription}

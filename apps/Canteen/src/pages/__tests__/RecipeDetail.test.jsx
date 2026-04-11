@@ -1,15 +1,13 @@
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  act,
-} from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import RecipeDetail from "../RecipeDetail";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { useAuth } from "@shared/core/hooks/useAuth";
+import * as canteenApi from "@shared/core/services/canteenApi";
+
+import RecipeDetail from "../RecipeDetail";
+
+vi.mock("@shared/core/services/canteenApi");
 const mockNavigate = vi.fn();
 let mockLocation = { key: "default" };
 
@@ -24,8 +22,7 @@ vi.mock("react-router-dom", () => ({
   useLocation: () => mockLocation,
 }));
 
-vi.mock("@shared/core/context/data/useData");
-vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
   default: ({ children }) => <div data-testid="midden-card">{children}</div>,
@@ -68,9 +65,6 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 describe("RecipeDetail", () => {
-  const mockGetRecipe = vi.fn().mockResolvedValue({});
-  const mockToggleRecipeLike = vi.fn();
-
   const mockRecipe = {
     id: "123",
     title: "Test Recipe",
@@ -81,9 +75,7 @@ describe("RecipeDetail", () => {
     wait_time_minutes: 30,
     total_time_minutes: 60,
     servings: 4,
-    ingredients: [
-      { quantity: "1", unit: "cup", name: "Flour", notes: "sifted" },
-    ],
+    ingredients: [{ quantity: "1", unit: "cup", name: "Flour", notes: "sifted" }],
     instructions: "Mix and bake.",
     likes: [],
     tags: [{ id: "1", name: "TestTag" }],
@@ -91,93 +83,105 @@ describe("RecipeDetail", () => {
 
   const mockUser = { id: "iam1", canteenId: "user1", username: "testuser" };
 
-  const defaultContext = {
-    currentRecipe: mockRecipe,
-    recipesLoading: false,
-    getRecipe: mockGetRecipe,
-    toggleRecipeLike: mockToggleRecipeLike,
-    getUserLists: vi.fn(),
-  };
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocation = { key: "default" };
     mockNavigate.mockClear();
-    useData.mockReturnValue(defaultContext);
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
     useAuth.mockReturnValue({ user: mockUser });
+    canteenApi.fetchRecipe.mockResolvedValue(mockRecipe);
   });
 
+  const renderComponent = () =>
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RecipeDetail />
+      </QueryClientProvider>,
+    );
+
   it("fetches recipe on mount", async () => {
-    useData.mockReturnValue({ ...defaultContext, currentRecipe: null });
-    render(<RecipeDetail />);
-    expect(mockGetRecipe).toHaveBeenCalledWith("123");
+    renderComponent();
 
     await act(async () => {
-      await Promise.resolve(); // Flush the unresolved promise to prevent act() warnings
+      await waitFor(() => expect(canteenApi.fetchRecipe).toHaveBeenCalledWith("123"));
     });
   });
 
-  it("renders loading state", () => {
-    useData.mockReturnValue({ ...defaultContext, recipesLoading: true });
-    render(<RecipeDetail />);
-    expect(screen.getByText(/Loading recipe.../i)).toBeInTheDocument();
+  it("renders loading state", async () => {
+    canteenApi.fetchRecipe.mockImplementation(() => new Promise(() => {})); // hang forever
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByText(/Loading recipe.../i)).toBeInTheDocument();
+    });
   });
 
   it("renders not found state", async () => {
-    useData.mockReturnValue({ ...defaultContext, currentRecipe: null });
-    mockGetRecipe.mockResolvedValue(null);
-    render(<RecipeDetail />);
+    canteenApi.fetchRecipe.mockResolvedValue(null);
+    renderComponent();
     await waitFor(() => {
       expect(screen.getByText(/Recipe not found/i)).toBeInTheDocument();
     });
   });
 
-  it("renders recipe details correctly", () => {
-    render(<RecipeDetail />);
-    expect(screen.getByText("Test Recipe")).toBeInTheDocument();
-    expect(screen.getByText("chef_test")).toBeInTheDocument();
-    expect(screen.getByText("A tasty test recipe")).toBeInTheDocument();
-    expect(screen.getByText("10m")).toBeInTheDocument();
-    expect(screen.getByText("20m")).toBeInTheDocument();
-    expect(screen.getByText("1h")).toBeInTheDocument();
-    expect(screen.getByText("4")).toBeInTheDocument();
-    expect(screen.getByText("Flour")).toBeInTheDocument();
-    expect(screen.getByText("Mix and bake.")).toBeInTheDocument();
-    expect(screen.getByText("TestTag")).toBeInTheDocument();
-  });
-
-  it("renders author link correctly", () => {
-    render(<RecipeDetail />);
-    const authorLink = screen.getByText("chef_test").closest("a");
-    expect(authorLink).toHaveAttribute("href", "/user/u1");
-  });
-
-  it("formats time correctly for over 60 minutes", () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      currentRecipe: {
-        ...mockRecipe,
-        prep_time_minutes: 125,
-      },
+  it("renders recipe details correctly", async () => {
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByText("Test Recipe")).toBeInTheDocument();
+      expect(screen.getByText("chef_test")).toBeInTheDocument();
+      expect(screen.getByText("A tasty test recipe")).toBeInTheDocument();
+      expect(screen.getByText("10m")).toBeInTheDocument();
+      expect(screen.getByText("20m")).toBeInTheDocument();
+      expect(screen.getByText("1h")).toBeInTheDocument();
+      expect(screen.getByText("4")).toBeInTheDocument();
+      expect(screen.getByText("Flour")).toBeInTheDocument();
+      expect(screen.getByText("Mix and bake.")).toBeInTheDocument();
+      expect(screen.getByText("TestTag")).toBeInTheDocument();
     });
-    render(<RecipeDetail />);
-    expect(screen.getByText("2h05m")).toBeInTheDocument();
+  });
+
+  it("renders author link correctly", async () => {
+    renderComponent();
+    await waitFor(() => {
+      const authorLink = screen.getByText("chef_test").closest("a");
+      expect(authorLink).toHaveAttribute("href", "/user/u1");
+    });
+  });
+
+  it("formats time correctly for over 60 minutes", async () => {
+    canteenApi.fetchRecipe.mockResolvedValue({
+      ...mockRecipe,
+      prep_time_minutes: 125,
+    });
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByText("2h05m")).toBeInTheDocument();
+    });
   });
 
   it("handles like toggle", async () => {
-    render(<RecipeDetail />);
-    const likeBtn = screen.getByRole("button", { name: /♡\s*Like/i });
+    canteenApi.likeRecipe.mockResolvedValue({});
+    renderComponent();
+    const likeBtn = await screen.findByRole("button", { name: /♡\s*Like/i });
     await act(async () => {
       fireEvent.click(likeBtn);
     });
-    expect(mockToggleRecipeLike).toHaveBeenCalledWith("123", false);
+    expect(canteenApi.likeRecipe).toHaveBeenCalledWith("123");
   });
 
   it("renders edit and delete buttons in popover for owner", async () => {
-    useAuth.mockReturnValue({ user: { id: "iam1", canteenId: "u1", username: "chef_test" } });
-    render(<RecipeDetail />);
+    useAuth.mockReturnValue({
+      user: { id: "iam1", canteenId: "u1", username: "chef_test" },
+    });
+    renderComponent();
 
-    const optionsBtn = screen.getByRole("button", { name: "Options" });
+    const optionsBtn = await screen.findByRole("button", { name: "Options" });
     await act(async () => {
       fireEvent.click(optionsBtn);
     });
@@ -185,35 +189,32 @@ describe("RecipeDetail", () => {
     await waitFor(() => {
       expect(screen.getByText("Edit")).toBeInTheDocument();
       const editLink = screen.getByText("Edit").closest("a");
-      expect(editLink).toHaveAttribute(
-        "data-state",
-        JSON.stringify({ fromDetail: true }),
-      );
+      expect(editLink).toHaveAttribute("data-state", JSON.stringify({ fromDetail: true }));
       expect(screen.getByText("Delete")).toBeInTheDocument();
     });
   });
 
-  it("does not render options popover for non-owner", () => {
-    useAuth.mockReturnValue({ user: { id: "iam1", canteenId: "user1", username: "testuser" } });
-    render(<RecipeDetail />);
-    expect(
-      screen.queryByRole("button", { name: "Options" }),
-    ).not.toBeInTheDocument();
+  it("does not render options popover for non-owner", async () => {
+    useAuth.mockReturnValue({
+      user: { id: "iam1", canteenId: "user1", username: "testuser" },
+    });
+    renderComponent();
+
+    await screen.findByText("Test Recipe");
+    expect(screen.queryByRole("button", { name: "Options" })).not.toBeInTheDocument();
     expect(screen.queryByText("Edit")).not.toBeInTheDocument();
     expect(screen.queryByText("Delete")).not.toBeInTheDocument();
   });
 
   it("handles recipe deletion", async () => {
-    const mockDeleteRecipe = vi.fn().mockResolvedValue({});
-    useData.mockReturnValue({
-      ...defaultContext,
-      deleteRecipe: mockDeleteRecipe,
+    useAuth.mockReturnValue({
+      user: { id: "iam1", canteenId: "u1", username: "chef_test" },
     });
-    useAuth.mockReturnValue({ user: { id: "iam1", canteenId: "u1", username: "chef_test" } });
+    canteenApi.deleteRecipe.mockResolvedValue({});
 
-    render(<RecipeDetail />);
+    renderComponent();
 
-    const optionsBtn = screen.getByRole("button", { name: "Options" });
+    const optionsBtn = await screen.findByRole("button", { name: "Options" });
     await act(async () => {
       fireEvent.click(optionsBtn);
     });
@@ -225,9 +226,7 @@ describe("RecipeDetail", () => {
 
     const modalTitle = await screen.findByText("Delete Recipe");
     expect(modalTitle).toBeInTheDocument();
-    expect(
-      screen.getByText(/Are you sure you want to delete this recipe\?/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to delete this recipe\?/i)).toBeInTheDocument();
 
     const confirmBtns = screen.getAllByText("Delete");
     await act(async () => {
@@ -235,47 +234,49 @@ describe("RecipeDetail", () => {
     });
 
     await waitFor(() => {
-      expect(mockDeleteRecipe).toHaveBeenCalledWith("123");
+      expect(canteenApi.deleteRecipe).toHaveBeenCalledWith("123");
       expect(mockNavigate).toHaveBeenCalledWith("/recipes");
     });
   });
 
-  it("shows liked state correctly", () => {
+  it("shows liked state correctly", async () => {
     const likedRecipe = {
       ...mockRecipe,
       likes: [{ user_id: "user1" }],
     };
-    useData.mockReturnValue({
-      ...defaultContext,
-      currentRecipe: likedRecipe,
+    canteenApi.fetchRecipe.mockResolvedValue(likedRecipe);
+
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /♥\s*Liked/i })).toBeInTheDocument();
     });
-
-    render(<RecipeDetail />);
-    expect(
-      screen.getByRole("button", { name: /♥\s*Liked/i }),
-    ).toBeInTheDocument();
   });
 
-  it("renders add to list popover", () => {
-    render(<RecipeDetail />);
-    const popover = screen.getByTestId("list-add-popover");
-    expect(popover).toBeInTheDocument();
-    expect(popover).toHaveAttribute("data-recipe-id", "123");
-    expect(popover).toHaveTextContent(/\+\s*Add to List/);
+  it("renders add to list popover", async () => {
+    renderComponent();
+    await waitFor(() => {
+      const popover = screen.getByTestId("list-add-popover");
+      expect(popover).toBeInTheDocument();
+      expect(popover).toHaveAttribute("data-recipe-id", "123");
+      expect(popover).toHaveTextContent(/\+\s*Add to List/);
+    });
   });
 
-  it("renders share recipe popover", () => {
-    render(<RecipeDetail />);
-    const sharePopover = screen.getByTestId("share-recipe-popover");
-    expect(sharePopover).toBeInTheDocument();
-    expect(sharePopover).toHaveAttribute("data-recipe-id", "123");
-    expect(sharePopover).toHaveTextContent("Share");
+  it("renders share recipe popover", async () => {
+    renderComponent();
+    await waitFor(() => {
+      const sharePopover = screen.getByTestId("share-recipe-popover");
+      expect(sharePopover).toBeInTheDocument();
+      expect(sharePopover).toHaveAttribute("data-recipe-id", "123");
+      expect(sharePopover).toHaveTextContent("Share");
+    });
   });
 
   it("renders back button when history is present and navigates back", async () => {
     mockLocation = { key: "not-default" };
-    render(<RecipeDetail />);
-    const backBtn = screen.getByRole("button", { name: "Go back" });
+    renderComponent();
+
+    const backBtn = await screen.findByRole("button", { name: "Go back" });
     expect(backBtn).toBeInTheDocument();
     await act(async () => {
       fireEvent.click(backBtn);
@@ -283,11 +284,11 @@ describe("RecipeDetail", () => {
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
-  it("does not render back button on direct load", () => {
+  it("does not render back button on direct load", async () => {
     mockLocation = { key: "default" };
-    render(<RecipeDetail />);
-    expect(
-      screen.queryByRole("button", { name: "Go back" }),
-    ).not.toBeInTheDocument();
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
+    });
   });
 });

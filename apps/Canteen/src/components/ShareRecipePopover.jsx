@@ -1,19 +1,22 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Button,
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
   Field,
   Label,
-  Textarea,
   Popover,
   PopoverButton,
   PopoverPanel,
-  Combobox,
-  ComboboxInput,
-  ComboboxOptions,
-  ComboboxOption,
+  Textarea,
 } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { fetchFriends, sendMessage } from "@shared/core/services/canteenApi";
+
 import MiddenModal from "@shared/ui/components/MiddenModal";
 
 const ShareRecipePopover = ({
@@ -24,15 +27,19 @@ const ShareRecipePopover = ({
   label = "Share",
 }) => {
   const { user } = useAuth();
-  const { friends, getFriends, sendMessage } = useData();
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
   const [copyStatus, setCopyStatus] = useState("Copy Link");
-  const friendsLoadedRef = useRef(false);
   const copyTimeoutRef = useRef(null);
+
+  const { data: friends = [] } = useQuery({
+    queryKey: ["friends", user?.canteenId],
+    queryFn: () => fetchFriends(user.canteenId, 500, 0),
+    enabled: !!user,
+  });
 
   useEffect(() => {
     return () => {
@@ -42,19 +49,10 @@ const ShareRecipePopover = ({
     };
   }, []);
 
-  const ensureFriendsLoaded = () => {
-    if (user && !friendsLoadedRef.current) {
-      getFriends(user.canteenId);
-      friendsLoadedRef.current = true;
-    }
-  };
-
   const filteredFriends =
     query === ""
       ? friends
-      : friends.filter((friend) =>
-          friend.username.toLowerCase().includes(query.toLowerCase()),
-        );
+      : friends.filter((friend) => friend.username.toLowerCase().includes(query.toLowerCase()));
 
   const handleComboboxChange = (friend, close) => {
     if (friend) {
@@ -65,20 +63,27 @@ const ShareRecipePopover = ({
     }
   };
 
-  const handleSend = async (e) => {
+  const sendMessageMutation = useMutation({
+    mutationFn: ({ receiverId, content, recipeId }) => sendMessage(receiverId, content, recipeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      queryClient.invalidateQueries({ queryKey: ["threads"] });
+      setIsModalOpen(false);
+      setSelectedFriend(null);
+      setMessage("");
+    },
+    onError: (error) => console.error(error),
+  });
+
+  const handleSend = (e) => {
     e.preventDefault();
     if (!selectedFriend || !recipe) return;
 
-    setSending(true);
-    try {
-      await sendMessage(selectedFriend.id, message, recipe.id);
-      setIsModalOpen(false);
-      setSelectedFriend(null);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSending(false);
-    }
+    sendMessageMutation.mutate({
+      receiverId: selectedFriend.id,
+      content: message,
+      recipeId: recipe.id,
+    });
   };
 
   const handleCopyLink = () => {
@@ -99,11 +104,7 @@ const ShareRecipePopover = ({
       <Popover className={className}>
         {({ close }) => (
           <>
-            <PopoverButton
-              onMouseEnter={ensureFriendsLoaded}
-              onClick={ensureFriendsLoaded}
-              className={`focus:outline-none ${buttonClassName}`}
-            >
+            <PopoverButton className={`focus:outline-none ${buttonClassName}`}>
               {label}
             </PopoverButton>
             <PopoverPanel
@@ -165,12 +166,8 @@ const ShareRecipePopover = ({
       >
         <form onSubmit={handleSend} className="flex flex-col gap-4">
           <div className="bg-primary/20 border-accent/50 border border-dashed p-3">
-            <h4 className="font-mono font-bold text-white mb-1">
-              {recipe?.title}
-            </h4>
-            <p className="text-lightGrey truncate font-mono text-sm">
-              {recipe?.description}
-            </p>
+            <h4 className="font-mono font-bold text-white mb-1">{recipe?.title}</h4>
+            <p className="text-lightGrey truncate font-mono text-sm">{recipe?.description}</p>
           </div>
           <Field>
             <Label className="text-lightestGrey mb-1 block text-sm font-bold">
@@ -194,10 +191,10 @@ const ShareRecipePopover = ({
             </Button>
             <Button
               type="submit"
-              disabled={sending}
+              disabled={sendMessageMutation.isPending}
               className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
             >
-              {sending ? "Sending..." : "Send"}
+              {sendMessageMutation.isPending ? "Sending..." : "Send"}
             </Button>
           </div>
         </form>

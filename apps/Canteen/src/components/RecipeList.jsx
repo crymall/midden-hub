@@ -4,9 +4,7 @@ const RecipeList = ({ recipes, loading, emptyMessage = "No recipes found in the 
   if (loading) {
     return (
       <div className="flex w-full justify-center p-8">
-        <p className="text-lightestGrey font-mono text-xl animate-pulse">
-          Loading recipes...
-        </p>
+        <p className="text-lightestGrey font-mono text-xl animate-pulse">Loading recipes...</p>
       </div>
     );
   }
@@ -14,9 +12,7 @@ const RecipeList = ({ recipes, loading, emptyMessage = "No recipes found in the 
   if (!recipes || recipes.length === 0) {
     return (
       <div className="flex w-full justify-center p-8">
-        <p className="text-lightGrey font-mono text-lg">
-          {emptyMessage}
-        </p>
+        <p className="text-lightGrey font-mono text-lg">{emptyMessage}</p>
       </div>
     );
   }

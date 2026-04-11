@@ -5,14 +5,7 @@ const canteenApi = axios.create({
   withCredentials: true,
 });
 
-export const fetchRecipes = async (
-  limit,
-  offset,
-  tags = [],
-  ingredients = [],
-  title = "",
-  ids,
-) => {
+export const fetchRecipes = async (limit, offset, tags = [], ingredients = [], title = "", ids) => {
   const response = await canteenApi.get("/recipes", {
     params: { limit, offset, tags, ingredients, title, ids },
   });
@@ -64,10 +57,7 @@ export const unlikeRecipe = async (id) => {
 };
 
 export const addRecipeIngredient = async (recipeId, ingredientData) => {
-  const response = await canteenApi.post(
-    `/recipes/${recipeId}/ingredients`,
-    ingredientData,
-  );
+  const response = await canteenApi.post(`/recipes/${recipeId}/ingredients`, ingredientData);
   return response.data;
 };
 
@@ -79,16 +69,12 @@ export const addRecipeTag = async (recipeId, tagId) => {
 };
 
 export const removeRecipeTag = async (recipeId, tagId) => {
-  const response = await canteenApi.delete(
-    `/recipes/${recipeId}/tags/${tagId}`,
-  );
+  const response = await canteenApi.delete(`/recipes/${recipeId}/tags/${tagId}`);
   return response.data;
 };
 
 export const removeRecipeIngredient = async (recipeId, ingredientId) => {
-  const response = await canteenApi.delete(
-    `/recipes/${recipeId}/ingredients/${ingredientId}`,
-  );
+  const response = await canteenApi.delete(`/recipes/${recipeId}/ingredients/${ingredientId}`);
   return response.data;
 };
 
@@ -111,14 +97,7 @@ export const fetchLists = async (limit, offset, name, sort, order) => {
   return response.data;
 };
 
-export const fetchUserLists = async (
-  userId,
-  limit,
-  offset,
-  name,
-  sort,
-  order,
-) => {
+export const fetchUserLists = async (userId, limit, offset, name, sort, order) => {
   const response = await canteenApi.get(`/lists/user/${userId}`, {
     params: { limit, offset, name, sort, order },
   });

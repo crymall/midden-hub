@@ -1,72 +1,77 @@
-import { useEffect, useEffectEvent, useState } from "react";
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Button, Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import { PERMISSIONS } from "@shared/core/utils/constants";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
 import {
-  Button,
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-} from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
-import MiddenCard from "@shared/ui/components/MiddenCard";
+  deleteRecipe,
+  fetchRecipe,
+  likeRecipe,
+  unlikeRecipe,
+} from "@shared/core/services/canteenApi";
+
 import Can from "@shared/core/gateways/Can";
+
+import MiddenCard from "@shared/ui/components/MiddenCard";
+import MiddenModal from "@shared/ui/components/MiddenModal";
 import ListAddPopover from "../components/ListAddPopover";
 import ShareRecipePopover from "../components/ShareRecipePopover";
-import MiddenModal from "@shared/ui/components/MiddenModal";
-import { PERMISSIONS } from "@shared/core/utils/constants";
 
 const RecipeDetail = () => {
   const { id } = useParams();
-  const {
-    currentRecipe,
-    recipesLoading,
-    getRecipe,
-    toggleRecipeLike,
-    getUserLists,
-    deleteRecipe,
-  } = useData();
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const hasHistory = location.key !== "default";
-  const [fetchFailed, setFetchFailed] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const setFetchFailedEvent = useEffectEvent(() => {
-    setFetchFailed(true);
+  const {
+    data: currentRecipe,
+    isLoading: recipesLoading,
+    isError: fetchFailed,
+  } = useQuery({
+    queryKey: ["recipe", id],
+    queryFn: () => fetchRecipe(id),
+    enabled: !!id,
+    retry: false,
   });
 
-  const setFetchNotFailedEvent = useEffectEvent(() => {
-    setFetchFailed(false);
-  });
+  const isLiked = currentRecipe?.likes?.some((like) => like.user_id === user?.canteenId);
 
-  useEffect(() => {
-    if (id) {
-      if (String(currentRecipe?.id) !== String(id)) {
-        setFetchNotFailedEvent(false);
-        getRecipe(id).then((res) => {
-          if (!res) setFetchFailedEvent(true);
-        });
+  const toggleLikeMutation = useMutation({
+    mutationFn: async () => {
+      if (isLiked) {
+        await unlikeRecipe(currentRecipe.id);
+      } else {
+        await likeRecipe(currentRecipe.id);
       }
-    }
-  }, [id, currentRecipe?.id, getRecipe]);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recipe", id] });
+    },
+  });
 
-  useEffect(() => {
-    if (user) {
-      getUserLists(user.canteenId);
-    }
-  }, [user, getUserLists]);
+  const deleteRecipeMutation = useMutation({
+    mutationFn: () => deleteRecipe(currentRecipe.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["searchedRecipes"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfileRecipes"] });
+      setIsDeleteModalOpen(false);
+      navigate("/recipes");
+    },
+    onError: (err) => {
+      console.error("Failed to delete recipe", err);
+    },
+  });
 
-  if (
-    recipesLoading ||
-    (String(currentRecipe?.id) !== String(id) && !fetchFailed)
-  ) {
+  if (recipesLoading) {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
-          <p className="text-lightestGrey animate-pulse font-mono text-xl">
-            Loading recipe...
-          </p>
+          <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading recipe...</p>
         </div>
       </MiddenCard>
     );
@@ -82,22 +87,15 @@ const RecipeDetail = () => {
     );
   }
 
-  const isLiked = currentRecipe.likes?.some(
-    (like) => like.user_id === user?.canteenId,
-  );
-
   const isOwner =
-    user &&
-    currentRecipe.author &&
-    String(user.canteenId) === String(currentRecipe.author.id);
+    user && currentRecipe.author && String(user.canteenId) === String(currentRecipe.author.id);
 
   const handleLike = () => {
-    toggleRecipeLike(currentRecipe.id, isLiked);
+    toggleLikeMutation.mutate();
   };
 
   const formatTime = (minutes) => {
-    if (minutes === null || minutes === undefined || minutes === "")
-      return "0m";
+    if (minutes === null || minutes === undefined || minutes === "") return "0m";
     const num = Number(minutes);
     if (isNaN(num)) return "0m";
     if (num < 60) return `${num}m`;
@@ -107,14 +105,8 @@ const RecipeDetail = () => {
     return `${hrs}h${mins.toString().padStart(2, "0")}m`;
   };
 
-  const confirmDelete = async () => {
-    try {
-      await deleteRecipe(currentRecipe.id);
-      setIsDeleteModalOpen(false);
-      navigate("/recipes");
-    } catch (err) {
-      console.error("Failed to delete recipe", err);
-    }
+  const confirmDelete = () => {
+    deleteRecipeMutation.mutate();
   };
 
   return (
@@ -165,16 +157,15 @@ const RecipeDetail = () => {
               <div className="flex flex-wrap gap-2 max-sm:relative md:justify-end">
                 <Button
                   onClick={handleLike}
-                  className={`flex h-8 items-center justify-center gap-2.5 border px-3 text-sm font-bold transition-colors ${
+                  disabled={toggleLikeMutation.isPending}
+                  className={`flex h-8 items-center justify-center gap-2.5 border px-3 text-sm font-bold transition-colors disabled:opacity-50 ${
                     isLiked
                       ? "bg-accent border-accent text-white"
                       : "text-lightestGrey border-grey hover:border-lightestGrey bg-transparent"
                   }`}
                 >
                   <span>{isLiked ? "♥" : "♡"}</span>
-                  <span className="hidden sm:block">
-                    {isLiked ? "Liked" : "Like"}
-                  </span>
+                  <span className="hidden sm:block">{isLiked ? "Liked" : "Like"}</span>
                 </Button>
                 <ListAddPopover
                   recipeId={currentRecipe.id}
@@ -232,33 +223,21 @@ const RecipeDetail = () => {
 
         <div className="text-lightestGrey grid grid-cols-2 gap-4 rounded-lg bg-white/5 p-4 text-center font-mono md:grid-cols-4">
           <div>
-            <span className="text-grey block text-xs tracking-wider uppercase">
-              Prep Time
-            </span>
-            <span className="text-xl font-bold">
-              {formatTime(currentRecipe.prep_time_minutes)}
-            </span>
+            <span className="text-grey block text-xs tracking-wider uppercase">Prep Time</span>
+            <span className="text-xl font-bold">{formatTime(currentRecipe.prep_time_minutes)}</span>
           </div>
           <div>
-            <span className="text-grey block text-xs tracking-wider uppercase">
-              Cook Time
-            </span>
-            <span className="text-xl font-bold">
-              {formatTime(currentRecipe.cook_time_minutes)}
-            </span>
+            <span className="text-grey block text-xs tracking-wider uppercase">Cook Time</span>
+            <span className="text-xl font-bold">{formatTime(currentRecipe.cook_time_minutes)}</span>
           </div>
           <div>
-            <span className="text-grey block text-xs tracking-wider uppercase">
-              Total Time
-            </span>
+            <span className="text-grey block text-xs tracking-wider uppercase">Total Time</span>
             <span className="text-xl font-bold">
               {formatTime(currentRecipe.total_time_minutes)}
             </span>
           </div>
           <div>
-            <span className="text-grey block text-xs tracking-wider uppercase">
-              Servings
-            </span>
+            <span className="text-grey block text-xs tracking-wider uppercase">Servings</span>
             <span className="text-xl font-bold">{currentRecipe.servings}</span>
           </div>
         </div>
@@ -274,12 +253,7 @@ const RecipeDetail = () => {
                   <span className="text-accent">•</span>
                   <span>
                     {ing.quantity} {ing.unit} <strong>{ing.name}</strong>
-                    {ing.notes && (
-                      <span className="text-grey text-sm italic">
-                        {" "}
-                        ({ing.notes})
-                      </span>
-                    )}
+                    {ing.notes && <span className="text-grey text-sm italic"> ({ing.notes})</span>}
                   </span>
                 </li>
               ))}
@@ -303,8 +277,7 @@ const RecipeDetail = () => {
         title="Delete Recipe"
       >
         <p className="text-lightestGrey mb-6 font-mono">
-          Are you sure you want to delete this recipe? This action cannot be
-          undone.
+          Are you sure you want to delete this recipe? This action cannot be undone.
         </p>
         <div className="flex justify-end gap-2">
           <Button
@@ -315,9 +288,10 @@ const RecipeDetail = () => {
           </Button>
           <Button
             onClick={confirmDelete}
-            className="bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600"
+            disabled={deleteRecipeMutation.isPending}
+            className="bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600 disabled:opacity-50"
           >
-            Delete
+            {deleteRecipeMutation.isPending ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </MiddenModal>

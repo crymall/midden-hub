@@ -1,6 +1,7 @@
+import { explorerLinkList } from "@shared/core/utils/constants";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import AppGrid from "../components/AppGrid";
-import { explorerLinkList } from "@shared/core/utils/constants";
 
 const Explorer = () => {
   return (

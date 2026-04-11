@@ -1,12 +1,12 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import RecipeCard from '../RecipeCard';
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@shared/core/context/data/useData");
-vi.mock("@shared/core/context/auth/useAuth");
+import { useAuth } from "@shared/core/hooks/useAuth";
+
+import RecipeCard from "../RecipeCard";
+
+vi.mock("@shared/core/hooks/useAuth");
 vi.mock("@shared/core/gateways/Can", () => ({
   default: ({ children }) => <div data-testid="can-gate">{children}</div>,
 }));
@@ -22,9 +22,6 @@ vi.mock("../ListAddPopover", () => ({
 describe("RecipeCard", () => {
   const mockUser = { id: "iam123", canteenId: "user123" };
 
-  const defaultContext = {
-  };
-
   const mockRecipe = {
     id: "123",
     title: "Spicy Tacos",
@@ -39,14 +36,13 @@ describe("RecipeCard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useAuth.mockReturnValue({ user: mockUser });
-    useData.mockReturnValue(defaultContext);
   });
 
   it("renders the recipe title", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={mockRecipe} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("Spicy Tacos")).toBeInTheDocument();
   });
@@ -55,7 +51,7 @@ describe("RecipeCard", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={mockRecipe} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("Delicious tacos with spicy salsa.")).toBeInTheDocument();
   });
@@ -66,7 +62,7 @@ describe("RecipeCard", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={recipeWithLongDesc} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const expected = "word ".repeat(29).trim() + "...";
     expect(screen.getByText(expected)).toBeInTheDocument();
@@ -76,17 +72,20 @@ describe("RecipeCard", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={mockRecipe} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("♥ 3")).toBeInTheDocument();
   });
 
   it("formats large like counts compactly", () => {
-    const recipeManyLikes = { ...mockRecipe, likes: new Array(1200).fill("user") };
+    const recipeManyLikes = {
+      ...mockRecipe,
+      likes: new Array(1200).fill("user"),
+    };
     render(
       <MemoryRouter>
         <RecipeCard recipe={recipeManyLikes} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("♥ 1.2K")).toBeInTheDocument();
   });
@@ -96,7 +95,7 @@ describe("RecipeCard", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={recipeNoLikes} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.queryByText(/♥/)).not.toBeInTheDocument();
   });
@@ -105,7 +104,7 @@ describe("RecipeCard", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={mockRecipe} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("Mexican")).toBeInTheDocument();
     expect(screen.getByText("Spicy")).toBeInTheDocument();
@@ -115,7 +114,7 @@ describe("RecipeCard", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={mockRecipe} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const link = screen.getByRole("link");
     expect(link).toHaveAttribute("href", "/recipes/123");
@@ -125,7 +124,7 @@ describe("RecipeCard", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={mockRecipe} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const popover = screen.getByTestId("list-add-popover");
     expect(popover).toBeInTheDocument();
@@ -136,7 +135,7 @@ describe("RecipeCard", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={mockRecipe} inverse={true} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const card = screen.getByText("Spicy Tacos").closest("div.group");
     expect(card).toHaveClass("bg-dark/50", "border-lightestGrey");
@@ -146,7 +145,7 @@ describe("RecipeCard", () => {
     render(
       <MemoryRouter>
         <RecipeCard recipe={mockRecipe} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const card = screen.getByText("Spicy Tacos").closest("div.group");
     expect(card).toHaveClass("bg-primary/20", "border-accent");

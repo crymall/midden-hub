@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import Can from "@shared/core/gateways/Can";
-import ListAddPopover from "./ListAddPopover";
 import { PERMISSIONS } from "@shared/core/utils/constants";
+
+import Can from "@shared/core/gateways/Can";
+
+import ListAddPopover from "./ListAddPopover";
 
 const RecipeCard = ({ recipe, inverse = false }) => {
   const [showLeft, setShowLeft] = useState(false);
@@ -39,8 +41,7 @@ const RecipeCard = ({ recipe, inverse = false }) => {
   } else if (showLeft) {
     maskImage = "linear-gradient(to right, transparent, black 2rem)";
   } else if (showRight) {
-    maskImage =
-      "linear-gradient(to right, black calc(100% - 2rem), transparent)";
+    maskImage = "linear-gradient(to right, black calc(100% - 2rem), transparent)";
   }
 
   return (
@@ -52,10 +53,7 @@ const RecipeCard = ({ recipe, inverse = false }) => {
             : "bg-primary/20 border-accent hover:bg-primary/40"
         }`}
       >
-        <Link
-          to={`/recipes/${recipe.id}`}
-          className="absolute inset-0 z-0"
-        >
+        <Link to={`/recipes/${recipe.id}`} className="absolute inset-0 z-0">
           <span className="sr-only">View {recipe.title}</span>
         </Link>
 
@@ -89,10 +87,7 @@ const RecipeCard = ({ recipe, inverse = false }) => {
           <div className="flex shrink-0 items-center gap-3">
             {recipe.likes && recipe.likes.length > 0 && (
               <span className="text-accent font-mono text-xs font-bold">
-                ♥{" "}
-                {Intl.NumberFormat("en-US", { notation: "compact" }).format(
-                  recipe.likes.length,
-                )}
+                ♥ {Intl.NumberFormat("en-US", { notation: "compact" }).format(recipe.likes.length)}
               </span>
             )}
             <Can perform={PERMISSIONS.writeData}>

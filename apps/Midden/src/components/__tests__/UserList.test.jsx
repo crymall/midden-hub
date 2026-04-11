@@ -1,98 +1,101 @@
+import { PERMISSIONS } from "@shared/core/utils/constants";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import * as iamApi from "@shared/core/services/iamApi";
+
 import UserList from "../UserList";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
 
-vi.mock("@shared/core/context/data/useData");
-vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/hooks/useAuth");
+vi.mock("@shared/core/services/iamApi");
 
-vi.mock("@shared/core/utils/constants", () => ({
-  ROLES: { Admin: 1, Editor: 2 },
-}));
+vi.mock("@shared/core/utils/constants", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    ROLES: { Admin: 1, Editor: 2 },
+  };
+});
 
 describe("UserList Component", () => {
-  const mockDeleteUser = vi.fn();
-  const mockUpdateUserRole = vi.fn();
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useData.mockReturnValue({
-      users: [],
-      usersLoading: false,
-      deleteUser: mockDeleteUser,
-      updateUserRole: mockUpdateUserRole,
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
     });
     useAuth.mockReturnValue({
-      user: { id: 99, username: "admin" },
+      user: {
+        id: 99,
+        username: "admin",
+        permissions: [PERMISSIONS.writeUsers],
+      },
     });
   });
 
+  const renderWithClient = (ui) =>
+    render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+
   it("renders loading state", () => {
-    useData.mockReturnValue({ usersLoading: true });
-    render(<UserList />);
+    iamApi.fetchUsers.mockImplementation(() => new Promise(() => {}));
+    renderWithClient(<UserList />);
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
-  it("renders empty state", () => {
-    useData.mockReturnValue({ users: [], usersLoading: false });
-    render(<UserList />);
-    expect(screen.getByText(/no users found/i)).toBeInTheDocument();
+  it("renders empty state", async () => {
+    iamApi.fetchUsers.mockResolvedValue({ users: [] });
+    renderWithClient(<UserList />);
+    expect(await screen.findByText(/no users found/i)).toBeInTheDocument();
   });
 
-  it("renders user table", () => {
-    const users = [
-      { id: 1, username: "user1", role: "Editor" },
-      { id: 2, username: "user2", role: "Admin" },
-    ];
-    useData.mockReturnValue({
-      users,
-      usersLoading: false,
-      deleteUser: mockDeleteUser,
-      updateUserRole: mockUpdateUserRole,
+  it("renders user table", async () => {
+    iamApi.fetchUsers.mockResolvedValue({
+      users: [
+        { id: 1, username: "user1", role: "Editor" },
+        { id: 2, username: "user2", role: "Admin" },
+      ],
     });
 
-    render(<UserList />);
-    expect(screen.getByText("user1")).toBeInTheDocument();
+    renderWithClient(<UserList />);
+    expect(await screen.findByText("user1")).toBeInTheDocument();
     expect(screen.getByText("user2")).toBeInTheDocument();
   });
 
   it("calls deleteUser when delete button is clicked and confirmed", async () => {
-    const users = [{ id: 1, username: "user1", role: "Editor" }];
-    useData.mockReturnValue({
-      users,
-      usersLoading: false,
-      deleteUser: mockDeleteUser,
-      updateUserRole: mockUpdateUserRole,
+    iamApi.fetchUsers.mockResolvedValue({
+      users: [{ id: 1, username: "user1", role: "Editor" }],
     });
+    iamApi.deleteUser.mockResolvedValue({});
 
     const confirmSpy = vi.spyOn(window, "confirm").mockImplementation(() => true);
     const user = userEvent.setup();
 
-    render(<UserList />);
-    const deleteBtn = screen.getByRole("button", { name: /delete user/i });
+    renderWithClient(<UserList />);
+    const deleteBtn = await screen.findByRole("button", {
+      name: /delete user/i,
+    });
     await user.click(deleteBtn);
 
     expect(confirmSpy).toHaveBeenCalled();
-    expect(mockDeleteUser).toHaveBeenCalledWith(1);
+    expect(iamApi.deleteUser).toHaveBeenCalledWith(1);
     confirmSpy.mockRestore();
   });
 
-  it("disables admin actions for current user or other admin users", () => {
-    const users = [
-      { id: 99, username: "admin", role: "Admin" }, // Current user
-      { id: 2, username: "otherAdmin", role: "Admin" }, // Another admin
-    ];
-    useAuth.mockReturnValue({ user: { id: 99, username: "admin" } });
-    useData.mockReturnValue({
-      users,
-      usersLoading: false,
-      deleteUser: mockDeleteUser,
-      updateUserRole: mockUpdateUserRole,
+  it("disables admin actions for current user or other admin users", async () => {
+    iamApi.fetchUsers.mockResolvedValue({
+      users: [
+        { id: 99, username: "admin", role: "Admin" },
+        { id: 2, username: "otherAdmin", role: "Admin" },
+      ],
     });
 
-    render(<UserList />);
+    renderWithClient(<UserList />);
+    await screen.findByText("admin");
+
     const deleteBtns = screen.getAllByRole("button", { name: /delete user/i });
     const roleSelects = screen.getAllByRole("combobox");
 

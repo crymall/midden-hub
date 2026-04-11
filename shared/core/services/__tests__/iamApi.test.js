@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import * as api from "../iamApi";
 
 const { mockGet, mockPost, mockPatch, mockDelete, mockUse } = vi.hoisted(() => ({
@@ -35,17 +36,28 @@ describe("iamApi", () => {
   describe("Auth", () => {
     it("login calls post with credentials", async () => {
       await api.login("user", "pass");
-      expect(mockPost).toHaveBeenCalledWith("/login", { username: "user", password: "pass" });
+      expect(mockPost).toHaveBeenCalledWith("/login", {
+        username: "user",
+        password: "pass",
+      });
     });
 
     it("verify2FA calls post with code and rememberMe", async () => {
       await api.verify2FA("u1", "123456", true);
-      expect(mockPost).toHaveBeenCalledWith("/verify-2fa", { userId: "u1", code: "123456", rememberMe: true });
+      expect(mockPost).toHaveBeenCalledWith("/verify-2fa", {
+        userId: "u1",
+        code: "123456",
+        rememberMe: true,
+      });
     });
 
     it("register calls post with user details", async () => {
       await api.register("user", "email@test.com", "pass");
-      expect(mockPost).toHaveBeenCalledWith("/register", { username: "user", email: "email@test.com", password: "pass" });
+      expect(mockPost).toHaveBeenCalledWith("/register", {
+        username: "user",
+        email: "email@test.com",
+        password: "pass",
+      });
     });
 
     it("verify calls get", async () => {
@@ -72,7 +84,9 @@ describe("iamApi", () => {
 
     it("updateUserRole calls patch", async () => {
       await api.updateUserRole("u1", "admin");
-      expect(mockPatch).toHaveBeenCalledWith("/users/u1/role", { roleId: "admin" });
+      expect(mockPatch).toHaveBeenCalledWith("/users/u1/role", {
+        roleId: "admin",
+      });
     });
 
     it("deleteUser calls delete", async () => {
