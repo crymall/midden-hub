@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import MiddenCard from "../MiddenCard";
 
 describe("MiddenCard Component", () => {
@@ -7,14 +8,14 @@ describe("MiddenCard Component", () => {
     render(
       <MiddenCard>
         <div data-testid="child">Child Content</div>
-      </MiddenCard>
+      </MiddenCard>,
     );
     expect(screen.getByTestId("child")).toBeInTheDocument();
   });
 
   it("applies custom className", () => {
     const { container } = render(
-      <MiddenCard className="custom-class">Content</MiddenCard>
+      <MiddenCard className="custom-class">Content</MiddenCard>,
     );
     expect(container.firstChild).toHaveClass("custom-class");
   });

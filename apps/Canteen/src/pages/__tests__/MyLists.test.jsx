@@ -1,10 +1,12 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import MyLists from "../MyLists";
-import { useAuth } from "@shared/core/hooks/useAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
 import * as canteenApi from "@shared/core/services/canteenApi";
+
+import MyLists from "../MyLists";
 
 const mockNavigate = vi.fn();
 
@@ -36,38 +38,53 @@ describe("MyLists", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
     useAuth.mockReturnValue({ user: defaultUser });
     canteenApi.fetchUserLists.mockResolvedValue(defaultLists);
   });
 
-  const renderComponent = (ui) => render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        {ui}
-      </MemoryRouter>
-    </QueryClientProvider>
-  );
+  const renderComponent = (ui) =>
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>{ui}</MemoryRouter>
+      </QueryClientProvider>,
+    );
 
   it("renders lists", async () => {
     renderComponent(<MyLists />);
-    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Favorites")).toBeInTheDocument(),
+    );
     expect(screen.getByText("Weekly")).toBeInTheDocument();
   });
 
   it("does not fetch lists on mount if cache exists", async () => {
     canteenApi.createList.mockResolvedValue({});
     renderComponent(<MyLists />);
-    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Favorites")).toBeInTheDocument(),
+    );
     expect(canteenApi.fetchUserLists).toHaveBeenCalledTimes(1); // Once on mount by useQuery
   });
 
   it("fetches lists on mount if cache is empty", async () => {
     canteenApi.fetchUserLists.mockResolvedValue([]);
     renderComponent(<MyLists />);
-    
+
     await waitFor(() => {
-      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("user1", 20, 0, "", "created_at", "DESC");
+      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith(
+        "user1",
+        20,
+        0,
+        "",
+        "created_at",
+        "DESC",
+      );
     });
   });
 
@@ -81,7 +98,9 @@ describe("MyLists", () => {
     fireEvent.click(deleteBtn);
 
     expect(screen.getByText("Delete List")).toBeInTheDocument();
-    expect(screen.getByText(/Are you sure you want to delete this list/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Are you sure you want to delete this list/),
+    ).toBeInTheDocument();
 
     const confirmBtn = screen.getByText("Delete");
     fireEvent.click(confirmBtn);
@@ -93,7 +112,6 @@ describe("MyLists", () => {
 
   it("opens create modal and creates list", async () => {
     renderComponent(<MyLists />);
-    
 
     const createBtn = screen.getByText("+ List");
     fireEvent.click(createBtn);
@@ -114,11 +132,15 @@ describe("MyLists", () => {
   it("renders back button if history exists and navigates back", async () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={["/", "/my-lists"]} initialIndex={1}><MyLists /></MemoryRouter>
-      </QueryClientProvider>
+        <MemoryRouter initialEntries={["/", "/my-lists"]} initialIndex={1}>
+          <MyLists />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
 
-    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Favorites")).toBeInTheDocument(),
+    );
 
     const backBtn = screen.getByRole("button", { name: "Go back" });
     expect(backBtn).toBeInTheDocument();
@@ -129,22 +151,40 @@ describe("MyLists", () => {
   it("does not render back button if no history exists", async () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={["/my-lists"]} initialIndex={0}><MyLists /></MemoryRouter>
-      </QueryClientProvider>
+        <MemoryRouter initialEntries={["/my-lists"]} initialIndex={0}>
+          <MyLists />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
 
-    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
-    expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByText("Favorites")).toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByRole("button", { name: "Go back" }),
+    ).not.toBeInTheDocument();
   });
 
   it("does not render back button if navigated with hideBack state", async () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={["/lists/1", { pathname: "/my-lists", state: { hideBack: true } }]} initialIndex={1}><MyLists /></MemoryRouter>
-      </QueryClientProvider>
+        <MemoryRouter
+          initialEntries={[
+            "/lists/1",
+            { pathname: "/my-lists", state: { hideBack: true } },
+          ]}
+          initialIndex={1}
+        >
+          <MyLists />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
 
-    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
-    expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByText("Favorites")).toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByRole("button", { name: "Go back" }),
+    ).not.toBeInTheDocument();
   });
 });

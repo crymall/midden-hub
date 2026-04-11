@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import MiddenModal from "../MiddenModal";
 
 global.ResizeObserver = class ResizeObserver {
@@ -13,7 +14,7 @@ describe("MiddenModal", () => {
     render(
       <MiddenModal isOpen={true} onClose={() => {}} title="Test Modal">
         <div>Modal Content</div>
-      </MiddenModal>
+      </MiddenModal>,
     );
     await waitFor(() => {
       expect(screen.getByText("Test Modal")).toBeInTheDocument();
@@ -25,7 +26,7 @@ describe("MiddenModal", () => {
     render(
       <MiddenModal isOpen={false} onClose={() => {}} title="Test Modal">
         <div>Modal Content</div>
-      </MiddenModal>
+      </MiddenModal>,
     );
     await waitFor(() => {
       expect(screen.queryByText("Test Modal")).not.toBeInTheDocument();

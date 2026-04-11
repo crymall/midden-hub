@@ -1,8 +1,10 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import CanteenHome from "../CanteenHome";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
+
+import CanteenHome from "../CanteenHome";
 
 const mockNavigate = vi.fn();
 const mockLocation = { pathname: "" };
@@ -33,13 +35,15 @@ describe("CanteenHome", () => {
     render(
       <MemoryRouter>
         <CanteenHome />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText(/Find and Share/i)).toBeInTheDocument();
     expect(screen.getByText("Recipes.")).toBeInTheDocument();
     expect(screen.getByText(/That’s it./i)).toBeInTheDocument();
-    expect(screen.getByText(/Curate your own recipe book./i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Curate your own recipe book./i),
+    ).toBeInTheDocument();
   });
 
   it("renders the 'Login or Register' button when no user is authenticated", () => {
@@ -47,10 +51,12 @@ describe("CanteenHome", () => {
     render(
       <MemoryRouter>
         <CanteenHome />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(screen.getByRole("button", { name: "Login or Register" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Login or Register" }),
+    ).toBeInTheDocument();
   });
 
   it("does not render the 'Login or Register' button when user is authenticated", () => {
@@ -58,10 +64,12 @@ describe("CanteenHome", () => {
     render(
       <MemoryRouter>
         <CanteenHome />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    expect(screen.queryByRole("button", { name: "Login or Register" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Login or Register" }),
+    ).not.toBeInTheDocument();
   });
 
   it("navigates to login on button click with correct state", () => {
@@ -69,10 +77,12 @@ describe("CanteenHome", () => {
     render(
       <MemoryRouter>
         <CanteenHome />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    const loginButton = screen.getByRole("button", { name: "Login or Register" });
+    const loginButton = screen.getByRole("button", {
+      name: "Login or Register",
+    });
     fireEvent.click(loginButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/login", {

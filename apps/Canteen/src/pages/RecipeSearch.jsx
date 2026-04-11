@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@headlessui/react";
-import MiddenCard from "@shared/ui/components/MiddenCard";
-import RecipeList from "../components/RecipeList";
-import RecipeFilter from "../components/RecipeFilter";
-import PaginationControls from "../components/PaginationControls";
-import Can from "@shared/core/gateways/Can";
 import { PERMISSIONS } from "@shared/core/utils/constants";
 import { useQuery } from "@tanstack/react-query";
+
 import { fetchRecipes } from "@shared/core/services/canteenApi";
+
+import Can from "@shared/core/gateways/Can";
+
+import MiddenCard from "@shared/ui/components/MiddenCard";
+import PaginationControls from "../components/PaginationControls";
+import RecipeFilter from "../components/RecipeFilter";
+import RecipeList from "../components/RecipeList";
 
 const RecipeSearch = () => {
   const [page, setPage] = useState(1);
@@ -17,10 +20,17 @@ const RecipeSearch = () => {
 
   const { data: recipes = [], isLoading: recipesLoading } = useQuery({
     queryKey: ["searchedRecipes", { limit, page, filters }],
-    queryFn: () => { 
+    queryFn: () => {
       const { tags, ingredients, title, ids } = filters;
-      return fetchRecipes(limit, (page - 1) * limit, tags, ingredients, title, ids); 
-    }
+      return fetchRecipes(
+        limit,
+        (page - 1) * limit,
+        tags,
+        ingredients,
+        title,
+        ids,
+      );
+    },
   });
 
   const handleFilter = (newFilters) => {
@@ -48,7 +58,9 @@ const RecipeSearch = () => {
         </h2>
         <Can perform={PERMISSIONS.writeData}>
           <Link to="/recipes/new">
-            <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">+ Recipe</Button>
+            <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">
+              + Recipe
+            </Button>
           </Link>
         </Can>
       </div>
@@ -56,7 +68,11 @@ const RecipeSearch = () => {
       <RecipeList
         recipes={recipes}
         loading={recipesLoading}
-        emptyMessage={hasFilters ? "No recipes found matching your search." : "No recipes found in the canteen."}
+        emptyMessage={
+          hasFilters
+            ? "No recipes found matching your search."
+            : "No recipes found in the canteen."
+        }
       />
 
       <PaginationControls

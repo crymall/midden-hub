@@ -1,9 +1,17 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Button, Textarea, Field } from "@headlessui/react";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { Button, Field, Textarea } from "@headlessui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchConversation, fetchUser, markMessagesAsRead, sendMessage, fetchRecipes } from "@shared/core/services/canteenApi";
+import {
+  fetchConversation,
+  fetchRecipes,
+  fetchUser,
+  markMessagesAsRead,
+  sendMessage,
+} from "@shared/core/services/canteenApi";
+
 import RecipeCard from "../components/RecipeCard";
 
 const Conversation = () => {
@@ -20,51 +28,57 @@ const Conversation = () => {
     enabled: !!id,
   });
 
-  const { data: currentConversation = [], isLoading: conversationLoading } = useQuery({
-    queryKey: ["conversations", id],
-    queryFn: async () => {
-      const conversation = await fetchConversation(id);
-      const recipeIds = [...new Set(conversation.map((msg) => msg.recipe_id).filter(Boolean))];
+  const { data: currentConversation = [], isLoading: conversationLoading } =
+    useQuery({
+      queryKey: ["conversations", id],
+      queryFn: async () => {
+        const conversation = await fetchConversation(id);
+        const recipeIds = [
+          ...new Set(conversation.map((msg) => msg.recipe_id).filter(Boolean)),
+        ];
 
-      if (recipeIds.length > 0) {
-        const fetchedRecipes = await fetchRecipes(
-          recipeIds.length,
-          0,
-          undefined,
-          undefined,
-          undefined,
-          recipeIds
-        );
-        const recipesMap = {};
-        for (const recipe of fetchedRecipes) {
-          recipesMap[String(recipe.id)] = recipe;
-        }
-        for (const msg of conversation) {
-          if (msg.recipe_id && recipesMap[String(msg.recipe_id)]) {
-            msg.recipe = recipesMap[String(msg.recipe_id)];
+        if (recipeIds.length > 0) {
+          const fetchedRecipes = await fetchRecipes(
+            recipeIds.length,
+            0,
+            undefined,
+            undefined,
+            undefined,
+            recipeIds,
+          );
+          const recipesMap = {};
+          for (const recipe of fetchedRecipes) {
+            recipesMap[String(recipe.id)] = recipe;
+          }
+          for (const msg of conversation) {
+            if (msg.recipe_id && recipesMap[String(msg.recipe_id)]) {
+              msg.recipe = recipesMap[String(msg.recipe_id)];
+            }
           }
         }
-      }
-      return conversation;
-    },
-    enabled: !!id,
-  });
+        return conversation;
+      },
+      enabled: !!id,
+    });
 
   const { mutate: mutateMarkMessagesAsRead } = useMutation({
     mutationFn: (unreadIds) => markMessagesAsRead(unreadIds),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["conversations", id] })
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["conversations", id] }),
   });
 
   const handleSendMutation = useMutation({
     mutationFn: ({ id, newMessage }) => sendMessage(id, newMessage),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["conversations", id] })
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["conversations", id] }),
   });
 
   useEffect(() => {
     if (currentConversation.length > 0 && user) {
       const unreadIds = currentConversation
         .filter(
-          (msg) => String(msg.receiver_id) === String(user.canteenId) && !msg.is_read,
+          (msg) =>
+            String(msg.receiver_id) === String(user.canteenId) && !msg.is_read,
         )
         .map((msg) => msg.id);
 

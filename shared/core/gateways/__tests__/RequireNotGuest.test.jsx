@@ -1,8 +1,9 @@
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Routes, Route, useLocation } from "react-router-dom";
-import { describe, it, expect, vi } from "vitest";
-import RequireNotGuest from "../RequireNotGuest";
+import { describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "../../hooks/useAuth";
+import RequireNotGuest from "../RequireNotGuest";
 
 vi.mock("../../hooks/useAuth");
 
@@ -17,7 +18,7 @@ describe("RequireNotGuest Gateway", () => {
             <Route path="/restricted" element={<div>Restricted Content</div>} />
           </Route>
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Verifying session...")).toBeInTheDocument();
@@ -25,7 +26,10 @@ describe("RequireNotGuest Gateway", () => {
   });
 
   it("renders outlet content if user is authenticated and not guest", () => {
-    useAuth.mockReturnValue({ user: { username: "regularUser" }, isLoading: false });
+    useAuth.mockReturnValue({
+      user: { username: "regularUser" },
+      isLoading: false,
+    });
 
     render(
       <MemoryRouter initialEntries={["/restricted"]}>
@@ -34,7 +38,7 @@ describe("RequireNotGuest Gateway", () => {
             <Route path="/restricted" element={<div>Restricted Content</div>} />
           </Route>
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Restricted Content")).toBeInTheDocument();
@@ -61,9 +65,9 @@ describe("RequireNotGuest Gateway", () => {
             <Route path="/restricted" element={<div>Restricted Content</div>} />
           </Route>
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-    
+
     expect(screen.getByText("Login Page")).toBeInTheDocument();
     expect(screen.getByTestId("from-state")).toHaveTextContent("/restricted");
   });
@@ -79,7 +83,7 @@ describe("RequireNotGuest Gateway", () => {
             <Route path="/restricted" element={<div>Restricted Content</div>} />
           </Route>
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("Login Page")).toBeInTheDocument();
   });

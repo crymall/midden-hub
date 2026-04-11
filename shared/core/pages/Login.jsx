@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, Field, Input, Label } from "@headlessui/react";
+
 import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
@@ -120,17 +121,32 @@ export default function Login() {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="size-4 cursor-pointer"
                 />
-                <Label htmlFor="rememberMe" className="cursor-pointer text-sm font-bold">
+                <Label
+                  htmlFor="rememberMe"
+                  className="cursor-pointer text-sm font-bold"
+                >
                   Remember This Device
                 </Label>
               </Field>
             </>
           ) : (
             <>
-              {pageInput("Username", "text", "Your username", username, setUsername)}
+              {pageInput(
+                "Username",
+                "text",
+                "Your username",
+                username,
+                setUsername,
+              )}
               {mode === "register" &&
                 pageInput("Email", "email", "you@example.com", email, setEmail)}
-              {pageInput("Password", "password", "Your password", password, setPassword)}
+              {pageInput(
+                "Password",
+                "password",
+                "Your password",
+                password,
+                setPassword,
+              )}
             </>
           )}
 
@@ -143,12 +159,15 @@ export default function Login() {
             </Button>
 
             {mode === "register" &&
-              pageButton("Already have an account? Login", () => setCleanMode("login"))}
+              pageButton("Already have an account? Login", () =>
+                setCleanMode("login"),
+              )}
 
             {mode === "2fa" &&
               pageButton("Back to Login", () => setCleanMode("login"))}
 
-            {mode === "login" && pageButton("Create Account", () => setCleanMode("register"))}
+            {mode === "login" &&
+              pageButton("Create Account", () => setCleanMode("register"))}
           </div>
         </form>
       </div>

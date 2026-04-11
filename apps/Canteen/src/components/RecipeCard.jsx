@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import Can from "@shared/core/gateways/Can";
-import ListAddPopover from "./ListAddPopover";
 import { PERMISSIONS } from "@shared/core/utils/constants";
+
+import Can from "@shared/core/gateways/Can";
+
+import ListAddPopover from "./ListAddPopover";
 
 const RecipeCard = ({ recipe, inverse = false }) => {
   const [showLeft, setShowLeft] = useState(false);
@@ -52,10 +54,7 @@ const RecipeCard = ({ recipe, inverse = false }) => {
             : "bg-primary/20 border-accent hover:bg-primary/40"
         }`}
       >
-        <Link
-          to={`/recipes/${recipe.id}`}
-          className="absolute inset-0 z-0"
-        >
+        <Link to={`/recipes/${recipe.id}`} className="absolute inset-0 z-0">
           <span className="sr-only">View {recipe.title}</span>
         </Link>
 

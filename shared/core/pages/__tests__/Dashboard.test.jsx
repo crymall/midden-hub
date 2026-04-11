@@ -1,10 +1,11 @@
-import { render, screen } from "@testing-library/react";
 import { lazy } from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { describe, it, expect, vi } from "vitest";
-import Dashboard from "../Dashboard";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "../../hooks/useAuth";
 import { navMeta } from "../../utils/constants";
+import Dashboard from "../Dashboard";
 
 vi.mock("../../hooks/useAuth");
 
@@ -18,7 +19,7 @@ describe("Dashboard Component", () => {
     render(
       <MemoryRouter>
         <Dashboard navMeta={navMeta.midden} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Midden")).toBeInTheDocument();
@@ -38,7 +39,7 @@ describe("Dashboard Component", () => {
             <Route index element={<div>Test Content</div>} />
           </Route>
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Test Content")).toBeInTheDocument();
@@ -59,7 +60,7 @@ describe("Dashboard Component", () => {
             <Route index element={<LazyContent />} />
           </Route>
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Loading...")).toBeInTheDocument();

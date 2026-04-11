@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { createRecipe } from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import RecipeForm from "../components/RecipeForm";
 
@@ -20,7 +22,9 @@ const NewRecipe = () => {
     },
     onError: (err) => {
       console.error(err);
-      setError("Failed to create recipe. Please check your inputs and try again.");
+      setError(
+        "Failed to create recipe. Please check your inputs and try again.",
+      );
     },
   });
 
@@ -34,7 +38,12 @@ const NewRecipe = () => {
       <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
         New Recipe
       </h2>
-      <RecipeForm onSubmit={handleSubmit} isSubmitting={createRecipeMutation.isPending} error={error} submitLabel="Create Recipe" />
+      <RecipeForm
+        onSubmit={handleSubmit}
+        isSubmitting={createRecipeMutation.isPending}
+        error={error}
+        submitLabel="Create Recipe"
+      />
     </MiddenCard>
   );
 };

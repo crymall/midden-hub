@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import {
-  fetchRecipe,
-  updateRecipe,
-  removeRecipeTag,
-  addRecipeTag,
-  removeRecipeIngredient,
   addRecipeIngredient,
+  addRecipeTag,
+  fetchRecipe,
+  removeRecipeIngredient,
+  removeRecipeTag,
+  updateRecipe,
 } from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import RecipeForm from "../components/RecipeForm";
 

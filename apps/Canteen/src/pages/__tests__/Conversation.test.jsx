@@ -1,16 +1,18 @@
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+  act,
+  fireEvent,
   render,
   screen,
-  fireEvent,
   waitFor,
-  act,
 } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
-import Conversation from "../Conversation";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as canteenApi from "@shared/core/services/canteenApi";
+
+import Conversation from "../Conversation";
 
 vi.mock("@shared/core/services/canteenApi");
 vi.mock("@shared/core/hooks/useAuth");

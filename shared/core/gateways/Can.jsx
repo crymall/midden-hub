@@ -1,5 +1,5 @@
-import { useAuth } from "../hooks/useAuth";
 import Loading from "../../ui/components/Loading";
+import { useAuth } from "../hooks/useAuth";
 
 const Can = ({ perform, children, not }) => {
   const { user, isLoading } = useAuth();

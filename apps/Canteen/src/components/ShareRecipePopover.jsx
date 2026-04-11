@@ -1,21 +1,23 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Button,
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
   Field,
   Label,
-  Textarea,
   Popover,
   PopoverButton,
   PopoverPanel,
-  Combobox,
-  ComboboxInput,
-  ComboboxOptions,
-  ComboboxOption,
+  Textarea,
 } from "@headlessui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import MiddenModal from "@shared/ui/components/MiddenModal";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchFriends, sendMessage } from "@shared/core/services/canteenApi";
+
+import MiddenModal from "@shared/ui/components/MiddenModal";
 
 const ShareRecipePopover = ({
   recipe,
@@ -64,7 +66,8 @@ const ShareRecipePopover = ({
   };
 
   const sendMessageMutation = useMutation({
-    mutationFn: ({ receiverId, content, recipeId }) => sendMessage(receiverId, content, recipeId),
+    mutationFn: ({ receiverId, content, recipeId }) =>
+      sendMessage(receiverId, content, recipeId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
       queryClient.invalidateQueries({ queryKey: ["threads"] });
@@ -72,14 +75,18 @@ const ShareRecipePopover = ({
       setSelectedFriend(null);
       setMessage("");
     },
-    onError: (error) => console.error(error)
+    onError: (error) => console.error(error),
   });
 
   const handleSend = (e) => {
     e.preventDefault();
     if (!selectedFriend || !recipe) return;
 
-    sendMessageMutation.mutate({ receiverId: selectedFriend.id, content: message, recipeId: recipe.id });
+    sendMessageMutation.mutate({
+      receiverId: selectedFriend.id,
+      content: message,
+      recipeId: recipe.id,
+    });
   };
 
   const handleCopyLink = () => {
@@ -91,7 +98,10 @@ const ShareRecipePopover = ({
       if (copyTimeoutRef.current) {
         clearTimeout(copyTimeoutRef.current);
       }
-      copyTimeoutRef.current = setTimeout(() => setCopyStatus("Copy Link"), 2000);
+      copyTimeoutRef.current = setTimeout(
+        () => setCopyStatus("Copy Link"),
+        2000,
+      );
     });
   };
 
@@ -100,9 +110,7 @@ const ShareRecipePopover = ({
       <Popover className={className}>
         {({ close }) => (
           <>
-            <PopoverButton
-              className={`focus:outline-none ${buttonClassName}`}
-            >
+            <PopoverButton className={`focus:outline-none ${buttonClassName}`}>
               {label}
             </PopoverButton>
             <PopoverPanel

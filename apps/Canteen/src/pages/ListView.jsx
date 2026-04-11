@@ -1,7 +1,12 @@
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { fetchUserLists, fetchListRecipes } from "@shared/core/services/canteenApi";
+import {
+  fetchListRecipes,
+  fetchUserLists,
+} from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import RecipeList from "../components/RecipeList";
 
@@ -18,7 +23,11 @@ const ListView = () => {
     enabled: !!user,
   });
 
-  const { data: currentListRecipes = [], isLoading: recipesLoading, isError: recipesFetchFailed } = useQuery({
+  const {
+    data: currentListRecipes = [],
+    isLoading: recipesLoading,
+    isError: recipesFetchFailed,
+  } = useQuery({
     queryKey: ["listRecipes", id],
     queryFn: () => fetchListRecipes(id),
     enabled: !!id,
@@ -80,10 +89,7 @@ const ListView = () => {
         </div>
       </div>
 
-      <RecipeList
-        recipes={currentListRecipes}
-        loading={isLoading}
-      />
+      <RecipeList recipes={currentListRecipes} loading={isLoading} />
     </MiddenCard>
   );
 };

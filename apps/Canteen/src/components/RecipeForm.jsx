@@ -2,43 +2,62 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
-  Field,
-  Label,
-  Input,
-  Textarea,
-  Popover,
-  PopoverButton,
-  PopoverPanel,
   Checkbox,
   Combobox,
   ComboboxInput,
-  ComboboxOptions,
   ComboboxOption,
+  ComboboxOptions,
+  Field,
+  Input,
+  Label,
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+  Textarea,
 } from "@headlessui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import {
+  createIngredient,
+  createTag,
+  fetchIngredients,
+  fetchTags,
+} from "@shared/core/services/canteenApi";
+
 import MiddenModal from "@shared/ui/components/MiddenModal";
 import DurationInput from "./DurationInput";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchTags, fetchIngredients, createTag, createIngredient } from "@shared/core/services/canteenApi";
 
-const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = "Save Recipe" }) => {
+const RecipeForm = ({
+  initialData,
+  onSubmit,
+  isSubmitting,
+  error,
+  submitLabel = "Save Recipe",
+}) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [formData, setFormData] = useState(initialData?.formData || {
-    title: "",
-    description: "",
-    prep_time_minutes: "",
-    cook_time_minutes: "",
-    wait_time_minutes: "",
-    servings: "",
-    instructions: "",
-  });
+  const [formData, setFormData] = useState(
+    initialData?.formData || {
+      title: "",
+      description: "",
+      prep_time_minutes: "",
+      cook_time_minutes: "",
+      wait_time_minutes: "",
+      servings: "",
+      instructions: "",
+    },
+  );
 
-  const [ingredients, setIngredients] = useState(initialData?.ingredients || [
-    { id: null, name: "", quantity: "", unit: "", notes: "" },
-  ]);
+  const [ingredients, setIngredients] = useState(
+    initialData?.ingredients || [
+      { id: null, name: "", quantity: "", unit: "", notes: "" },
+    ],
+  );
 
-  const [selectedTags, setSelectedTags] = useState(initialData?.selectedTags || []);
+  const [selectedTags, setSelectedTags] = useState(
+    initialData?.selectedTags || [],
+  );
 
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [newTagName, setNewTagName] = useState("");
@@ -52,12 +71,12 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
 
   const { data: tags = [] } = useQuery({
     queryKey: ["tags"],
-    queryFn: () => fetchTags(500, 0)
+    queryFn: () => fetchTags(500, 0),
   });
 
   const { data: searchResults = [] } = useQuery({
     queryKey: ["ingredients", ingredientSearchQuery],
-    queryFn: () => fetchIngredients(50, 0, ingredientSearchQuery)
+    queryFn: () => fetchIngredients(50, 0, ingredientSearchQuery),
   });
 
   const handleChange = (e) => {
@@ -109,7 +128,7 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
       setNewTagName("");
       setIsTagModalOpen(false);
     },
-    onError: (e) => console.error(e)
+    onError: (e) => console.error(e),
   });
 
   const handleConfirmCreateTag = () => {
@@ -140,7 +159,7 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
       setPendingIngredientName("");
       setPendingIngredientIndex(null);
     },
-    onError: (e) => console.error(e)
+    onError: (e) => console.error(e),
   });
 
   const handleConfirmCreateIngredient = () => {
@@ -161,9 +180,11 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
 
     const sServings = sanitizeNumber(formData.servings);
     const newInvalidFields = [];
-    if (!formData.title || !formData.title.trim()) newInvalidFields.push("title");
+    if (!formData.title || !formData.title.trim())
+      newInvalidFields.push("title");
     if (sServings === null) newInvalidFields.push("servings");
-    if (!formData.instructions || !formData.instructions.trim()) newInvalidFields.push("instructions");
+    if (!formData.instructions || !formData.instructions.trim())
+      newInvalidFields.push("instructions");
 
     if (newInvalidFields.length > 0) {
       setInvalidFields(newInvalidFields);
@@ -216,7 +237,8 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
   ) => (
     <Field className={className}>
       <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-        {label}{props.required ? " *" : ""}
+        {label}
+        {props.required ? " *" : ""}
       </Label>
       <Input
         name={name}
@@ -239,7 +261,8 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
   ) => (
     <Field className={className}>
       <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-        {label}{required ? " *" : ""}
+        {label}
+        {required ? " *" : ""}
       </Label>
       <Textarea
         name={name}
@@ -438,9 +461,9 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
                             id: null,
                           };
                           setIngredients(newIngredients);
-                        setIngredientSearchQuery(val);
+                          setIngredientSearchQuery(val);
                         }}
-                      onFocus={() => setIngredientSearchQuery(ing.name)}
+                        onFocus={() => setIngredientSearchQuery(ing.name)}
                       />
                       {(searchResults.length > 0 ||
                         ((ing.name || "").trim() !== "" &&
@@ -498,7 +521,14 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
           </div>
         </div>
 
-        {renderTextarea("Instructions", "instructions", 10, "", "Step 1: ...", true)}
+        {renderTextarea(
+          "Instructions",
+          "instructions",
+          10,
+          "",
+          "Step 1: ...",
+          true,
+        )}
 
         <div className="flex justify-end gap-4 pt-4">
           <Button
@@ -523,30 +553,30 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
         onClose={() => setIsTagModalOpen(false)}
         title="Create New Tag"
       >
-            <div className="flex flex-col gap-4">
-              <Input
-                value={newTagName}
-                onChange={(e) => setNewTagName(e.target.value)}
-                className={`${baseInputClass} w-full`}
-                placeholder="Tag Name"
-                autoFocus
-              />
-              <div className="flex justify-end gap-2">
-                <Button
-                  onClick={() => setIsTagModalOpen(false)}
-                  className="text-lightGrey px-4 py-2 font-bold hover:text-white"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleConfirmCreateTag}
-                  disabled={createTagMutation.isPending}
-                  className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
-                >
-                  {createTagMutation.isPending ? "Creating..." : "Create"}
-                </Button>
-              </div>
-            </div>
+        <div className="flex flex-col gap-4">
+          <Input
+            value={newTagName}
+            onChange={(e) => setNewTagName(e.target.value)}
+            className={`${baseInputClass} w-full`}
+            placeholder="Tag Name"
+            autoFocus
+          />
+          <div className="flex justify-end gap-2">
+            <Button
+              onClick={() => setIsTagModalOpen(false)}
+              className="text-lightGrey px-4 py-2 font-bold hover:text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmCreateTag}
+              disabled={createTagMutation.isPending}
+              className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
+            >
+              {createTagMutation.isPending ? "Creating..." : "Create"}
+            </Button>
+          </div>
+        </div>
       </MiddenModal>
 
       <MiddenModal
@@ -554,28 +584,28 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
         onClose={() => setIsIngredientModalOpen(false)}
         title="Create Ingredient"
       >
-            <p className="text-lightestGrey mb-6 font-mono">
-              Are you sure you want to create the ingredient{" "}
-              <span className="text-accent font-bold">
-                {`"${pendingIngredientName}"`}
-              </span>
-              ?
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button
-                onClick={() => setIsIngredientModalOpen(false)}
-                className="text-lightGrey px-4 py-2 font-bold hover:text-white"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleConfirmCreateIngredient}
-                disabled={createIngredientMutation.isPending}
-                className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
-              >
-                {createIngredientMutation.isPending ? "Creating..." : "Create"}
-              </Button>
-            </div>
+        <p className="text-lightestGrey mb-6 font-mono">
+          Are you sure you want to create the ingredient{" "}
+          <span className="text-accent font-bold">
+            {`"${pendingIngredientName}"`}
+          </span>
+          ?
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button
+            onClick={() => setIsIngredientModalOpen(false)}
+            className="text-lightGrey px-4 py-2 font-bold hover:text-white"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmCreateIngredient}
+            disabled={createIngredientMutation.isPending}
+            className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
+          >
+            {createIngredientMutation.isPending ? "Creating..." : "Create"}
+          </Button>
+        </div>
       </MiddenModal>
     </>
   );

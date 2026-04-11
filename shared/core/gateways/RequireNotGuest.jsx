@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+
 import Loading from "../../ui/components/Loading";
+import { useAuth } from "../hooks/useAuth";
 
 const RequireNotGuest = () => {
   const { user, isLoading } = useAuth();

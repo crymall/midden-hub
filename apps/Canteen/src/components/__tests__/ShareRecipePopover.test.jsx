@@ -1,9 +1,17 @@
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import ShareRecipePopover from "../ShareRecipePopover";
-import { useAuth } from "@shared/core/hooks/useAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
 import * as canteenApi from "@shared/core/services/canteenApi";
+
+import ShareRecipePopover from "../ShareRecipePopover";
 
 vi.mock("@shared/core/services/canteenApi");
 vi.mock("@shared/core/hooks/useAuth");
@@ -40,7 +48,12 @@ describe("ShareRecipePopover", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useAuth.mockReturnValue({ user: mockUser });
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
     canteenApi.fetchFriends.mockResolvedValue(mockFriends);
     canteenApi.sendMessage.mockResolvedValue({});
 
@@ -55,7 +68,7 @@ describe("ShareRecipePopover", () => {
     return render(
       <QueryClientProvider client={queryClient}>
         <ShareRecipePopover recipe={mockRecipe} label="Share" {...props} />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
   };
 
@@ -67,7 +80,7 @@ describe("ShareRecipePopover", () => {
   describe("Popover Behavior", () => {
     it("fetches friends on mount", async () => {
       renderComponent();
-      
+
       await waitFor(() => {
         expect(canteenApi.fetchFriends).toHaveBeenCalledWith("user123", 500, 0);
       });
@@ -160,9 +173,13 @@ describe("ShareRecipePopover", () => {
       });
       expect(screen.getByText(`Share with Alice`)).toBeInTheDocument();
 
-      const messageInput = screen.getByPlaceholderText("Check out this recipe!");
+      const messageInput = screen.getByPlaceholderText(
+        "Check out this recipe!",
+      );
       await act(async () => {
-        fireEvent.change(messageInput, { target: { value: "You should try this!" } });
+        fireEvent.change(messageInput, {
+          target: { value: "You should try this!" },
+        });
       });
 
       const sendButton = screen.getByText("Send");
@@ -174,7 +191,7 @@ describe("ShareRecipePopover", () => {
         expect(canteenApi.sendMessage).toHaveBeenCalledWith(
           "friend1",
           "You should try this!",
-          "recipe456"
+          "recipe456",
         );
       });
 

@@ -1,9 +1,11 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import ListAddPopover from "../ListAddPopover";
-import { useAuth } from "@shared/core/hooks/useAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
 import * as canteenApi from "@shared/core/services/canteenApi";
+
+import ListAddPopover from "../ListAddPopover";
 
 global.ResizeObserver = class ResizeObserver {
   observe() {}
@@ -26,15 +28,21 @@ describe("ListAddPopover", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useAuth.mockReturnValue({ user: defaultUser });
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
     canteenApi.fetchUserLists.mockResolvedValue(defaultLists);
     canteenApi.addRecipeToList.mockResolvedValue({});
     canteenApi.createList.mockResolvedValue({ id: "list3", name: "New List" });
   });
 
-  const renderComponent = (ui) => render(
-    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
-  );
+  const renderComponent = (ui) =>
+    render(
+      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+    );
 
   it("renders the button correctly", () => {
     renderComponent(<ListAddPopover recipeId="recipe1" />);
@@ -52,7 +60,12 @@ describe("ListAddPopover", () => {
       await screen.findByText("Favorites");
       fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
-      await waitFor(() => expect(canteenApi.addRecipeToList).toHaveBeenCalledWith("list1", "recipe1"));
+      await waitFor(() =>
+        expect(canteenApi.addRecipeToList).toHaveBeenCalledWith(
+          "list1",
+          "recipe1",
+        ),
+      );
     });
 
     it("opens create modal and creates list", async () => {
@@ -75,7 +88,10 @@ describe("ListAddPopover", () => {
 
       await waitFor(() => {
         expect(canteenApi.createList).toHaveBeenCalledWith("New List");
-        expect(canteenApi.addRecipeToList).toHaveBeenCalledWith("list3", "recipe1");
+        expect(canteenApi.addRecipeToList).toHaveBeenCalledWith(
+          "list3",
+          "recipe1",
+        );
       });
     });
   });

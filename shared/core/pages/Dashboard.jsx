@@ -1,8 +1,9 @@
-import { useLayoutEffect, Suspense } from "react";
+import { Suspense, useLayoutEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+
 import Header from "../../ui/components/Header";
 import Loading from "../../ui/components/Loading";
+import { useAuth } from "../hooks/useAuth";
 
 const Dashboard = ({ navMeta }) => {
   const { user, logout } = useAuth();

@@ -1,20 +1,28 @@
 import { useState } from "react";
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Popover,
   PopoverButton,
   PopoverPanel,
 } from "@headlessui/react";
+import { PERMISSIONS } from "@shared/core/utils/constants";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchRecipe, likeRecipe, unlikeRecipe, deleteRecipe } from "@shared/core/services/canteenApi";
-import MiddenCard from "@shared/ui/components/MiddenCard";
+import {
+  deleteRecipe,
+  fetchRecipe,
+  likeRecipe,
+  unlikeRecipe,
+} from "@shared/core/services/canteenApi";
+
 import Can from "@shared/core/gateways/Can";
+
+import MiddenCard from "@shared/ui/components/MiddenCard";
+import MiddenModal from "@shared/ui/components/MiddenModal";
 import ListAddPopover from "../components/ListAddPopover";
 import ShareRecipePopover from "../components/ShareRecipePopover";
-import MiddenModal from "@shared/ui/components/MiddenModal";
-import { PERMISSIONS } from "@shared/core/utils/constants";
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -25,7 +33,11 @@ const RecipeDetail = () => {
   const hasHistory = location.key !== "default";
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const { data: currentRecipe, isLoading: recipesLoading, isError: fetchFailed } = useQuery({
+  const {
+    data: currentRecipe,
+    isLoading: recipesLoading,
+    isError: fetchFailed,
+  } = useQuery({
     queryKey: ["recipe", id],
     queryFn: () => fetchRecipe(id),
     enabled: !!id,
@@ -46,7 +58,7 @@ const RecipeDetail = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recipe", id] });
-    }
+    },
   });
 
   const deleteRecipeMutation = useMutation({
@@ -59,7 +71,7 @@ const RecipeDetail = () => {
     },
     onError: (err) => {
       console.error("Failed to delete recipe", err);
-    }
+    },
   });
 
   if (recipesLoading) {

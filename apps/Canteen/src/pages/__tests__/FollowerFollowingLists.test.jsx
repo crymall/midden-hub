@@ -1,10 +1,18 @@
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
-import FollowerFollowingLists from "../FollowerFollowingLists";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import * as canteenApi from "@shared/core/services/canteenApi";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
+import * as canteenApi from "@shared/core/services/canteenApi";
+
+import FollowerFollowingLists from "../FollowerFollowingLists";
 
 vi.mock("@shared/core/services/canteenApi");
 vi.mock("@shared/core/hooks/useAuth");
@@ -17,10 +25,16 @@ vi.mock("../../components/CanteenUserList", () => ({
   default: ({ users, onToggleFollow, onPageChange, onLimitChange }) => (
     <div data-testid="canteen-user-list">
       <div>Users Count: {users.length}</div>
-      <button onClick={() => onToggleFollow("targetId", false)}>Mock Follow</button>
-      <button onClick={() => onToggleFollow("targetId", true)}>Mock Unfollow</button>
+      <button onClick={() => onToggleFollow("targetId", false)}>
+        Mock Follow
+      </button>
+      <button onClick={() => onToggleFollow("targetId", true)}>
+        Mock Unfollow
+      </button>
       <button onClick={() => onPageChange(2)}>Next Page</button>
-      <button onClick={() => onLimitChange({ target: { value: 50 } })}>Change Limit</button>
+      <button onClick={() => onLimitChange({ target: { value: 50 } })}>
+        Change Limit
+      </button>
     </div>
   ),
 }));
@@ -32,12 +46,20 @@ describe("FollowerFollowingLists", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
     useAuth.mockReturnValue({ user: defaultUser });
-    
+
     canteenApi.fetchFollowers.mockResolvedValue([{ id: "f1" }, { id: "f2" }]);
     canteenApi.fetchFollowing.mockResolvedValue([{ id: "f3" }]);
-    canteenApi.fetchRelationshipCounts.mockResolvedValue({ followers: 2, following: 1 });
+    canteenApi.fetchRelationshipCounts.mockResolvedValue({
+      followers: 2,
+      following: 1,
+    });
   });
 
   const renderComponent = (initialRoute = "/network/1") => {
@@ -48,11 +70,13 @@ describe("FollowerFollowingLists", () => {
             <Route path="/network/:id" element={<FollowerFollowingLists />} />
             <Route
               path="/user/:id"
-              element={<div data-testid="profile-redirect">Redirected to Profile</div>}
+              element={
+                <div data-testid="profile-redirect">Redirected to Profile</div>
+              }
             />
           </Routes>
         </MemoryRouter>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
   };
 

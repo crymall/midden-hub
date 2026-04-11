@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { StrictMode } from "react";
-import App from "../App";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import App from "../App";
 
 const renderMock = vi.fn();
 const createRootMock = vi.fn(() => ({ render: renderMock }));
@@ -24,7 +25,7 @@ describe("main.jsx", () => {
 
   it("renders App component into root element", async () => {
     vi.resetModules();
-    
+
     await import("../main.jsx");
 
     const rootElement = document.getElementById("root");
@@ -34,7 +35,7 @@ describe("main.jsx", () => {
         <QueryClientProvider client={expect.any(QueryClient)}>
           <App />
         </QueryClientProvider>
-      </StrictMode>
+      </StrictMode>,
     );
   });
 });

@@ -1,14 +1,20 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@headlessui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
+import {
+  createList,
+  deleteList,
+  fetchUserLists,
+} from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import MiddenModal from "@shared/ui/components/MiddenModal";
+import CreateListModal from "../components/CreateListModal";
 import ListList from "../components/ListList";
 import PaginationControls from "../components/PaginationControls";
-import CreateListModal from "../components/CreateListModal";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createList, fetchUserLists, deleteList } from "@shared/core/services/canteenApi";
 
 const MyLists = () => {
   const { user } = useAuth();
@@ -20,24 +26,27 @@ const MyLists = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [listToDelete, setListToDelete] = useState(null);
-  const offset = limit ? (page - 1) * limit : 0; 
+  const offset = limit ? (page - 1) * limit : 0;
 
   const { data: userLists = [], isLoading: fetchingLists } = useQuery({
     queryKey: ["userLists", user?.canteenId, { limit: limit, offset: offset }],
-    queryFn: () => fetchUserLists(user.canteenId, limit, offset, "", "created_at", "DESC"),
-    enabled: !!user
+    queryFn: () =>
+      fetchUserLists(user.canteenId, limit, offset, "", "created_at", "DESC"),
+    enabled: !!user,
   });
 
   const createListMutation = useMutation({
     mutationFn: (name) => createList(name),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userLists", user?.canteenId] });
+      queryClient.invalidateQueries({
+        queryKey: ["userLists", user?.canteenId],
+      });
       queryClient.invalidateQueries({ queryKey: ["comboboxLists"] });
       setIsCreateModalOpen(false);
     },
     onError: (error) => {
       console.error("Failed to create list", error);
-    }
+    },
   });
 
   const handleCreateList = (name) => {
@@ -53,13 +62,15 @@ const MyLists = () => {
   const deleteListMutation = useMutation({
     mutationFn: (id) => deleteList(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userLists", user?.canteenId] });
+      queryClient.invalidateQueries({
+        queryKey: ["userLists", user?.canteenId],
+      });
       queryClient.invalidateQueries({ queryKey: ["comboboxLists"] });
       setListToDelete(null);
     },
     onError: (error) => {
       console.error("Failed to delete list", error);
-    }
+    },
   });
 
   const confirmDeleteList = () => {
@@ -88,7 +99,9 @@ const MyLists = () => {
               D
             </button>
           )}
-          <h2 className="font-gothic text-4xl font-bold text-white">My Lists</h2>
+          <h2 className="font-gothic text-4xl font-bold text-white">
+            My Lists
+          </h2>
         </div>
         <Button
           onClick={() => setIsCreateModalOpen(true)}

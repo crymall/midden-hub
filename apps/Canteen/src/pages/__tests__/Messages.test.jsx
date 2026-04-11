@@ -1,10 +1,18 @@
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import Messages from "../Messages";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import * as canteenApi from "@shared/core/services/canteenApi";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
+import * as canteenApi from "@shared/core/services/canteenApi";
+
+import Messages from "../Messages";
 
 vi.mock("@shared/core/services/canteenApi");
 vi.mock("@shared/core/hooks/useAuth");
@@ -19,7 +27,9 @@ vi.mock("react-router-dom", async () => {
 });
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
-  default: ({ children, className }) => <div className={className}>{children}</div>,
+  default: ({ children, className }) => (
+    <div className={className}>{children}</div>
+  ),
 }));
 
 global.ResizeObserver = class ResizeObserver {
@@ -53,12 +63,17 @@ describe("Messages", () => {
   ];
 
   beforeEach(() => {
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
     vi.clearAllMocks();
     mockNavigate.mockClear();
 
     useAuth.mockReturnValue({ user: mockUser });
-    
+
     canteenApi.fetchThreads.mockResolvedValue(mockThreads);
     canteenApi.fetchFriends.mockResolvedValue([]);
   });
@@ -69,7 +84,7 @@ describe("Messages", () => {
         <MemoryRouter>
           <Messages />
         </MemoryRouter>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
   };
 
@@ -86,7 +101,9 @@ describe("Messages", () => {
   it("renders thread with recipe share text", async () => {
     renderComponent();
     await waitFor(() => {
-      expect(screen.getByText("You shared a recipe: Older message")).toBeInTheDocument();
+      expect(
+        screen.getByText("You shared a recipe: Older message"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -103,7 +120,7 @@ describe("Messages", () => {
     await waitFor(() => {
       const friend1Link = screen.getByText("Friend1").closest("a");
       expect(friend1Link).toHaveClass("bg-accent/10");
-      
+
       const friend2Link = screen.getByText("Friend2").closest("a");
       expect(friend2Link).not.toHaveClass("bg-accent/10");
     });
@@ -112,12 +129,16 @@ describe("Messages", () => {
   it("handles empty threads", async () => {
     canteenApi.fetchThreads.mockResolvedValue([]);
     renderComponent();
-    await waitFor(() => expect(screen.getByText("No conversations yet.")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("No conversations yet.")).toBeInTheDocument(),
+    );
   });
 
   it("opens new message popover and searches friends", async () => {
     canteenApi.fetchThreads.mockResolvedValue([]);
-    canteenApi.fetchFriends.mockResolvedValue([{ id: "f1", username: "TestFriend" }]);
+    canteenApi.fetchFriends.mockResolvedValue([
+      { id: "f1", username: "TestFriend" },
+    ]);
 
     renderComponent();
 
@@ -143,11 +164,15 @@ describe("Messages", () => {
 
   it("navigates to conversation when friend is selected in new message popover", async () => {
     canteenApi.fetchThreads.mockResolvedValue([]);
-    canteenApi.fetchFriends.mockResolvedValue([{ id: "f1", username: "TestFriend" }]);
+    canteenApi.fetchFriends.mockResolvedValue([
+      { id: "f1", username: "TestFriend" },
+    ]);
 
     renderComponent();
-    await act(async () => { fireEvent.click(screen.getByText("+ Message")); });
-    
+    await act(async () => {
+      fireEvent.click(screen.getByText("+ Message"));
+    });
+
     const input = screen.getByPlaceholderText("Search friends...");
     await act(async () => {
       fireEvent.change(input, { target: { value: "Test" } });
@@ -156,7 +181,9 @@ describe("Messages", () => {
     await waitFor(() => {
       expect(screen.getByText("TestFriend")).toBeInTheDocument();
     });
-    await act(async () => { fireEvent.keyDown(input, { key: "Enter", code: "Enter" }); });
+    await act(async () => {
+      fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
+    });
 
     expect(mockNavigate).toHaveBeenCalledWith("/messages/f1");
   });

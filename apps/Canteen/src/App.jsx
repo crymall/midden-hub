@@ -1,10 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Suspense, lazy } from "react";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { navMeta } from "@shared/core/utils/constants";
+
+import RequireNotGuest from "@shared/core/gateways/RequireNotGuest";
+
 import Dashboard from "@shared/core/pages/Dashboard";
 import Login from "@shared/core/pages/Login";
 import NotFound from "@shared/core/pages/NotFound";
-import RequireNotGuest from "@shared/core/gateways/RequireNotGuest";
-import { navMeta } from "@shared/core/utils/constants";
+
 import Loading from "@shared/ui/components/Loading";
 
 const CanteenHome = lazy(() => import("./pages/CanteenHome"));

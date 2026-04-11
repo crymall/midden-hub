@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@headlessui/react";
+
 import MiddenModal from "@shared/ui/components/MiddenModal";
 import PaginationControls from "./PaginationControls";
 
-const CanteenUserList = ({ 
-  users, 
-  followingList, 
-  followersList = [], 
-  loading, 
-  onToggleFollow, 
+const CanteenUserList = ({
+  users,
+  followingList,
+  followersList = [],
+  loading,
+  onToggleFollow,
   emptyMessage,
   page,
   limit,
   onPageChange,
   onLimitChange,
-  isNextDisabled
+  isNextDisabled,
 }) => {
   const [userToUnfriend, setUserToUnfriend] = useState(null);
 
@@ -41,8 +42,12 @@ const CanteenUserList = ({
     <>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {users.map((user) => {
-          const isFollowing = followingList.some((f) => String(f.id) === String(user.id));
-          const isFollower = followersList.some((f) => String(f.id) === String(user.id));
+          const isFollowing = followingList.some(
+            (f) => String(f.id) === String(user.id),
+          );
+          const isFollower = followersList.some(
+            (f) => String(f.id) === String(user.id),
+          );
           const isFriend = isFollowing && isFollower;
 
           return (
@@ -50,10 +55,7 @@ const CanteenUserList = ({
               key={user.id}
               className="group border-grey hover:border-accent relative flex flex-col border-2 border-dashed p-4 transition-colors"
             >
-              <Link
-                to={`/user/${user.id}`}
-                className="absolute inset-0 z-0"
-              >
+              <Link to={`/user/${user.id}`} className="absolute inset-0 z-0">
                 <span className="sr-only">View {user.username}</span>
               </Link>
               <div className="pointer-events-none relative z-10 flex items-start justify-between">
@@ -75,14 +77,16 @@ const CanteenUserList = ({
                       isFriend
                         ? "border-accent text-accent hover:bg-accent hover:text-white border bg-transparent"
                         : isFollowing
-                        ? "border-grey text-lightGrey hover:border-lightestGrey hover:text-white border bg-transparent"
-                        : "bg-accent hover:bg-accent/80 text-white"
+                          ? "border-grey text-lightGrey hover:border-lightestGrey hover:text-white border bg-transparent"
+                          : "bg-accent hover:bg-accent/80 text-white"
                     }`}
                   >
                     {isFriend ? (
                       <>
                         <span className="group-hover/btn:hidden">Friends</span>
-                        <span className="hidden group-hover/btn:inline">Unfriend</span>
+                        <span className="hidden group-hover/btn:inline">
+                          Unfriend
+                        </span>
                       </>
                     ) : isFollowing ? (
                       "Unfollow"
@@ -115,7 +119,8 @@ const CanteenUserList = ({
       >
         <p className="text-lightestGrey mb-6 font-mono">
           Are you sure you want to unfollow{" "}
-          <strong className="text-white">{userToUnfriend?.username}</strong>? You will no longer be friends.
+          <strong className="text-white">{userToUnfriend?.username}</strong>?
+          You will no longer be friends.
         </p>
         <div className="flex justify-end gap-2">
           <Button

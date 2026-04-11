@@ -1,17 +1,31 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import App from "../App";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
+
+import App from "../App";
 
 vi.mock("@shared/core/hooks/useAuth");
 
-vi.mock("@shared/core/pages/Login", () => ({ default: () => <div>Login Page</div> }));
-vi.mock("@shared/core/pages/NotFound", () => ({ default: () => <div>NotFound Page</div> }));
-vi.mock("@shared/ui/components/Header", () => ({ default: () => <div>Header Component</div> }));
+vi.mock("@shared/core/pages/Login", () => ({
+  default: () => <div>Login Page</div>,
+}));
+vi.mock("@shared/core/pages/NotFound", () => ({
+  default: () => <div>NotFound Page</div>,
+}));
+vi.mock("@shared/ui/components/Header", () => ({
+  default: () => <div>Header Component</div>,
+}));
 
-vi.mock("../pages/Explorer", () => ({ default: () => <div>Explorer Page</div> }));
-vi.mock("../pages/Settings", () => ({ default: () => <div>Settings Page</div> }));
-vi.mock("../pages/Experiments", () => ({ default: () => <div>Experiments Page</div> }));
+vi.mock("../pages/Explorer", () => ({
+  default: () => <div>Explorer Page</div>,
+}));
+vi.mock("../pages/Settings", () => ({
+  default: () => <div>Settings Page</div>,
+}));
+vi.mock("../pages/Experiments", () => ({
+  default: () => <div>Experiments Page</div>,
+}));
 vi.mock("../pages/About", () => ({ default: () => <div>About Page</div> }));
 
 describe("App Routing", () => {

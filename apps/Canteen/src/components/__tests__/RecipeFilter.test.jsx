@@ -1,8 +1,10 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import RecipeFilter from "../RecipeFilter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import * as canteenApi from "@shared/core/services/canteenApi";
+
+import RecipeFilter from "../RecipeFilter";
 
 vi.mock("@shared/core/services/canteenApi");
 
@@ -17,19 +19,22 @@ describe("RecipeFilter", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
     canteenApi.fetchTags.mockResolvedValue(mockTags);
   });
 
-  const renderComponent = (ui) => render(
-    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
-  );
+  const renderComponent = (ui) =>
+    render(
+      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+    );
 
   it("renders correctly and fetches tags on mount", async () => {
     renderComponent(<RecipeFilter onFilter={mockOnFilter} />);
 
     expect(
-      screen.getByPlaceholderText("Search by title...")
+      screen.getByPlaceholderText("Search by title..."),
     ).toBeInTheDocument();
     expect(screen.getByText("Search")).toBeInTheDocument();
     expect(screen.getByText("Clear")).toBeInTheDocument();

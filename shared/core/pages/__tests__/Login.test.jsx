@@ -1,9 +1,10 @@
+import { MemoryRouter } from "react-router-dom";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import Login from "../Login";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "../../hooks/useAuth";
+import Login from "../Login";
 
 vi.mock("../../hooks/useAuth");
 
@@ -28,12 +29,16 @@ describe("Login Component", () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-    expect(screen.getByRole("heading", { name: /log in/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /log in/i }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^login$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /^login$/i }),
+    ).toBeInTheDocument();
   });
 
   it("switches to register mode", async () => {
@@ -41,15 +46,21 @@ describe("Login Component", () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    const createAccountBtn = screen.getByRole("button", { name: /create account/i });
+    const createAccountBtn = screen.getByRole("button", {
+      name: /create account/i,
+    });
     await user.click(createAccountBtn);
 
-    expect(screen.getByRole("heading", { name: /create account/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /create account/i }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^register$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /^register$/i }),
+    ).toBeInTheDocument();
   });
 
   it("calls login function on form submission", async () => {
@@ -59,14 +70,17 @@ describe("Login Component", () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.type(screen.getByLabelText(/username/i), "testuser");
     await user.type(screen.getByLabelText(/password/i), "password123");
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
-    expect(mockLogin).toHaveBeenCalledWith({ username: "testuser", password: "password123" });
+    expect(mockLogin).toHaveBeenCalledWith({
+      username: "testuser",
+      password: "password123",
+    });
   });
 
   it("transitions to 2FA mode when login requires it", async () => {
@@ -76,7 +90,7 @@ describe("Login Component", () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.type(screen.getByLabelText(/username/i), "testuser");
@@ -84,7 +98,9 @@ describe("Login Component", () => {
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: /2-factor verification/i }),
+      ).toBeInTheDocument();
     });
     expect(screen.getByLabelText(/verification code/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/remember this device/i)).toBeInTheDocument();
@@ -97,7 +113,7 @@ describe("Login Component", () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.type(screen.getByLabelText(/username/i), "testuser");
@@ -105,14 +121,20 @@ describe("Login Component", () => {
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: /2-factor verification/i }),
+      ).toBeInTheDocument();
     });
 
     await user.type(screen.getByLabelText(/verification code/i), "123456");
     await user.click(screen.getByLabelText(/remember this device/i));
     await user.click(screen.getByRole("button", { name: /^verify$/i }));
 
-    expect(mockVerifyLogin).toHaveBeenCalledWith({ userId: "123", code: "123456", rememberMe: true });
+    expect(mockVerifyLogin).toHaveBeenCalledWith({
+      userId: "123",
+      code: "123456",
+      rememberMe: true,
+    });
   });
 
   it("submits 2FA code with rememberMe unchecked by default", async () => {
@@ -122,7 +144,7 @@ describe("Login Component", () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await user.type(screen.getByLabelText(/username/i), "testuser");
@@ -130,13 +152,19 @@ describe("Login Component", () => {
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: /2-factor verification/i }),
+      ).toBeInTheDocument();
     });
 
     await user.type(screen.getByLabelText(/verification code/i), "123456");
     await user.click(screen.getByRole("button", { name: /^verify$/i }));
 
-    expect(mockVerifyLogin).toHaveBeenCalledWith({ userId: "123", code: "123456", rememberMe: false });
+    expect(mockVerifyLogin).toHaveBeenCalledWith({
+      userId: "123",
+      code: "123456",
+      rememberMe: false,
+    });
   });
 
   it("displays error message on login failure", async () => {
@@ -147,7 +175,7 @@ describe("Login Component", () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     await user.type(screen.getByLabelText(/username/i), "testuser");
     await user.type(screen.getByLabelText(/password/i), "password123");

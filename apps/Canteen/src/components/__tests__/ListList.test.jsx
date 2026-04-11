@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
 import ListList from "../ListList";
 
 describe("ListList", () => {
@@ -21,7 +22,7 @@ describe("ListList", () => {
           emptyMessage="No lists found."
           {...props}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   };
 
@@ -53,7 +54,7 @@ describe("ListList", () => {
     renderComponent();
     const favoritesHeading = screen.getByText("Favorites");
     const favoritesContainer = favoritesHeading.closest(".relative");
-    
+
     const button = favoritesContainer.querySelector("button");
     expect(button).not.toBeInTheDocument();
   });
@@ -69,6 +70,9 @@ describe("ListList", () => {
 
   it("renders links pointing to correct list details", () => {
     renderComponent();
-    expect(screen.getByText("View Favorites").closest("a")).toHaveAttribute("href", "/my-lists/1");
+    expect(screen.getByText("View Favorites").closest("a")).toHaveAttribute(
+      "href",
+      "/my-lists/1",
+    );
   });
 });

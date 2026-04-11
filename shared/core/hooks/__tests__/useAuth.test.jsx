@@ -1,10 +1,11 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { useAuth } from "../useAuth";
-import * as iamApi from "../../services/iamApi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import * as canteenApi from "../../services/canteenApi";
+import * as iamApi from "../../services/iamApi";
+import { useAuth } from "../useAuth";
 
 vi.mock("../../services/iamApi");
 vi.mock("../../services/canteenApi");
@@ -25,9 +26,7 @@ describe("useAuth hook", () => {
 
   const wrapper = ({ children }) => (
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        {children}
-      </MemoryRouter>
+      <MemoryRouter>{children}</MemoryRouter>
     </QueryClientProvider>
   );
 

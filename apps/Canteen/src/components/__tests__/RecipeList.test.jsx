@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import RecipeList from "../RecipeList";
 
 vi.mock("../RecipeCard", () => ({
@@ -14,16 +15,22 @@ describe("RecipeList", () => {
 
   it("renders empty state when recipes is null", () => {
     render(<RecipeList recipes={null} loading={false} />);
-    expect(screen.getByText(/No recipes found in the canteen/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No recipes found in the canteen/i),
+    ).toBeInTheDocument();
   });
 
   it("renders empty state when recipes is empty array", () => {
     render(<RecipeList recipes={[]} loading={false} />);
-    expect(screen.getByText(/No recipes found in the canteen/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No recipes found in the canteen/i),
+    ).toBeInTheDocument();
   });
 
   it("renders custom empty message", () => {
-    render(<RecipeList recipes={[]} loading={false} emptyMessage="Custom Message" />);
+    render(
+      <RecipeList recipes={[]} loading={false} emptyMessage="Custom Message" />,
+    );
     expect(screen.getByText("Custom Message")).toBeInTheDocument();
   });
 

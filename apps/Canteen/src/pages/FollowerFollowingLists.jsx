@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useSearchParams, Link, useParams, Navigate } from "react-router-dom";
+import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchFollowers,
   fetchFollowing,
@@ -9,6 +10,7 @@ import {
   followUser,
   unfollowUser,
 } from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import CanteenUserList from "../components/CanteenUserList";
 

@@ -1,16 +1,16 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
 import CreateListModal from "../CreateListModal";
 
 vi.mock("@shared/ui/components/MiddenModal", () => ({
-  default: ({ isOpen, children, title }) => (
+  default: ({ isOpen, children, title }) =>
     isOpen ? (
       <div data-testid="midden-modal">
         <h2>{title}</h2>
         {children}
       </div>
-    ) : null
-  ),
+    ) : null,
 }));
 
 describe("CreateListModal", () => {
@@ -43,7 +43,7 @@ describe("CreateListModal", () => {
     render(<CreateListModal {...defaultProps} />);
     const input = screen.getByLabelText("List Name");
     fireEvent.change(input, { target: { value: "My New List" } });
-    
+
     fireEvent.click(screen.getByText("Create List"));
     expect(defaultProps.onCreate).toHaveBeenCalledWith("My New List");
   });
@@ -59,9 +59,9 @@ describe("CreateListModal", () => {
     const { rerender } = render(<CreateListModal {...defaultProps} />);
     const input = screen.getByLabelText("List Name");
     fireEvent.change(input, { target: { value: "Dirty Input" } });
-    
+
     rerender(<CreateListModal {...defaultProps} isOpen={false} />);
-    
+
     rerender(<CreateListModal {...defaultProps} isOpen={true} />);
     expect(screen.getByLabelText("List Name")).toHaveValue("");
   });

@@ -1,16 +1,26 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Popover, PopoverButton, PopoverPanel, Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from "@headlessui/react";
-import { useAuth } from "@shared/core/hooks/useAuth";
-import MiddenCard from "@shared/ui/components/MiddenCard";
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+} from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchThreads, fetchFriends } from "@shared/core/services/canteenApi";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { fetchFriends, fetchThreads } from "@shared/core/services/canteenApi";
+
+import MiddenCard from "@shared/ui/components/MiddenCard";
 import PaginationControls from "../components/PaginationControls";
 
 const Messages = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
@@ -30,13 +40,9 @@ const Messages = () => {
   return (
     <MiddenCard>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-gothic text-4xl font-bold text-white">
-          Messages
-        </h2>
+        <h2 className="font-gothic text-4xl font-bold text-white">Messages</h2>
         <Popover>
-          <PopoverButton
-            className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors focus:outline-none"
-          >
+          <PopoverButton className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors focus:outline-none">
             + Message
           </PopoverButton>
           <PopoverPanel
@@ -59,7 +65,10 @@ const Messages = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
                 />
-                <ComboboxOptions static className="mt-2 max-h-60 w-full overflow-auto">
+                <ComboboxOptions
+                  static
+                  className="mt-2 max-h-60 w-full overflow-auto"
+                >
                   {friends?.length === 0 ? (
                     <div className="text-lightGrey p-2 font-mono text-sm">
                       No friends found.
@@ -89,7 +98,8 @@ const Messages = () => {
         ) : (
           threads.map((thread) => {
             const isUnread =
-              String(thread.sender_id) !== String(user?.canteenId) && !thread.is_read;
+              String(thread.sender_id) !== String(user?.canteenId) &&
+              !thread.is_read;
 
             let threadContent = thread.content;
             if (thread.recipe_id) {

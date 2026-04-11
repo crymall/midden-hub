@@ -1,10 +1,18 @@
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import RecipeSearch from "../RecipeSearch";
-import { useAuth } from "@shared/core/hooks/useAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
 import * as canteenApi from "@shared/core/services/canteenApi";
+
+import RecipeSearch from "../RecipeSearch";
 
 vi.mock("@shared/core/services/canteenApi");
 vi.mock("@shared/core/hooks/useAuth");
@@ -68,38 +76,70 @@ describe("RecipeSearch", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
     canteenApi.fetchRecipes.mockResolvedValue([]);
     useAuth.mockReturnValue({ user: { permissions: [] } });
   });
 
-  const renderComponent = () => render(
-    <QueryClientProvider client={queryClient}><MemoryRouter><RecipeSearch /></MemoryRouter></QueryClientProvider>
-  );
+  const renderComponent = () =>
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <RecipeSearch />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
 
   it("fetches recipes on mount", async () => {
     renderComponent();
     await waitFor(() => {
-      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(20, 0, undefined, undefined, undefined, undefined);
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        20,
+        0,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
     });
   });
 
   it("handles pagination interactions", async () => {
-    canteenApi.fetchRecipes.mockResolvedValue(Array.from({ length: 20 }, (_, i) => ({ id: i + 1 })));
+    canteenApi.fetchRecipes.mockResolvedValue(
+      Array.from({ length: 20 }, (_, i) => ({ id: i + 1 })),
+    );
 
     renderComponent();
 
-    await waitFor(() => expect(screen.getByTestId("page-val")).toHaveTextContent("1"));
+    await waitFor(() =>
+      expect(screen.getByTestId("page-val")).toHaveTextContent("1"),
+    );
 
     await act(async () => fireEvent.click(screen.getByText("Next")));
     await waitFor(() => {
-      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(20, 20, undefined, undefined, undefined, undefined);
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        20,
+        20,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
       expect(screen.getByTestId("page-val")).toHaveTextContent("2");
     });
 
     await act(async () => fireEvent.click(screen.getByText("Prev")));
     await waitFor(() => {
-      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(20, 0, undefined, undefined, undefined, undefined);
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        20,
+        0,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
       expect(screen.getByTestId("page-val")).toHaveTextContent("1");
     });
   });
@@ -109,7 +149,16 @@ describe("RecipeSearch", () => {
 
     const input = await screen.findByTestId("limit-input");
     await act(async () => fireEvent.change(input, { target: { value: "50" } }));
-    await waitFor(() => expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(50, 0, undefined, undefined, undefined, undefined));
+    await waitFor(() =>
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        50,
+        0,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      ),
+    );
   });
 
   it("handles filter application", async () => {
@@ -118,21 +167,36 @@ describe("RecipeSearch", () => {
     const filterBtn = await screen.findByTestId("filter-btn");
     await act(async () => fireEvent.click(filterBtn));
 
-    await waitFor(() => expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(20, 0, undefined, undefined, "Test Filter", undefined));
+    await waitFor(() =>
+      expect(canteenApi.fetchRecipes).toHaveBeenCalledWith(
+        20,
+        0,
+        undefined,
+        undefined,
+        "Test Filter",
+        undefined,
+      ),
+    );
   });
 
   it("passes correct disabled state to pagination controls", async () => {
-    canteenApi.fetchRecipes.mockResolvedValue(Array.from({ length: 10 }, (_, i) => ({ id: i + 1 })));
+    canteenApi.fetchRecipes.mockResolvedValue(
+      Array.from({ length: 10 }, (_, i) => ({ id: i + 1 })),
+    );
 
     renderComponent();
-    await waitFor(() => expect(screen.getByTestId("next-disabled-val")).toHaveTextContent("true"));
+    await waitFor(() =>
+      expect(screen.getByTestId("next-disabled-val")).toHaveTextContent("true"),
+    );
   });
 
   it("passes correct loading state to pagination controls", async () => {
     canteenApi.fetchRecipes.mockImplementation(() => new Promise(() => {})); // Hang to simulate loading state
 
     renderComponent();
-    await waitFor(() => expect(screen.getByTestId("loading-val")).toHaveTextContent("true"));
+    await waitFor(() =>
+      expect(screen.getByTestId("loading-val")).toHaveTextContent("true"),
+    );
   });
 
   it("renders create button when user has permission", async () => {
@@ -141,10 +205,7 @@ describe("RecipeSearch", () => {
 
     const createBtn = screen.getByText("+ Recipe");
     expect(createBtn).toBeInTheDocument();
-    expect(createBtn.closest("a")).toHaveAttribute(
-      "href",
-      "/recipes/new",
-    );
+    expect(createBtn.closest("a")).toHaveAttribute("href", "/recipes/new");
   });
 
   it("does not render create button when user lacks permission", async () => {
@@ -160,12 +221,20 @@ describe("RecipeSearch", () => {
     const filterBtn = await screen.findByTestId("filter-btn");
     await act(async () => fireEvent.click(filterBtn));
 
-    await waitFor(() => expect(screen.getByText("No recipes found matching your search.")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.getByText("No recipes found matching your search."),
+      ).toBeInTheDocument(),
+    );
   });
 
   it("shows default empty message when no filters are active", async () => {
     renderComponent();
-    
-    await waitFor(() => expect(screen.getByText("No recipes found in the canteen.")).toBeInTheDocument());
+
+    await waitFor(() =>
+      expect(
+        screen.getByText("No recipes found in the canteen."),
+      ).toBeInTheDocument(),
+    );
   });
 });

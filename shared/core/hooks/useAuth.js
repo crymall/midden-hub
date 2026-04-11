@@ -1,7 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useLocation } from "react-router-dom";
-import * as iamApi from "../services/iamApi";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import * as canteenApi from "../services/canteenApi";
+import * as iamApi from "../services/iamApi";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -53,8 +54,9 @@ export const useAuth = () => {
   });
 
   const registerMutation = useMutation({
-    mutationFn: ({ username, email, password }) => iamApi.register(username, email, password),
-  })
+    mutationFn: ({ username, email, password }) =>
+      iamApi.register(username, email, password),
+  });
 
   const logoutMutation = useMutation({
     mutationFn: iamApi.logout,

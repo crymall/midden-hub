@@ -1,5 +1,6 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
 import DurationInput from "../DurationInput";
 
 global.ResizeObserver = class ResizeObserver {
@@ -36,14 +37,14 @@ describe("DurationInput", () => {
     await act(async () => {
       fireEvent.change(input, { target: { value: "2" } });
     });
-    
+
     expect(handleChange).toHaveBeenLastCalledWith(2);
 
     const button = screen.getByRole("button");
     await act(async () => {
       fireEvent.click(button);
     });
-    
+
     const hoursOption = screen.getByText("Hours");
     await act(async () => {
       fireEvent.click(hoursOption);

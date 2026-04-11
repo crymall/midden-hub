@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
 import AppCard from "../AppCard";
 
 describe("AppCard Component", () => {
@@ -14,7 +15,7 @@ describe("AppCard Component", () => {
     render(
       <MemoryRouter>
         <AppCard {...defaultProps} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const link = screen.getByRole("link", { name: /apple/i });
     expect(link).toHaveAttribute("href", "/internal");
@@ -26,7 +27,7 @@ describe("AppCard Component", () => {
     render(
       <MemoryRouter>
         <AppCard {...defaultProps} to="https://example.com" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const link = screen.getByRole("link", { name: /apple/i });
     expect(link).toHaveAttribute("href", "https://example.com");
@@ -39,9 +40,9 @@ describe("AppCard Component", () => {
     render(
       <MemoryRouter>
         <AppCard {...defaultProps} description={description} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-    
+
     const descText = screen.getByText(description);
     expect(descText).toBeInTheDocument();
 
@@ -57,7 +58,7 @@ describe("AppCard Component", () => {
     const { container } = render(
       <MemoryRouter>
         <AppCard {...defaultProps} description={description} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const card = container.firstChild;
@@ -76,14 +77,18 @@ describe("AppCard Component", () => {
     render(
       <MemoryRouter>
         <AppCard {...defaultProps} description={description} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    const toggleBtn = screen.getByRole("button", { name: /expand description/i });
+    const toggleBtn = screen.getByRole("button", {
+      name: /expand description/i,
+    });
     expect(toggleBtn).toBeInTheDocument();
 
     fireEvent.click(toggleBtn);
-    expect(screen.getByRole("button", { name: /collapse description/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /collapse description/i }),
+    ).toBeInTheDocument();
 
     const descriptions = screen.getAllByText(description);
     expect(descriptions.length).toBeGreaterThan(0);

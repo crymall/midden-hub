@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import Header from "../Header";
 
 const mockNavigate = vi.fn();
@@ -35,7 +36,7 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header {...defaultProps} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("Midden")).toBeInTheDocument();
     expect(screen.getByText("testuser")).toBeInTheDocument();
@@ -46,9 +47,9 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header {...defaultProps} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-    
+
     const settingsBtn = screen.getByRole("button", { name: /settings/i });
     await user.click(settingsBtn);
     expect(mockNavigate).toHaveBeenCalledWith("/settings");
@@ -58,9 +59,11 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header {...defaultProps} title="Canteen" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-    expect(screen.queryByRole("button", { name: /settings/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /settings/i }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /logout/i })).toBeInTheDocument();
   });
 
@@ -69,9 +72,9 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header {...defaultProps} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-    
+
     const logoutBtn = screen.getByRole("button", { name: /logout/i });
     await user.click(logoutBtn);
     expect(mockLogout).toHaveBeenCalled();
@@ -79,37 +82,43 @@ describe("Header Component", () => {
   });
 
   it("renders navigation links when provided", () => {
-    const navLinks = [
-      { to: "/test", label: "Test Link", ariaLabel: "Test" },
-    ];
+    const navLinks = [{ to: "/test", label: "Test Link", ariaLabel: "Test" }];
     render(
       <MemoryRouter>
         <Header {...defaultProps} navLinks={navLinks} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("Test Link")).toBeInTheDocument();
   });
 
   it("renders restricted link when permission is allowed", () => {
     const navLinks = [
-      { to: "/restricted", label: "Restricted Link", requiredPermission: "allowed" },
+      {
+        to: "/restricted",
+        label: "Restricted Link",
+        requiredPermission: "allowed",
+      },
     ];
     render(
       <MemoryRouter>
         <Header {...defaultProps} navLinks={navLinks} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("Restricted Link")).toBeInTheDocument();
   });
 
   it("does not render restricted link when permission is denied", () => {
     const navLinks = [
-      { to: "/restricted", label: "Restricted Link", requiredPermission: "denied" },
+      {
+        to: "/restricted",
+        label: "Restricted Link",
+        requiredPermission: "denied",
+      },
     ];
     render(
       <MemoryRouter>
         <Header {...defaultProps} navLinks={navLinks} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.queryByText("Restricted Link")).not.toBeInTheDocument();
   });
@@ -119,7 +128,7 @@ describe("Header Component", () => {
     render(
       <MemoryRouter>
         <Header {...defaultProps} user={null} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const loginBtn = screen.getByRole("button", { name: /login/i });
@@ -131,13 +140,11 @@ describe("Header Component", () => {
 
   it("replaces :userId in navigation links with actual user id", () => {
     const userWithId = { ...user, id: 123 };
-    const navLinks = [
-      { to: "/user/:userId/profile", label: "Profile" },
-    ];
+    const navLinks = [{ to: "/user/:userId/profile", label: "Profile" }];
     render(
       <MemoryRouter>
         <Header {...defaultProps} user={userWithId} navLinks={navLinks} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const link = screen.getByText("Profile");
@@ -145,13 +152,11 @@ describe("Header Component", () => {
   });
 
   it("does not replace :userId if user is not present", () => {
-    const navLinks = [
-      { to: "/user/:userId/profile", label: "Profile" },
-    ];
+    const navLinks = [{ to: "/user/:userId/profile", label: "Profile" }];
     render(
       <MemoryRouter>
         <Header {...defaultProps} user={null} navLinks={navLinks} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const link = screen.getByText("Profile");

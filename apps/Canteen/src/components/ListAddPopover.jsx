@@ -1,20 +1,26 @@
 import { useState } from "react";
 import {
   Button,
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
   Field,
-  Label,
   Input,
+  Label,
   Popover,
   PopoverButton,
   PopoverPanel,
-  Combobox,
-  ComboboxInput,
-  ComboboxOptions,
-  ComboboxOption,
 } from "@headlessui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchUserLists, createList, addRecipeToList } from "@shared/core/services/canteenApi";
+import {
+  addRecipeToList,
+  createList,
+  fetchUserLists,
+} from "@shared/core/services/canteenApi";
+
 import MiddenModal from "@shared/ui/components/MiddenModal";
 
 const ListAddPopover = ({
@@ -64,7 +70,7 @@ const ListAddPopover = ({
         setAddListMessage("Failed.");
       }
       setTimeout(() => setAddListMessage(""), 1500);
-    }
+    },
   });
 
   const createListMutation = useMutation({
@@ -80,7 +86,7 @@ const ListAddPopover = ({
     },
     onError: (error) => {
       console.error(error);
-    }
+    },
   });
 
   const handleCreateList = (e) => {
@@ -97,9 +103,7 @@ const ListAddPopover = ({
       <Popover className={className}>
         {({ close }) => (
           <>
-            <PopoverButton
-              className={`focus:outline-none ${buttonClassName}`}
-            >
+            <PopoverButton className={`focus:outline-none ${buttonClassName}`}>
               {addListMessage || label}
             </PopoverButton>
             <PopoverPanel
@@ -130,8 +134,7 @@ const ListAddPopover = ({
                     ))}
                     {query.length > 0 &&
                       !comboboxLists.some(
-                        (l) =>
-                          l.name.toLowerCase() === query.toLowerCase(),
+                        (l) => l.name.toLowerCase() === query.toLowerCase(),
                       ) && (
                         <ComboboxOption
                           value={{ action: "create" }}
@@ -153,35 +156,39 @@ const ListAddPopover = ({
         onClose={() => setIsCreateListOpen(false)}
         title="Create New List"
       >
-            <form onSubmit={handleCreateList} className="flex flex-col gap-4">
-              <Field>
-                <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-                  List Name
-                </Label>
-                <Input
-                  required
-                  value={newListName}
-                  onChange={(e) => setNewListName(e.target.value)}
-                  className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
-                />
-              </Field>
-              <div className="mt-2 flex justify-end gap-2">
-                <Button
-                  type="button"
-                  onClick={() => setIsCreateListOpen(false)}
-                  className="text-lightGrey px-4 py-2 font-bold hover:text-white"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createListMutation.isPending || addToListMutation.isPending}
-                  className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
-                >
-                  {createListMutation.isPending || addToListMutation.isPending ? "Adding..." : "Create & Add"}
-                </Button>
-              </div>
-            </form>
+        <form onSubmit={handleCreateList} className="flex flex-col gap-4">
+          <Field>
+            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
+              List Name
+            </Label>
+            <Input
+              required
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+              className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
+            />
+          </Field>
+          <div className="mt-2 flex justify-end gap-2">
+            <Button
+              type="button"
+              onClick={() => setIsCreateListOpen(false)}
+              className="text-lightGrey px-4 py-2 font-bold hover:text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={
+                createListMutation.isPending || addToListMutation.isPending
+              }
+              className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
+            >
+              {createListMutation.isPending || addToListMutation.isPending
+                ? "Adding..."
+                : "Create & Add"}
+            </Button>
+          </div>
+        </form>
       </MiddenModal>
     </>
   );

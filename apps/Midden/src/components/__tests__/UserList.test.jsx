@@ -1,11 +1,13 @@
+import { PERMISSIONS } from "@shared/core/utils/constants";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import UserList from "../UserList";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as iamApi from "@shared/core/services/iamApi";
-import { PERMISSIONS } from "@shared/core/utils/constants";
+
+import UserList from "../UserList";
 
 vi.mock("@shared/core/hooks/useAuth");
 vi.mock("@shared/core/services/iamApi");
@@ -27,13 +29,18 @@ describe("UserList Component", () => {
       defaultOptions: { queries: { retry: false } },
     });
     useAuth.mockReturnValue({
-      user: { id: 99, username: "admin", permissions: [PERMISSIONS.writeUsers] },
+      user: {
+        id: 99,
+        username: "admin",
+        permissions: [PERMISSIONS.writeUsers],
+      },
     });
   });
 
-  const renderWithClient = (ui) => render(
-    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
-  );
+  const renderWithClient = (ui) =>
+    render(
+      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+    );
 
   it("renders loading state", () => {
     iamApi.fetchUsers.mockImplementation(() => new Promise(() => {}));
@@ -66,11 +73,15 @@ describe("UserList Component", () => {
     });
     iamApi.deleteUser.mockResolvedValue({});
 
-    const confirmSpy = vi.spyOn(window, "confirm").mockImplementation(() => true);
+    const confirmSpy = vi
+      .spyOn(window, "confirm")
+      .mockImplementation(() => true);
     const user = userEvent.setup();
 
     renderWithClient(<UserList />);
-    const deleteBtn = await screen.findByRole("button", { name: /delete user/i });
+    const deleteBtn = await screen.findByRole("button", {
+      name: /delete user/i,
+    });
     await user.click(deleteBtn);
 
     expect(confirmSpy).toHaveBeenCalled();

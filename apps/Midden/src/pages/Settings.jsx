@@ -1,20 +1,23 @@
 import {
+  Field,
+  Input,
+  Label,
   Tab,
   TabGroup,
   TabList,
   TabPanel,
   TabPanels,
-  Field,
-  Label,
-  Input,
 } from "@headlessui/react";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@shared/core/hooks/useAuth";
-import UserList from "../components/UserList";
-import Can from "@shared/core/gateways/Can";
-import MiddenCard from "@shared/ui/components/MiddenCard";
 import { PERMISSIONS } from "@shared/core/utils/constants";
-import { fetchUsers, fetchUser } from "@shared/core/services/iamApi";
+import { useQuery } from "@tanstack/react-query";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { fetchUser, fetchUsers } from "@shared/core/services/iamApi";
+
+import Can from "@shared/core/gateways/Can";
+
+import MiddenCard from "@shared/ui/components/MiddenCard";
+import UserList from "../components/UserList";
 
 const Settings = () => {
   const { user } = useAuth();
@@ -34,7 +37,6 @@ const Settings = () => {
     },
     enabled: !!user?.id,
   });
-
 
   return (
     <MiddenCard>
@@ -74,7 +76,7 @@ const Settings = () => {
                   Email
                 </Label>
                 <Input
-                value={userEmail || ""}
+                  value={userEmail || ""}
                   readOnly
                   className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
                 />

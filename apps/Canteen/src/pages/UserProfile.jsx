@@ -1,14 +1,25 @@
 import { useState } from "react";
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@headlessui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchUser, fetchUserRecipes, fetchUserLists, fetchRelationshipCounts, fetchFollowers, followUser, unfollowUser, createList } from "@shared/core/services/canteenApi";
+import {
+  createList,
+  fetchFollowers,
+  fetchRelationshipCounts,
+  fetchUser,
+  fetchUserLists,
+  fetchUserRecipes,
+  followUser,
+  unfollowUser,
+} from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
-import RecipeList from "../components/RecipeList";
+import CreateListModal from "../components/CreateListModal";
 import ListList from "../components/ListList";
 import PaginationControls from "../components/PaginationControls";
-import CreateListModal from "../components/CreateListModal";
+import RecipeList from "../components/RecipeList";
 
 const UserProfile = () => {
   const { id } = useParams();
@@ -23,7 +34,11 @@ const UserProfile = () => {
   const [listPage, setListPage] = useState(1);
   const [listLimit, setListLimit] = useState(20);
 
-  const { data: viewedUser, isLoading: viewedUserLoading, isError: fetchFailed } = useQuery({
+  const {
+    data: viewedUser,
+    isLoading: viewedUserLoading,
+    isError: fetchFailed,
+  } = useQuery({
     queryKey: ["user", id],
     queryFn: () => fetchUser(id),
     enabled: !!id,
@@ -39,15 +54,23 @@ const UserProfile = () => {
   const { data: isFollowingCheck = [] } = useQuery({
     queryKey: ["isFollowing", id, currentUser?.canteenId],
     queryFn: () => fetchFollowers(id, 1, 0, currentUser?.canteenId),
-    enabled: !!id && !!currentUser && String(currentUser.canteenId) !== String(id),
+    enabled:
+      !!id && !!currentUser && String(currentUser.canteenId) !== String(id),
   });
   const isFollowing = isFollowingCheck.length > 0;
 
-  const { data: userProfileRecipes = [], isLoading: recipesLoading } = useQuery({
-    queryKey: ["userProfileRecipes", id, { page: recipePage, limit: recipeLimit }],
-    queryFn: () => fetchUserRecipes(id, recipeLimit, (recipePage - 1) * recipeLimit),
-    enabled: !!id && activeTab === "recipes",
-  });
+  const { data: userProfileRecipes = [], isLoading: recipesLoading } = useQuery(
+    {
+      queryKey: [
+        "userProfileRecipes",
+        id,
+        { page: recipePage, limit: recipeLimit },
+      ],
+      queryFn: () =>
+        fetchUserRecipes(id, recipeLimit, (recipePage - 1) * recipeLimit),
+      enabled: !!id && activeTab === "recipes",
+    },
+  );
 
   const { data: userLists = [], isLoading: listsLoading } = useQuery({
     queryKey: ["userLists", id, { page: listPage, limit: listLimit }],
@@ -86,10 +109,14 @@ const UserProfile = () => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["isFollowing", id, currentUser?.canteenId] });
+      queryClient.invalidateQueries({
+        queryKey: ["isFollowing", id, currentUser?.canteenId],
+      });
       queryClient.invalidateQueries({ queryKey: ["relationshipCounts", id] });
-      queryClient.invalidateQueries({ queryKey: ["following", currentUser?.canteenId] });
-    }
+      queryClient.invalidateQueries({
+        queryKey: ["following", currentUser?.canteenId],
+      });
+    },
   });
 
   const handleFollowToggle = () => {
@@ -137,25 +164,33 @@ const UserProfile = () => {
                   to={`/user/${viewedUser.id}/network?tab=followers`}
                   className="hover:text-white transition-colors"
                 >
-                  <strong className="text-white">{relationshipCounts?.followers || 0}</strong>{" "}
+                  <strong className="text-white">
+                    {relationshipCounts?.followers || 0}
+                  </strong>{" "}
                   Followers
                 </Link>
                 <Link
                   to={`/user/${viewedUser.id}/network?tab=following`}
                   className="hover:text-white transition-colors"
                 >
-                  <strong className="text-white">{relationshipCounts?.following || 0}</strong>{" "}
+                  <strong className="text-white">
+                    {relationshipCounts?.following || 0}
+                  </strong>{" "}
                   Following
                 </Link>
               </>
             ) : (
               <>
                 <span>
-                  <strong className="text-white">{relationshipCounts?.followers || 0}</strong>{" "}
+                  <strong className="text-white">
+                    {relationshipCounts?.followers || 0}
+                  </strong>{" "}
                   Followers
                 </span>
                 <span>
-                  <strong className="text-white">{relationshipCounts?.following || 0}</strong>{" "}
+                  <strong className="text-white">
+                    {relationshipCounts?.following || 0}
+                  </strong>{" "}
                   Following
                 </span>
               </>

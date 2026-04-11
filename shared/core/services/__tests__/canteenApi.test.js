@@ -1,14 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import * as api from "../canteenApi";
 
-const { mockGet, mockPost, mockPut, mockDelete, mockPatch, mockUse } = vi.hoisted(() => ({
-  mockGet: vi.fn(),
-  mockPost: vi.fn(),
-  mockPut: vi.fn(),
-  mockDelete: vi.fn(),
-  mockPatch: vi.fn(),
-  mockUse: vi.fn(),
-}));
+const { mockGet, mockPost, mockPut, mockDelete, mockPatch, mockUse } =
+  vi.hoisted(() => ({
+    mockGet: vi.fn(),
+    mockPost: vi.fn(),
+    mockPut: vi.fn(),
+    mockDelete: vi.fn(),
+    mockPatch: vi.fn(),
+    mockUse: vi.fn(),
+  }));
 
 vi.mock("axios", () => ({
   default: {
@@ -37,9 +39,15 @@ describe("canteenApi", () => {
 
   describe("Recipes", () => {
     it("fetchRecipes calls get with correct params", async () => {
-      await api.fetchRecipes(10, 5, ['tag1'], ['ing1'], 'soup');
+      await api.fetchRecipes(10, 5, ["tag1"], ["ing1"], "soup");
       expect(mockGet).toHaveBeenCalledWith("/recipes", {
-        params: { limit: 10, offset: 5, tags: ['tag1'], ingredients: ['ing1'], title: 'soup' },
+        params: {
+          limit: 10,
+          offset: 5,
+          tags: ["tag1"],
+          ingredients: ["ing1"],
+          title: "soup",
+        },
       });
     });
 
@@ -97,7 +105,9 @@ describe("canteenApi", () => {
 
     it("addRecipeTag calls post", async () => {
       await api.addRecipeTag("123", "tag1");
-      expect(mockPost).toHaveBeenCalledWith("/recipes/123/tags", { tag_id: "tag1" });
+      expect(mockPost).toHaveBeenCalledWith("/recipes/123/tags", {
+        tag_id: "tag1",
+      });
     });
 
     it("removeRecipeTag calls delete", async () => {
@@ -129,28 +139,52 @@ describe("canteenApi", () => {
     it("fetchLists calls get", async () => {
       await api.fetchLists(10, 0, "test", "name", "asc");
       expect(mockGet).toHaveBeenCalledWith("/lists", {
-        params: { limit: 10, offset: 0, name: "test", sort: "name", order: "asc" },
+        params: {
+          limit: 10,
+          offset: 0,
+          name: "test",
+          sort: "name",
+          order: "asc",
+        },
       });
     });
 
     it("fetchLists calls get with defaults", async () => {
       await api.fetchLists(10, 0);
       expect(mockGet).toHaveBeenCalledWith("/lists", {
-        params: { limit: 10, offset: 0, name: undefined, sort: undefined, order: undefined },
+        params: {
+          limit: 10,
+          offset: 0,
+          name: undefined,
+          sort: undefined,
+          order: undefined,
+        },
       });
     });
 
     it("fetchUserLists calls get", async () => {
       await api.fetchUserLists("u1", 10, 0, "test", "name", "asc");
       expect(mockGet).toHaveBeenCalledWith("/lists/user/u1", {
-        params: { limit: 10, offset: 0, name: "test", sort: "name", order: "asc" },
+        params: {
+          limit: 10,
+          offset: 0,
+          name: "test",
+          sort: "name",
+          order: "asc",
+        },
       });
     });
 
     it("fetchUserLists calls get with defaults", async () => {
       await api.fetchUserLists("u1", 10, 0);
       expect(mockGet).toHaveBeenCalledWith("/lists/user/u1", {
-        params: { limit: 10, offset: 0, name: undefined, sort: undefined, order: undefined },
+        params: {
+          limit: 10,
+          offset: 0,
+          name: undefined,
+          sort: undefined,
+          order: undefined,
+        },
       });
     });
 
@@ -178,7 +212,9 @@ describe("canteenApi", () => {
 
     it("addRecipeToList calls post", async () => {
       await api.addRecipeToList("l1", "r1");
-      expect(mockPost).toHaveBeenCalledWith("/lists/l1/recipes", { recipe_id: "r1" });
+      expect(mockPost).toHaveBeenCalledWith("/lists/l1/recipes", {
+        recipe_id: "r1",
+      });
     });
 
     it("removeRecipeFromList calls delete", async () => {
@@ -260,7 +296,12 @@ describe("canteenApi", () => {
 
   describe("Messages", () => {
     it("sendMessage calls post with correct data", async () => {
-      const data = { receiver_id: "u2", content: "Hello", recipe_id: 1, list_id: null };
+      const data = {
+        receiver_id: "u2",
+        content: "Hello",
+        recipe_id: 1,
+        list_id: null,
+      };
       await api.sendMessage("u2", "Hello", 1, null);
       expect(mockPost).toHaveBeenCalledWith("/messages", data);
     });

@@ -1,15 +1,16 @@
 import { useState } from "react";
 import {
   Button,
-  Input,
+  Checkbox,
   Field,
+  Input,
   Label,
   Popover,
   PopoverButton,
   PopoverPanel,
-  Checkbox,
 } from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
+
 import { fetchTags } from "@shared/core/services/canteenApi";
 
 const RecipeFilter = ({ onFilter }) => {
@@ -18,7 +19,7 @@ const RecipeFilter = ({ onFilter }) => {
 
   const { data: tags = [] } = useQuery({
     queryKey: ["filterTags"],
-    queryFn: () => fetchTags(500, 0)
+    queryFn: () => fetchTags(500, 0),
   });
 
   const handleSubmit = (e) => {
@@ -100,7 +101,9 @@ const RecipeFilter = ({ onFilter }) => {
                           />
                         </svg>
                       </Checkbox>
-                      <Label className="font-mono text-sm cursor-pointer">{tag.name}</Label>
+                      <Label className="font-mono text-sm cursor-pointer">
+                        {tag.name}
+                      </Label>
                     </Field>
                   ))}
                 </div>

@@ -1,6 +1,7 @@
-import { useState, useEffect, useEffectEvent } from "react";
-import { Button, Dialog, DialogPanel } from "@headlessui/react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Button, Dialog, DialogPanel } from "@headlessui/react";
+
 import Can from "../../core/gateways/Can";
 
 const MobileBurgerMenu = ({ navLinks }) => {

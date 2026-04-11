@@ -1,15 +1,17 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+  act,
+  fireEvent,
   render,
   screen,
-  fireEvent,
   waitFor,
-  act,
 } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import RecipeDetail from "../RecipeDetail";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import * as canteenApi from "@shared/core/services/canteenApi";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
+import * as canteenApi from "@shared/core/services/canteenApi";
+
+import RecipeDetail from "../RecipeDetail";
 
 vi.mock("@shared/core/services/canteenApi");
 const mockNavigate = vi.fn();

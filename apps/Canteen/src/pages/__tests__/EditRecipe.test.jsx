@@ -1,9 +1,11 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import EditRecipe from "../EditRecipe";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import * as canteenApi from "@shared/core/services/canteenApi";
+
+import EditRecipe from "../EditRecipe";
 
 vi.mock("@shared/core/services/canteenApi");
 vi.mock("../../components/DurationInput", () => ({
@@ -59,18 +61,26 @@ describe("EditRecipe", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocation = { state: { fromDetail: true } };
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
     canteenApi.fetchRecipe.mockResolvedValue(mockRecipe);
     canteenApi.updateRecipe.mockResolvedValue({});
     canteenApi.fetchTags.mockResolvedValue([]);
     canteenApi.fetchIngredients.mockResolvedValue([]);
   });
 
-  const renderComponent = () => render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter><EditRecipe /></MemoryRouter>
-    </QueryClientProvider>
-  );
+  const renderComponent = () =>
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <EditRecipe />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
 
   it("fetches and renders recipe data on cache miss, and submits properly", async () => {
     renderComponent();
@@ -80,22 +90,29 @@ describe("EditRecipe", () => {
     await waitFor(() => {
       expect(screen.getByDisplayValue("Original Recipe")).toBeInTheDocument();
     });
-    
-    expect(screen.getByDisplayValue("Original description")).toBeInTheDocument();
-    
+
+    expect(
+      screen.getByDisplayValue("Original description"),
+    ).toBeInTheDocument();
+
     expect(screen.getByTestId("duration-input-Prep Time")).toHaveValue("10");
     expect(screen.getByTestId("duration-input-Cook Time")).toHaveValue("20");
     expect(screen.getByTestId("duration-input-Wait Time")).toHaveValue("30");
 
-    fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: "Updated Recipe" } });
+    fireEvent.change(screen.getByLabelText(/Title/i), {
+      target: { value: "Updated Recipe" },
+    });
 
     const submitBtn = screen.getByText("Save Changes");
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(canteenApi.updateRecipe).toHaveBeenCalledWith("123", expect.objectContaining({
-        title: "Updated Recipe",
-      }));
+      expect(canteenApi.updateRecipe).toHaveBeenCalledWith(
+        "123",
+        expect.objectContaining({
+          title: "Updated Recipe",
+        }),
+      );
     });
 
     expect(mockNavigate).toHaveBeenCalledWith(-1);
@@ -104,7 +121,6 @@ describe("EditRecipe", () => {
   it("uses cached recipe data if available without fetching", async () => {
     renderComponent();
 
-    
     await waitFor(() => {
       expect(screen.getByDisplayValue("Original Recipe")).toBeInTheDocument();
     });
@@ -118,13 +134,17 @@ describe("EditRecipe", () => {
       expect(screen.getByDisplayValue("Original Recipe")).toBeInTheDocument();
     });
 
-    fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: "Updated Recipe" } });
+    fireEvent.change(screen.getByLabelText(/Title/i), {
+      target: { value: "Updated Recipe" },
+    });
     fireEvent.click(screen.getByText("Save Changes"));
 
     await waitFor(() => {
       expect(canteenApi.updateRecipe).toHaveBeenCalled();
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith("/recipes/123", { replace: true });
+    expect(mockNavigate).toHaveBeenCalledWith("/recipes/123", {
+      replace: true,
+    });
   });
 });

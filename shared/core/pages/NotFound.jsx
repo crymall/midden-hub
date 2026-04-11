@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+
 import MiddenCard from "../../ui/components/MiddenCard";
 
 const NotFound = () => {

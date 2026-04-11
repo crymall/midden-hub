@@ -1,9 +1,11 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import NewRecipe from "../NewRecipe";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import * as canteenApi from "@shared/core/services/canteenApi";
+
+import NewRecipe from "../NewRecipe";
 
 vi.mock("@shared/core/services/canteenApi");
 
@@ -20,8 +22,8 @@ vi.mock("../../components/RecipeForm", () => ({
   default: ({ onSubmit, isSubmitting, error, submitLabel }) => (
     <div data-testid="mock-recipe-form">
       {error && <div data-testid="form-error">{error}</div>}
-      <button 
-        disabled={isSubmitting} 
+      <button
+        disabled={isSubmitting}
         onClick={() => onSubmit({ title: "Mock Recipe" })}
       >
         {submitLabel}
@@ -35,12 +37,19 @@ describe("NewRecipe", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+    queryClient = new QueryClient({
+      defaultOptions: { mutations: { retry: false } },
+    });
   });
 
-  const renderComponent = () => render(
-    <QueryClientProvider client={queryClient}><MemoryRouter><NewRecipe /></MemoryRouter></QueryClientProvider>
-  );
+  const renderComponent = () =>
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <NewRecipe />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
 
   it("renders the page and handles successful submission", async () => {
     canteenApi.createRecipe.mockResolvedValue({ id: "123" });
@@ -48,12 +57,14 @@ describe("NewRecipe", () => {
     renderComponent();
 
     expect(screen.getByText("New Recipe")).toBeInTheDocument();
-    
+
     const submitBtn = screen.getByText("Create Recipe");
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(canteenApi.createRecipe).toHaveBeenCalledWith({ title: "Mock Recipe" });
+      expect(canteenApi.createRecipe).toHaveBeenCalledWith({
+        title: "Mock Recipe",
+      });
     });
 
     expect(mockNavigate).toHaveBeenCalledWith("/recipes/123", {
@@ -71,7 +82,9 @@ describe("NewRecipe", () => {
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(screen.getByTestId("form-error")).toHaveTextContent("Failed to create recipe. Please check your inputs and try again.");
+      expect(screen.getByTestId("form-error")).toHaveTextContent(
+        "Failed to create recipe. Please check your inputs and try again.",
+      );
     });
     consoleSpy.mockRestore();
   });

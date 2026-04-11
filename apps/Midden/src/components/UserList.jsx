@@ -1,9 +1,13 @@
 import { Button, Select } from "@headlessui/react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { PERMISSIONS, ROLES } from "@shared/core/utils/constants";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { ROLES } from "@shared/core/utils/constants";
-import { PERMISSIONS } from "@shared/core/utils/constants";
-import { fetchUsers, deleteUser, updateUserRole } from "@shared/core/services/iamApi";
+import {
+  deleteUser,
+  fetchUsers,
+  updateUserRole,
+} from "@shared/core/services/iamApi";
 
 const UserList = () => {
   const { user: currentUser } = useAuth();
@@ -81,7 +85,10 @@ const UserList = () => {
                     className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full min-w-25 border p-1 text-sm focus:outline-none"
                     value={ROLES[user.role] ? String(ROLES[user.role]) : ""}
                     onChange={(e) =>
-                      updateUserMutation.mutate({ userId: user.id, roleId: Number(e.target.value) })
+                      updateUserMutation.mutate({
+                        userId: user.id,
+                        roleId: Number(e.target.value),
+                      })
                     }
                     disabled={isDisabled}
                   >

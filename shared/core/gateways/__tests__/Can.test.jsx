@@ -1,8 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import Can from "../Can";
+import { describe, expect, it, vi } from "vitest";
+
 import { useAuth } from "../../hooks/useAuth";
 import { PERMISSIONS } from "../../utils/constants";
+import Can from "../Can";
 
 vi.mock("../../hooks/useAuth");
 
@@ -11,7 +12,7 @@ describe("Can Gateway", () => {
     useAuth.mockReturnValue({ isLoading: true, user: null });
 
     render(<Can perform={PERMISSIONS.writeUsers}>Content</Can>);
-    
+
     expect(screen.getByText("Verifying permissions...")).toBeInTheDocument();
   });
 
@@ -24,7 +25,7 @@ describe("Can Gateway", () => {
     render(
       <Can perform={PERMISSIONS.writeUsers}>
         <div>Allowed Content</div>
-      </Can>
+      </Can>,
     );
     expect(screen.getByText("Allowed Content")).toBeInTheDocument();
   });
@@ -38,7 +39,7 @@ describe("Can Gateway", () => {
     render(
       <Can perform={PERMISSIONS.writeUsers}>
         <div>Allowed Content</div>
-      </Can>
+      </Can>,
     );
     expect(screen.queryByText("Allowed Content")).not.toBeInTheDocument();
   });
