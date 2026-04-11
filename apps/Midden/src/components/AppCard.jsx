@@ -23,10 +23,7 @@ const AppCard = ({ to, symbol, label, description }) => {
     "sm:w-30 md:w-46",
   );
 
-  const contentClass = clsx(
-    "flex flex-1 items-center p-4",
-    "sm:flex-col sm:justify-center sm:p-0 sm:w-full sm:h-full",
-  );
+  const contentClass = clsx("flex flex-1 items-center p-4", "sm:flex-col sm:justify-center sm:p-0 sm:w-full sm:h-full");
 
   const symbolClass = clsx(
     "text-3xl font-icons icon mr-6 text-shadow-hard-grey",
@@ -53,9 +50,7 @@ const AppCard = ({ to, symbol, label, description }) => {
         alignRight ? "right-0 translate-x-4" : "left-0 -translate-x-4",
       )}
     >
-      <p className="md:text-base text-dark text-left font-mono text-sm">
-        {description}
-      </p>
+      <p className="md:text-base text-dark text-left font-mono text-sm">{description}</p>
     </div>
   );
 
@@ -66,9 +61,7 @@ const AppCard = ({ to, symbol, label, description }) => {
   );
 
   const LinkComponent = isExternal ? "a" : Link;
-  const linkProps = isExternal
-    ? { href: to, target: "_blank", rel: "noopener noreferrer" }
-    : { to };
+  const linkProps = isExternal ? { href: to, target: "_blank", rel: "noopener noreferrer" } : { to };
 
   return (
     <div ref={cardRef} className={wrapperClass} onMouseEnter={handleMouseEnter}>
@@ -88,13 +81,9 @@ const AppCard = ({ to, symbol, label, description }) => {
               setIsExpanded(!isExpanded);
             }}
             className="flex items-center justify-center px-6 text-lightestGrey hover:text-white hover:bg-white/10 sm:hidden transition-colors"
-            aria-label={
-              isExpanded ? "Collapse description" : "Expand description"
-            }
+            aria-label={isExpanded ? "Collapse description" : "Expand description"}
           >
-            <span className="text-xl font-icons icon">
-              {isExpanded ? "A" : "C"}
-            </span>
+            <span className="text-xl font-icons icon">{isExpanded ? "A" : "C"}</span>
           </button>
         )}
       </div>

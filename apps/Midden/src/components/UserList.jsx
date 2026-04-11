@@ -3,11 +3,7 @@ import { PERMISSIONS, ROLES } from "@shared/core/utils/constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
-import {
-  deleteUser,
-  fetchUsers,
-  updateUserRole,
-} from "@shared/core/services/iamApi";
+import { deleteUser, fetchUsers, updateUserRole } from "@shared/core/services/iamApi";
 
 const UserList = () => {
   const { user: currentUser } = useAuth();
@@ -52,18 +48,10 @@ const UserList = () => {
       <table className="divide-grey/30 min-w-full divide-y">
         <thead className="bg-white/5">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-bold tracking-wider text-white uppercase">
-              ID
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-bold tracking-wider text-white uppercase">
-              Username
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-bold tracking-wider text-white uppercase">
-              Role
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-bold tracking-wider text-white uppercase">
-              Actions
-            </th>
+            <th className="px-4 py-3 text-left text-xs font-bold tracking-wider text-white uppercase">ID</th>
+            <th className="px-4 py-3 text-left text-xs font-bold tracking-wider text-white uppercase">Username</th>
+            <th className="px-4 py-3 text-left text-xs font-bold tracking-wider text-white uppercase">Role</th>
+            <th className="px-4 py-3 text-left text-xs font-bold tracking-wider text-white uppercase">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-grey/30 divide-y">
@@ -74,12 +62,8 @@ const UserList = () => {
 
             return (
               <tr key={user.id} className="transition-colors hover:bg-white/5">
-                <td className="text-lightestGrey px-4 py-3 text-sm whitespace-nowrap">
-                  {user.id}
-                </td>
-                <td className="text-lightestGrey px-4 py-3 text-sm font-bold whitespace-nowrap">
-                  {user.username}
-                </td>
+                <td className="text-lightestGrey px-4 py-3 text-sm whitespace-nowrap">{user.id}</td>
+                <td className="text-lightestGrey px-4 py-3 text-sm font-bold whitespace-nowrap">{user.username}</td>
                 <td className="px-4 py-3 text-sm whitespace-nowrap">
                   <Select
                     className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full min-w-25 border p-1 text-sm focus:outline-none"
@@ -105,11 +89,7 @@ const UserList = () => {
                     disabled={isDisabled}
                     aria-label="Delete User"
                     onClick={() => {
-                      if (
-                        confirm(
-                          `Are you sure you want to delete ${user.username}?`,
-                        )
-                      ) {
+                      if (confirm(`Are you sure you want to delete ${user.username}?`)) {
                         deleteUserMutation.mutate(user.id);
                       }
                     }}

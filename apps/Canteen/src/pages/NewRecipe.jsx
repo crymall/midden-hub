@@ -22,9 +22,7 @@ const NewRecipe = () => {
     },
     onError: (err) => {
       console.error(err);
-      setError(
-        "Failed to create recipe. Please check your inputs and try again.",
-      );
+      setError("Failed to create recipe. Please check your inputs and try again.");
     },
   });
 
@@ -35,9 +33,7 @@ const NewRecipe = () => {
 
   return (
     <MiddenCard>
-      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
-        New Recipe
-      </h2>
+      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">New Recipe</h2>
       <RecipeForm
         onSubmit={handleSubmit}
         isSubmitting={createRecipeMutation.isPending}

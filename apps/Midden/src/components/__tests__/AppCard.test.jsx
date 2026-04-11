@@ -86,9 +86,7 @@ describe("AppCard Component", () => {
     expect(toggleBtn).toBeInTheDocument();
 
     fireEvent.click(toggleBtn);
-    expect(
-      screen.getByRole("button", { name: /collapse description/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /collapse description/i })).toBeInTheDocument();
 
     const descriptions = screen.getAllByText(description);
     expect(descriptions.length).toBeGreaterThan(0);

@@ -20,12 +20,7 @@ export default defineConfig({
     ],
     coverage: {
       provider: "v8",
-      include: [
-        "apps/**/*.jsx",
-        "apps/**/*.js",
-        "shared/**/*.jsx",
-        "shared/**/*.js",
-      ],
+      include: ["apps/**/*.jsx", "apps/**/*.js", "shared/**/*.jsx", "shared/**/*.js"],
       exclude: ["**/__tests__/**", "**/*.config.js", "**/main.jsx"],
     },
   },

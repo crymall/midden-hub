@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-  Button,
-  Checkbox,
-  Field,
-  Input,
-  Label,
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-} from "@headlessui/react";
+import { Button, Checkbox, Field, Input, Label, Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
 
 import { fetchTags } from "@shared/core/services/canteenApi";
@@ -31,11 +22,7 @@ const RecipeFilter = ({ onFilter }) => {
   };
 
   const toggleTag = (tagId) => {
-    setSelectedTags((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId],
-    );
+    setSelectedTags((prev) => (prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]));
   };
 
   const handleClear = () => {
@@ -45,15 +32,10 @@ const RecipeFilter = ({ onFilter }) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="border-grey mb-6 flex flex-col gap-4 border-b-2 pb-6"
-    >
+    <form onSubmit={handleSubmit} className="border-grey mb-6 flex flex-col gap-4 border-b-2 pb-6">
       <div className="flex flex-col gap-4 md:flex-row">
         <Field className="flex-1">
-          <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-            Search Recipes
-          </Label>
+          <Label className="text-lightestGrey mb-1 block text-sm font-bold">Search Recipes</Label>
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -64,9 +46,7 @@ const RecipeFilter = ({ onFilter }) => {
 
         {tags && tags.length > 0 && (
           <Field className="w-full md:w-64">
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              Filter by Tags
-            </Label>
+            <Label className="text-lightestGrey mb-1 block text-sm font-bold">Filter by Tags</Label>
             <Popover className="relative z-30">
               <PopoverButton className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey flex w-full items-center justify-between border p-2 text-left focus:outline-none">
                 <span className="truncate">
@@ -93,17 +73,10 @@ const RecipeFilter = ({ onFilter }) => {
                           viewBox="0 0 14 14"
                           fill="none"
                         >
-                          <path
-                            d="M3 8L6 11L11 3.5"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
+                          <path d="M3 8L6 11L11 3.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </Checkbox>
-                      <Label className="font-mono text-sm cursor-pointer">
-                        {tag.name}
-                      </Label>
+                      <Label className="font-mono text-sm cursor-pointer">{tag.name}</Label>
                     </Field>
                   ))}
                 </div>
@@ -114,10 +87,7 @@ const RecipeFilter = ({ onFilter }) => {
       </div>
 
       <div className="flex gap-4">
-        <Button
-          type="submit"
-          className="bg-grey hover:bg-lightGrey text-dark px-4 py-2 font-bold transition-colors"
-        >
+        <Button type="submit" className="bg-grey hover:bg-lightGrey text-dark px-4 py-2 font-bold transition-colors">
           Search
         </Button>
         <Button

@@ -14,15 +14,9 @@ import {
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import RecipeForm from "../components/RecipeForm";
 
-const addRemoveAndUpdateIngredients = async (
-  id,
-  originalIngredients,
-  updatedIngredients,
-) => {
+const addRemoveAndUpdateIngredients = async (id, originalIngredients, updatedIngredients) => {
   for (const ingredient of originalIngredients) {
-    const match = updatedIngredients.find(
-      (ci) => String(ci.id) === String(ingredient.id),
-    );
+    const match = updatedIngredients.find((ci) => String(ci.id) === String(ingredient.id));
     if (
       !match ||
       String(match.quantity) !== String(ingredient.quantity) ||
@@ -34,9 +28,7 @@ const addRemoveAndUpdateIngredients = async (
   }
 
   for (const ingredient of updatedIngredients) {
-    const match = originalIngredients.find(
-      (oi) => String(oi.id) === String(ingredient.id),
-    );
+    const match = originalIngredients.find((oi) => String(oi.id) === String(ingredient.id));
     if (
       !match ||
       String(match.quantity) !== String(ingredient.quantity) ||
@@ -88,23 +80,15 @@ const EditRecipe = () => {
       });
 
       const originalTags = recipe.tags?.map((t) => t.id) || [];
-      const tagsToAdd = updatedRecipe.tags.filter(
-        (t) => !originalTags.includes(t),
-      );
-      const tagsToRemove = originalTags.filter(
-        (t) => !updatedRecipe.tags.includes(t),
-      );
+      const tagsToAdd = updatedRecipe.tags.filter((t) => !originalTags.includes(t));
+      const tagsToRemove = originalTags.filter((t) => !updatedRecipe.tags.includes(t));
 
       await addAndRemoveRecipeTags(id, tagsToAdd, tagsToRemove);
 
       const originalIngredients = recipe.ingredients || [];
       const updatedIngredients = updatedRecipe.ingredients;
 
-      await addRemoveAndUpdateIngredients(
-        id,
-        originalIngredients,
-        updatedIngredients,
-      );
+      await addRemoveAndUpdateIngredients(id, originalIngredients, updatedIngredients);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recipe", id] });
@@ -118,9 +102,7 @@ const EditRecipe = () => {
     },
     onError: (err) => {
       console.error(err);
-      setError(
-        "Failed to update recipe. Please check your inputs and try again.",
-      );
+      setError("Failed to update recipe. Please check your inputs and try again.");
     },
   });
 
@@ -133,9 +115,7 @@ const EditRecipe = () => {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
-          <p className="text-lightestGrey animate-pulse font-mono text-xl">
-            Loading recipe...
-          </p>
+          <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading recipe...</p>
         </div>
       </MiddenCard>
     );
@@ -176,9 +156,7 @@ const EditRecipe = () => {
 
   return (
     <MiddenCard>
-      <h2 className="font-gothic mb-4 text-4xl font-bold text-white">
-        Edit Recipe
-      </h2>
+      <h2 className="font-gothic mb-4 text-4xl font-bold text-white">Edit Recipe</h2>
       <RecipeForm
         initialData={initialData}
         onSubmit={handleSubmit}

@@ -14,9 +14,7 @@ describe("MiddenCard Component", () => {
   });
 
   it("applies custom className", () => {
-    const { container } = render(
-      <MiddenCard className="custom-class">Content</MiddenCard>,
-    );
+    const { container } = render(<MiddenCard className="custom-class">Content</MiddenCard>);
     expect(container.firstChild).toHaveClass("custom-class");
   });
 });

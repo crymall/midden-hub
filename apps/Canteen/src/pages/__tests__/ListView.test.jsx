@@ -27,9 +27,7 @@ vi.mock("@shared/ui/components/MiddenCard", () => ({
 
 vi.mock("../../components/RecipeList", () => ({
   default: ({ recipes, loading }) => (
-    <div data-testid="recipe-list">
-      {loading ? "Loading Recipes..." : `Recipes: ${recipes?.length || 0}`}
-    </div>
+    <div data-testid="recipe-list">{loading ? "Loading Recipes..." : `Recipes: ${recipes?.length || 0}`}</div>
   ),
 }));
 
@@ -52,11 +50,7 @@ describe("ListView", () => {
     canteenApi.fetchListRecipes.mockResolvedValue([]);
   });
 
-  const renderWithRouter = (
-    listId = "1",
-    initialEntries = [`/lists/${listId}`],
-    initialIndex = 0,
-  ) => {
+  const renderWithRouter = (listId = "1", initialEntries = [`/lists/${listId}`], initialIndex = 0) => {
     render(
       <MemoryRouter initialEntries={initialEntries} initialIndex={initialIndex}>
         <QueryClientProvider client={queryClient}>
@@ -95,9 +89,7 @@ describe("ListView", () => {
       { id: 101, title: "Pasta" },
       { id: 102, title: "Soup" },
     ];
-    canteenApi.fetchUserLists.mockResolvedValue([
-      { id: "1", name: "Dinner Ideas" },
-    ]);
+    canteenApi.fetchUserLists.mockResolvedValue([{ id: "1", name: "Dinner Ideas" }]);
     canteenApi.fetchListRecipes.mockResolvedValue(mockRecipes);
 
     renderWithRouter("1");
@@ -109,18 +101,14 @@ describe("ListView", () => {
   });
 
   it("handles list not found state correctly", async () => {
-    canteenApi.fetchUserLists.mockResolvedValue([
-      { id: "2", name: "Other List" },
-    ]);
+    canteenApi.fetchUserLists.mockResolvedValue([{ id: "2", name: "Other List" }]);
 
     renderWithRouter("1");
 
     await waitFor(() => {
       expect(screen.getByText("List Not Found")).toBeInTheDocument();
     });
-    expect(
-      screen.getByText("The requested list could not be found."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("The requested list could not be found.")).toBeInTheDocument();
   });
 
   it("shows 'Loading List...' title if list is missing but recipes are loading", async () => {
@@ -150,12 +138,8 @@ describe("ListView", () => {
     renderWithRouter("1", ["/lists/1"], 0);
 
     await waitFor(() => {
-      expect(
-        screen.queryByRole("button", { name: "Go back" }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole("link", { name: "Go back to My Lists" }),
-      ).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Go back to My Lists" })).toBeInTheDocument();
     });
   });
 });

@@ -25,17 +25,12 @@ describe("RecipeFilter", () => {
     canteenApi.fetchTags.mockResolvedValue(mockTags);
   });
 
-  const renderComponent = (ui) =>
-    render(
-      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
-    );
+  const renderComponent = (ui) => render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 
   it("renders correctly and fetches tags on mount", async () => {
     renderComponent(<RecipeFilter onFilter={mockOnFilter} />);
 
-    expect(
-      screen.getByPlaceholderText("Search by title..."),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Search by title...")).toBeInTheDocument();
     expect(screen.getByText("Search")).toBeInTheDocument();
     expect(screen.getByText("Clear")).toBeInTheDocument();
     await waitFor(() => {

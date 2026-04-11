@@ -1,12 +1,6 @@
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
@@ -27,9 +21,7 @@ vi.mock("react-router-dom", async () => {
 });
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
-  default: ({ children, className }) => (
-    <div className={className}>{children}</div>
-  ),
+  default: ({ children, className }) => <div className={className}>{children}</div>,
 }));
 
 global.ResizeObserver = class ResizeObserver {
@@ -101,9 +93,7 @@ describe("Messages", () => {
   it("renders thread with recipe share text", async () => {
     renderComponent();
     await waitFor(() => {
-      expect(
-        screen.getByText("You shared a recipe: Older message"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("You shared a recipe: Older message")).toBeInTheDocument();
     });
   });
 
@@ -129,16 +119,12 @@ describe("Messages", () => {
   it("handles empty threads", async () => {
     canteenApi.fetchThreads.mockResolvedValue([]);
     renderComponent();
-    await waitFor(() =>
-      expect(screen.getByText("No conversations yet.")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("No conversations yet.")).toBeInTheDocument());
   });
 
   it("opens new message popover and searches friends", async () => {
     canteenApi.fetchThreads.mockResolvedValue([]);
-    canteenApi.fetchFriends.mockResolvedValue([
-      { id: "f1", username: "TestFriend" },
-    ]);
+    canteenApi.fetchFriends.mockResolvedValue([{ id: "f1", username: "TestFriend" }]);
 
     renderComponent();
 
@@ -164,9 +150,7 @@ describe("Messages", () => {
 
   it("navigates to conversation when friend is selected in new message popover", async () => {
     canteenApi.fetchThreads.mockResolvedValue([]);
-    canteenApi.fetchFriends.mockResolvedValue([
-      { id: "f1", username: "TestFriend" },
-    ]);
+    canteenApi.fetchFriends.mockResolvedValue([{ id: "f1", username: "TestFriend" }]);
 
     renderComponent();
     await act(async () => {

@@ -23,9 +23,7 @@ const CanteenUserList = ({
   if (loading && (!users || users.length === 0)) {
     return (
       <div className="flex justify-center p-12">
-        <p className="text-lightestGrey animate-pulse font-mono text-xl">
-          Loading users...
-        </p>
+        <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading users...</p>
       </div>
     );
   }
@@ -42,12 +40,8 @@ const CanteenUserList = ({
     <>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {users.map((user) => {
-          const isFollowing = followingList.some(
-            (f) => String(f.id) === String(user.id),
-          );
-          const isFollower = followersList.some(
-            (f) => String(f.id) === String(user.id),
-          );
+          const isFollowing = followingList.some((f) => String(f.id) === String(user.id));
+          const isFollower = followersList.some((f) => String(f.id) === String(user.id));
           const isFriend = isFollowing && isFollower;
 
           return (
@@ -84,9 +78,7 @@ const CanteenUserList = ({
                     {isFriend ? (
                       <>
                         <span className="group-hover/btn:hidden">Friends</span>
-                        <span className="hidden group-hover/btn:inline">
-                          Unfriend
-                        </span>
+                        <span className="hidden group-hover/btn:inline">Unfriend</span>
                       </>
                     ) : isFollowing ? (
                       "Unfollow"
@@ -112,15 +104,10 @@ const CanteenUserList = ({
         />
       )}
 
-      <MiddenModal
-        isOpen={!!userToUnfriend}
-        onClose={() => setUserToUnfriend(null)}
-        title="Unfriend User"
-      >
+      <MiddenModal isOpen={!!userToUnfriend} onClose={() => setUserToUnfriend(null)} title="Unfriend User">
         <p className="text-lightestGrey mb-6 font-mono">
-          Are you sure you want to unfollow{" "}
-          <strong className="text-white">{userToUnfriend?.username}</strong>?
-          You will no longer be friends.
+          Are you sure you want to unfollow <strong className="text-white">{userToUnfriend?.username}</strong>? You will
+          no longer be friends.
         </p>
         <div className="flex justify-end gap-2">
           <Button

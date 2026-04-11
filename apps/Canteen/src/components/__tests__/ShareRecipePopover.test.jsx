@@ -1,11 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
@@ -173,9 +167,7 @@ describe("ShareRecipePopover", () => {
       });
       expect(screen.getByText(`Share with Alice`)).toBeInTheDocument();
 
-      const messageInput = screen.getByPlaceholderText(
-        "Check out this recipe!",
-      );
+      const messageInput = screen.getByPlaceholderText("Check out this recipe!");
       await act(async () => {
         fireEvent.change(messageInput, {
           target: { value: "You should try this!" },
@@ -188,11 +180,7 @@ describe("ShareRecipePopover", () => {
       });
 
       await waitFor(() => {
-        expect(canteenApi.sendMessage).toHaveBeenCalledWith(
-          "friend1",
-          "You should try this!",
-          "recipe456",
-        );
+        expect(canteenApi.sendMessage).toHaveBeenCalledWith("friend1", "You should try this!", "recipe456");
       });
 
       await waitFor(() => {

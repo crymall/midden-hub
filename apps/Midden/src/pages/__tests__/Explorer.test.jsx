@@ -10,9 +10,7 @@ vi.mock("@shared/core/utils/constants", async (importOriginal) => {
   return {
     ...actual,
     explorerLinkList: actual.explorerLinkList.map((item) =>
-      item.label === "Canteen"
-        ? { ...item, to: "http://mock-canteen.url" }
-        : item,
+      item.label === "Canteen" ? { ...item, to: "http://mock-canteen.url" } : item,
     ),
   };
 });

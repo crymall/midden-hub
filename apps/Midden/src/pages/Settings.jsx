@@ -1,13 +1,4 @@
-import {
-  Field,
-  Input,
-  Label,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-} from "@headlessui/react";
+import { Field, Input, Label, Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { PERMISSIONS } from "@shared/core/utils/constants";
 import { useQuery } from "@tanstack/react-query";
 
@@ -40,9 +31,7 @@ const Settings = () => {
 
   return (
     <MiddenCard>
-      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
-        Settings
-      </h2>
+      <h2 className="mb-4 font-gothic text-4xl font-bold text-white">Settings</h2>
       <TabGroup>
         <TabList className="border-grey mb-6 flex space-x-4 border-b">
           <Tab className="data-selected:border-lightestGrey data-selected:text-lightestGrey text-grey hover:text-lightGrey cursor-pointer px-4 py-2 text-sm font-bold transition-colors focus:outline-none data-selected:border-b-2">
@@ -57,14 +46,10 @@ const Settings = () => {
 
         <TabPanels>
           <TabPanel>
-            <h2 className="mb-4 font-mono text-xl font-bold text-white">
-              User Information
-            </h2>
+            <h2 className="mb-4 font-mono text-xl font-bold text-white">User Information</h2>
             <div className="max-w-md space-y-4">
               <Field>
-                <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-                  Username
-                </Label>
+                <Label className="text-lightestGrey mb-1 block text-sm font-bold">Username</Label>
                 <Input
                   value={user.username}
                   readOnly
@@ -72,9 +57,7 @@ const Settings = () => {
                 />
               </Field>
               <Field>
-                <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-                  Email
-                </Label>
+                <Label className="text-lightestGrey mb-1 block text-sm font-bold">Email</Label>
                 <Input
                   value={userEmail || ""}
                   readOnly
@@ -86,9 +69,7 @@ const Settings = () => {
 
           <Can perform={writeUsers}>
             <TabPanel>
-              <h2 className="mb-4 font-mono text-xl font-bold text-white">
-                User Admin
-              </h2>
+              <h2 className="mb-4 font-mono text-xl font-bold text-white">User Admin</h2>
               <UserList users={users} isLoading={usersLoading} />
             </TabPanel>
           </Can>

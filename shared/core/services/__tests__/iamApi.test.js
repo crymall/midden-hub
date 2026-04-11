@@ -2,15 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as api from "../iamApi";
 
-const { mockGet, mockPost, mockPatch, mockDelete, mockUse } = vi.hoisted(
-  () => ({
-    mockGet: vi.fn(),
-    mockPost: vi.fn(),
-    mockPatch: vi.fn(),
-    mockDelete: vi.fn(),
-    mockUse: vi.fn(),
-  }),
-);
+const { mockGet, mockPost, mockPatch, mockDelete, mockUse } = vi.hoisted(() => ({
+  mockGet: vi.fn(),
+  mockPost: vi.fn(),
+  mockPatch: vi.fn(),
+  mockDelete: vi.fn(),
+  mockUse: vi.fn(),
+}));
 
 vi.mock("axios", () => ({
   default: {

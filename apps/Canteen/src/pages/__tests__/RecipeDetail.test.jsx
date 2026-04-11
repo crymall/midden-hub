@@ -1,11 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
@@ -81,9 +75,7 @@ describe("RecipeDetail", () => {
     wait_time_minutes: 30,
     total_time_minutes: 60,
     servings: 4,
-    ingredients: [
-      { quantity: "1", unit: "cup", name: "Flour", notes: "sifted" },
-    ],
+    ingredients: [{ quantity: "1", unit: "cup", name: "Flour", notes: "sifted" }],
     instructions: "Mix and bake.",
     likes: [],
     tags: [{ id: "1", name: "TestTag" }],
@@ -118,9 +110,7 @@ describe("RecipeDetail", () => {
     renderComponent();
 
     await act(async () => {
-      await waitFor(() =>
-        expect(canteenApi.fetchRecipe).toHaveBeenCalledWith("123"),
-      );
+      await waitFor(() => expect(canteenApi.fetchRecipe).toHaveBeenCalledWith("123"));
     });
   });
 
@@ -199,10 +189,7 @@ describe("RecipeDetail", () => {
     await waitFor(() => {
       expect(screen.getByText("Edit")).toBeInTheDocument();
       const editLink = screen.getByText("Edit").closest("a");
-      expect(editLink).toHaveAttribute(
-        "data-state",
-        JSON.stringify({ fromDetail: true }),
-      );
+      expect(editLink).toHaveAttribute("data-state", JSON.stringify({ fromDetail: true }));
       expect(screen.getByText("Delete")).toBeInTheDocument();
     });
   });
@@ -214,9 +201,7 @@ describe("RecipeDetail", () => {
     renderComponent();
 
     await screen.findByText("Test Recipe");
-    expect(
-      screen.queryByRole("button", { name: "Options" }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Options" })).not.toBeInTheDocument();
     expect(screen.queryByText("Edit")).not.toBeInTheDocument();
     expect(screen.queryByText("Delete")).not.toBeInTheDocument();
   });
@@ -241,9 +226,7 @@ describe("RecipeDetail", () => {
 
     const modalTitle = await screen.findByText("Delete Recipe");
     expect(modalTitle).toBeInTheDocument();
-    expect(
-      screen.getByText(/Are you sure you want to delete this recipe\?/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to delete this recipe\?/i)).toBeInTheDocument();
 
     const confirmBtns = screen.getAllByText("Delete");
     await act(async () => {
@@ -265,9 +248,7 @@ describe("RecipeDetail", () => {
 
     renderComponent();
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /♥\s*Liked/i }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /♥\s*Liked/i })).toBeInTheDocument();
     });
   });
 
@@ -307,9 +288,7 @@ describe("RecipeDetail", () => {
     mockLocation = { key: "default" };
     renderComponent();
     await waitFor(() => {
-      expect(
-        screen.queryByRole("button", { name: "Go back" }),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
     });
   });
 });

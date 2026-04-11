@@ -17,23 +17,12 @@ import {
 } from "@headlessui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  createIngredient,
-  createTag,
-  fetchIngredients,
-  fetchTags,
-} from "@shared/core/services/canteenApi";
+import { createIngredient, createTag, fetchIngredients, fetchTags } from "@shared/core/services/canteenApi";
 
 import MiddenModal from "@shared/ui/components/MiddenModal";
 import DurationInput from "./DurationInput";
 
-const RecipeForm = ({
-  initialData,
-  onSubmit,
-  isSubmitting,
-  error,
-  submitLabel = "Save Recipe",
-}) => {
+const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = "Save Recipe" }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -50,14 +39,10 @@ const RecipeForm = ({
   );
 
   const [ingredients, setIngredients] = useState(
-    initialData?.ingredients || [
-      { id: null, name: "", quantity: "", unit: "", notes: "" },
-    ],
+    initialData?.ingredients || [{ id: null, name: "", quantity: "", unit: "", notes: "" }],
   );
 
-  const [selectedTags, setSelectedTags] = useState(
-    initialData?.selectedTags || [],
-  );
+  const [selectedTags, setSelectedTags] = useState(initialData?.selectedTags || []);
 
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [newTagName, setNewTagName] = useState("");
@@ -94,10 +79,7 @@ const RecipeForm = ({
   };
 
   const addIngredient = () => {
-    setIngredients([
-      ...ingredients,
-      { id: null, name: "", quantity: "", unit: "", notes: "" },
-    ]);
+    setIngredients([...ingredients, { id: null, name: "", quantity: "", unit: "", notes: "" }]);
   };
 
   const removeIngredient = (index) => {
@@ -108,11 +90,7 @@ const RecipeForm = ({
   };
 
   const toggleTag = (tagId) => {
-    setSelectedTags((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId],
-    );
+    setSelectedTags((prev) => (prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]));
   };
 
   const handleOpenTagModal = () => {
@@ -180,11 +158,9 @@ const RecipeForm = ({
 
     const sServings = sanitizeNumber(formData.servings);
     const newInvalidFields = [];
-    if (!formData.title || !formData.title.trim())
-      newInvalidFields.push("title");
+    if (!formData.title || !formData.title.trim()) newInvalidFields.push("title");
     if (sServings === null) newInvalidFields.push("servings");
-    if (!formData.instructions || !formData.instructions.trim())
-      newInvalidFields.push("instructions");
+    if (!formData.instructions || !formData.instructions.trim()) newInvalidFields.push("instructions");
 
     if (newInvalidFields.length > 0) {
       setInvalidFields(newInvalidFields);
@@ -203,9 +179,7 @@ const RecipeForm = ({
 
     if (unresolvedIndices.length > 0) {
       setUnresolvedIngredients(unresolvedIndices);
-      setValidationError(
-        "Please create or select an existing ingredient for the highlighted items.",
-      );
+      setValidationError("Please create or select an existing ingredient for the highlighted items.");
       return;
     }
 
@@ -228,13 +202,7 @@ const RecipeForm = ({
   const baseInputClass =
     "bg-dark border-grey text-lightestGrey focus:border-lightestGrey border p-2 focus:outline-none";
 
-  const renderField = (
-    label,
-    name,
-    type = "text",
-    className = "",
-    props = {},
-  ) => (
+  const renderField = (label, name, type = "text", className = "", props = {}) => (
     <Field className={className}>
       <Label className="text-lightestGrey mb-1 block text-sm font-bold">
         {label}
@@ -251,14 +219,7 @@ const RecipeForm = ({
     </Field>
   );
 
-  const renderTextarea = (
-    label,
-    name,
-    rows = 3,
-    className = "",
-    placeholder = "",
-    required = false,
-  ) => (
+  const renderTextarea = (label, name, rows = 3, className = "", placeholder = "", required = false) => (
     <Field className={className}>
       <Label className="text-lightestGrey mb-1 block text-sm font-bold">
         {label}
@@ -278,15 +239,9 @@ const RecipeForm = ({
   return (
     <>
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
-        {error && (
-          <div className="border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">
-            {error}
-          </div>
-        )}
+        {error && <div className="border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">{error}</div>}
         {validationError && (
-          <div className="border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">
-            {validationError}
-          </div>
+          <div className="border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">{validationError}</div>
         )}
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -297,23 +252,17 @@ const RecipeForm = ({
           <DurationInput
             label="Prep Time"
             value={formData.prep_time_minutes}
-            onChange={(val) =>
-              setFormData((prev) => ({ ...prev, prep_time_minutes: val }))
-            }
+            onChange={(val) => setFormData((prev) => ({ ...prev, prep_time_minutes: val }))}
           />
           <DurationInput
             label="Cook Time"
             value={formData.cook_time_minutes}
-            onChange={(val) =>
-              setFormData((prev) => ({ ...prev, cook_time_minutes: val }))
-            }
+            onChange={(val) => setFormData((prev) => ({ ...prev, cook_time_minutes: val }))}
           />
           <DurationInput
             label="Wait Time"
             value={formData.wait_time_minutes}
-            onChange={(val) =>
-              setFormData((prev) => ({ ...prev, wait_time_minutes: val }))
-            }
+            onChange={(val) => setFormData((prev) => ({ ...prev, wait_time_minutes: val }))}
           />
           {renderField("Servings", "servings", "number", "", {
             min: "0",
@@ -321,9 +270,7 @@ const RecipeForm = ({
             required: true,
           })}
           <Field>
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              Tags
-            </Label>
+            <Label className="text-lightestGrey mb-1 block text-sm font-bold">Tags</Label>
             <Popover className="relative">
               <PopoverButton className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey flex w-full items-center justify-between border p-2 text-left focus:outline-none">
                 <span className="truncate">
@@ -350,17 +297,10 @@ const RecipeForm = ({
                           viewBox="0 0 14 14"
                           fill="none"
                         >
-                          <path
-                            d="M3 8L6 11L11 3.5"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
+                          <path d="M3 8L6 11L11 3.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </Checkbox>
-                      <Label className="cursor-pointer font-mono text-sm">
-                        {tag.name}
-                      </Label>
+                      <Label className="cursor-pointer font-mono text-sm">{tag.name}</Label>
                     </Field>
                   ))}
                   <div className="border-grey mt-2 border-t pt-2">
@@ -379,14 +319,8 @@ const RecipeForm = ({
 
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-lightestGrey block text-sm font-bold">
-              Ingredients
-            </span>
-            <Button
-              type="button"
-              onClick={addIngredient}
-              className="text-accent text-sm font-bold hover:text-white"
-            >
+            <span className="text-lightestGrey block text-sm font-bold">Ingredients</span>
+            <Button type="button" onClick={addIngredient} className="text-accent text-sm font-bold hover:text-white">
               + Add Ingredient
             </Button>
           </div>
@@ -406,30 +340,21 @@ const RecipeForm = ({
                     onChange={(e) => {
                       const val = e.target.value;
                       if (val < 0) return;
-                      handleIngredientChange(
-                        index,
-                        "quantity",
-                        val === "0" ? "" : val,
-                      );
+                      handleIngredientChange(index, "quantity", val === "0" ? "" : val);
                     }}
                     className={`${baseInputClass} w-20 flex-none`}
                   />
                   <Input
                     placeholder="Unit"
                     value={ing.unit}
-                    onChange={(e) =>
-                      handleIngredientChange(index, "unit", e.target.value)
-                    }
+                    onChange={(e) => handleIngredientChange(index, "unit", e.target.value)}
                     className={`${baseInputClass} w-24 flex-none`}
                   />
                   <div className="relative min-w-25 flex-1">
                     <Combobox
                       value={ing}
                       onChange={async (val) => {
-                        if (
-                          typeof val === "object" &&
-                          val?.action === "create"
-                        ) {
+                        if (typeof val === "object" && val?.action === "create") {
                           handleOpenIngredientModal(val.name, index);
                         } else if (val) {
                           const newIngredients = [...ingredients];
@@ -445,11 +370,7 @@ const RecipeForm = ({
                       by={(a, b) => a?.id === b?.id}
                     >
                       <ComboboxInput
-                        className={`${baseInputClass} w-full ${
-                          unresolvedIngredients.includes(index)
-                            ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500"
-                            : ""
-                        }`}
+                        className={`${baseInputClass} w-full ${unresolvedIngredients.includes(index) ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500" : ""}`}
                         placeholder="Name"
                         displayValue={(item) => item?.name || ""}
                         onChange={(e) => {
@@ -467,11 +388,7 @@ const RecipeForm = ({
                       />
                       {(searchResults.length > 0 ||
                         ((ing.name || "").trim() !== "" &&
-                          !searchResults.some(
-                            (r) =>
-                              r.name.toLowerCase() ===
-                              (ing.name || "").toLowerCase(),
-                          ))) && (
+                          !searchResults.some((r) => r.name.toLowerCase() === (ing.name || "").toLowerCase()))) && (
                         <ComboboxOptions className="bg-dark border-grey absolute z-50 mt-1 max-h-60 w-full overflow-auto border p-1 shadow-xl">
                           {searchResults.map((suggestion) => (
                             <ComboboxOption
@@ -483,11 +400,7 @@ const RecipeForm = ({
                             </ComboboxOption>
                           ))}
                           {(ing.name || "").trim() !== "" &&
-                            !searchResults.some(
-                              (r) =>
-                                r.name.toLowerCase() ===
-                                (ing.name || "").toLowerCase(),
-                            ) && (
+                            !searchResults.some((r) => r.name.toLowerCase() === (ing.name || "").toLowerCase()) && (
                               <ComboboxOption
                                 value={{ action: "create", name: ing.name }}
                                 className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-focus:text-white"
@@ -502,9 +415,7 @@ const RecipeForm = ({
                   <Input
                     placeholder="Notes"
                     value={ing.notes}
-                    onChange={(e) =>
-                      handleIngredientChange(index, "notes", e.target.value)
-                    }
+                    onChange={(e) => handleIngredientChange(index, "notes", e.target.value)}
                     className={`${baseInputClass} w-full flex-none md:w-1/2`}
                   />
                 </div>
@@ -521,14 +432,7 @@ const RecipeForm = ({
           </div>
         </div>
 
-        {renderTextarea(
-          "Instructions",
-          "instructions",
-          10,
-          "",
-          "Step 1: ...",
-          true,
-        )}
+        {renderTextarea("Instructions", "instructions", 10, "", "Step 1: ...", true)}
 
         <div className="flex justify-end gap-4 pt-4">
           <Button
@@ -548,11 +452,7 @@ const RecipeForm = ({
         </div>
       </form>
 
-      <MiddenModal
-        isOpen={isTagModalOpen}
-        onClose={() => setIsTagModalOpen(false)}
-        title="Create New Tag"
-      >
+      <MiddenModal isOpen={isTagModalOpen} onClose={() => setIsTagModalOpen(false)} title="Create New Tag">
         <div className="flex flex-col gap-4">
           <Input
             value={newTagName}
@@ -586,10 +486,7 @@ const RecipeForm = ({
       >
         <p className="text-lightestGrey mb-6 font-mono">
           Are you sure you want to create the ingredient{" "}
-          <span className="text-accent font-bold">
-            {`"${pendingIngredientName}"`}
-          </span>
-          ?
+          <span className="text-accent font-bold">{`"${pendingIngredientName}"`}</span>?
         </p>
         <div className="flex justify-end gap-2">
           <Button

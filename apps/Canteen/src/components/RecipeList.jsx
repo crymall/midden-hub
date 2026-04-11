@@ -1,16 +1,10 @@
 import RecipeCard from "./RecipeCard";
 
-const RecipeList = ({
-  recipes,
-  loading,
-  emptyMessage = "No recipes found in the canteen.",
-}) => {
+const RecipeList = ({ recipes, loading, emptyMessage = "No recipes found in the canteen." }) => {
   if (loading) {
     return (
       <div className="flex w-full justify-center p-8">
-        <p className="text-lightestGrey font-mono text-xl animate-pulse">
-          Loading recipes...
-        </p>
+        <p className="text-lightestGrey font-mono text-xl animate-pulse">Loading recipes...</p>
       </div>
     );
   }

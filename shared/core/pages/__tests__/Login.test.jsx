@@ -31,14 +31,10 @@ describe("Login Component", () => {
         <Login />
       </MemoryRouter>,
     );
-    expect(
-      screen.getByRole("heading", { name: /log in/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /log in/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /^login$/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^login$/i })).toBeInTheDocument();
   });
 
   it("switches to register mode", async () => {
@@ -54,13 +50,9 @@ describe("Login Component", () => {
     });
     await user.click(createAccountBtn);
 
-    expect(
-      screen.getByRole("heading", { name: /create account/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /create account/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /^register$/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^register$/i })).toBeInTheDocument();
   });
 
   it("calls login function on form submission", async () => {
@@ -98,9 +90,7 @@ describe("Login Component", () => {
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /2-factor verification/i }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
     });
     expect(screen.getByLabelText(/verification code/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/remember this device/i)).toBeInTheDocument();
@@ -121,9 +111,7 @@ describe("Login Component", () => {
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /2-factor verification/i }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
     });
 
     await user.type(screen.getByLabelText(/verification code/i), "123456");
@@ -152,9 +140,7 @@ describe("Login Component", () => {
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /2-factor verification/i }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /2-factor verification/i })).toBeInTheDocument();
     });
 
     await user.type(screen.getByLabelText(/verification code/i), "123456");

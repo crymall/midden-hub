@@ -12,9 +12,7 @@ describe("NotFound Component", () => {
       </MemoryRouter>,
     );
     expect(screen.getByText("404")).toBeInTheDocument();
-    expect(
-      screen.getByText(/page you are looking for does not exist/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/page you are looking for does not exist/i)).toBeInTheDocument();
   });
 
   it("renders link to return home", () => {

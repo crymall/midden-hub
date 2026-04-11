@@ -1,19 +1,10 @@
 import { Button, Select } from "@headlessui/react";
 
-const PaginationControls = ({
-  page,
-  limit,
-  onPageChange,
-  onLimitChange,
-  loading,
-  isNextDisabled,
-}) => {
+const PaginationControls = ({ page, limit, onPageChange, onLimitChange, loading, isNextDisabled }) => {
   return (
     <div className="border-grey mt-6 flex flex-col items-center justify-between gap-4 border-t-2 pt-4 sm:flex-row">
       <div className="flex items-center gap-2">
-        <label className="text-lightestGrey text-sm font-bold">
-          Rows per page:
-        </label>
+        <label className="text-lightestGrey text-sm font-bold">Rows per page:</label>
         <Select
           value={limit}
           onChange={onLimitChange}

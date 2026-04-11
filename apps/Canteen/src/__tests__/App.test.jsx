@@ -173,9 +173,7 @@ describe("App Routing", () => {
       user: { username: "testuser", permissions: [] },
     });
     render(<App />);
-    expect(
-      await screen.findByText("FollowerFollowingLists Page"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("FollowerFollowingLists Page")).toBeInTheDocument();
   });
 
   it("renders 404 for unknown routes when authenticated", async () => {

@@ -15,21 +15,11 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
-import {
-  addRecipeToList,
-  createList,
-  fetchUserLists,
-} from "@shared/core/services/canteenApi";
+import { addRecipeToList, createList, fetchUserLists } from "@shared/core/services/canteenApi";
 
 import MiddenModal from "@shared/ui/components/MiddenModal";
 
-const ListAddPopover = ({
-  recipeId,
-  className = "",
-  buttonClassName = "",
-  panelClassName = "",
-  label = "+ Add",
-}) => {
+const ListAddPopover = ({ recipeId, className = "", buttonClassName = "", panelClassName = "", label = "+ Add" }) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isCreateListOpen, setIsCreateListOpen] = useState(false);
@@ -103,16 +93,9 @@ const ListAddPopover = ({
       <Popover className={className}>
         {({ close }) => (
           <>
-            <PopoverButton className={`focus:outline-none ${buttonClassName}`}>
-              {addListMessage || label}
-            </PopoverButton>
-            <PopoverPanel
-              className={`bg-dark border-grey absolute z-50 w-64 border p-2 shadow-xl ${panelClassName}`}
-            >
-              <Combobox
-                onChange={(value) => handleComboboxChange(value, close)}
-                immediate
-              >
+            <PopoverButton className={`focus:outline-none ${buttonClassName}`}>{addListMessage || label}</PopoverButton>
+            <PopoverPanel className={`bg-dark border-grey absolute z-50 w-64 border p-2 shadow-xl ${panelClassName}`}>
+              <Combobox onChange={(value) => handleComboboxChange(value, close)} immediate>
                 <ComboboxInput
                   className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-1 text-sm focus:outline-none"
                   placeholder="Search or create list..."
@@ -132,17 +115,14 @@ const ListAddPopover = ({
                         {list.name}
                       </ComboboxOption>
                     ))}
-                    {query.length > 0 &&
-                      !comboboxLists.some(
-                        (l) => l.name.toLowerCase() === query.toLowerCase(),
-                      ) && (
-                        <ComboboxOption
-                          value={{ action: "create" }}
-                          className="data-focus:bg-accent text-lightestGrey cursor-pointer px-2 py-1 text-sm font-bold italic select-none data-focus:text-white"
-                        >
-                          {`Create "${query}"`}
-                        </ComboboxOption>
-                      )}
+                    {query.length > 0 && !comboboxLists.some((l) => l.name.toLowerCase() === query.toLowerCase()) && (
+                      <ComboboxOption
+                        value={{ action: "create" }}
+                        className="data-focus:bg-accent text-lightestGrey cursor-pointer px-2 py-1 text-sm font-bold italic select-none data-focus:text-white"
+                      >
+                        {`Create "${query}"`}
+                      </ComboboxOption>
+                    )}
                   </ComboboxOptions>
                 )}
               </Combobox>
@@ -151,16 +131,10 @@ const ListAddPopover = ({
         )}
       </Popover>
 
-      <MiddenModal
-        isOpen={isCreateListOpen}
-        onClose={() => setIsCreateListOpen(false)}
-        title="Create New List"
-      >
+      <MiddenModal isOpen={isCreateListOpen} onClose={() => setIsCreateListOpen(false)} title="Create New List">
         <form onSubmit={handleCreateList} className="flex flex-col gap-4">
           <Field>
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              List Name
-            </Label>
+            <Label className="text-lightestGrey mb-1 block text-sm font-bold">List Name</Label>
             <Input
               required
               value={newListName}
@@ -178,14 +152,10 @@ const ListAddPopover = ({
             </Button>
             <Button
               type="submit"
-              disabled={
-                createListMutation.isPending || addToListMutation.isPending
-              }
+              disabled={createListMutation.isPending || addToListMutation.isPending}
               className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
             >
-              {createListMutation.isPending || addToListMutation.isPending
-                ? "Adding..."
-                : "Create & Add"}
+              {createListMutation.isPending || addToListMutation.isPending ? "Adding..." : "Create & Add"}
             </Button>
           </div>
         </form>

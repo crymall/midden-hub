@@ -12,11 +12,7 @@ vi.mock("../DurationInput", () => ({
   default: ({ label, onChange, value }) => (
     <div>
       <label htmlFor={label}>{label}</label>
-      <input
-        id={label}
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      <input id={label} value={value || ""} onChange={(e) => onChange(e.target.value)} />
     </div>
   ),
 }));
@@ -56,10 +52,7 @@ describe("RecipeForm", () => {
     canteenApi.fetchIngredients.mockResolvedValue(defaultIngredients);
   });
 
-  const renderComponent = (ui) =>
-    render(
-      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
-    );
+  const renderComponent = (ui) => render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 
   it("opens create tag modal and creates tag", async () => {
     canteenApi.createTag.mockResolvedValue({ id: "t2", name: "New Tag" });
@@ -111,9 +104,7 @@ describe("RecipeForm", () => {
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
     expect(screen.getByText("Create Ingredient")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Are you sure you want to create the ingredient/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to create the ingredient/)).toBeInTheDocument();
     expect(screen.getByText('"New Ing"')).toBeInTheDocument();
 
     const confirmBtn = screen.getByText("Create");
@@ -178,9 +169,7 @@ describe("RecipeForm", () => {
         servings: 2,
         instructions: "Do it",
       },
-      ingredients: [
-        { id: "i1", name: "Salt", quantity: "1", unit: "tsp", notes: "" },
-      ],
+      ingredients: [{ id: "i1", name: "Salt", quantity: "1", unit: "tsp", notes: "" }],
       selectedTags: ["t1"],
     };
 
@@ -207,19 +196,13 @@ describe("RecipeForm", () => {
         description: "",
         instructions: "Bake",
       },
-      ingredients: [
-        { id: "i1", name: "Salt", quantity: "", unit: "tsp", notes: "" },
-      ],
+      ingredients: [{ id: "i1", name: "Salt", quantity: "", unit: "tsp", notes: "" }],
       selectedTags: [],
     };
 
     renderComponent(
       <MemoryRouter>
-        <RecipeForm
-          initialData={initialData}
-          onSubmit={mockOnSubmit}
-          submitLabel="Save Custom Recipe 2"
-        />
+        <RecipeForm initialData={initialData} onSubmit={mockOnSubmit} submitLabel="Save Custom Recipe 2" />
       </MemoryRouter>,
     );
 
@@ -233,9 +216,7 @@ describe("RecipeForm", () => {
           cook_time_minutes: null,
           wait_time_minutes: null,
           servings: 4,
-          ingredients: [
-            { id: "i1", name: "Salt", quantity: null, unit: "tsp", notes: "" },
-          ],
+          ingredients: [{ id: "i1", name: "Salt", quantity: null, unit: "tsp", notes: "" }],
         }),
       );
     });
@@ -244,10 +225,7 @@ describe("RecipeForm", () => {
   it("prevents submission if there are unresolved ingredients", async () => {
     renderComponent(
       <MemoryRouter>
-        <RecipeForm
-          onSubmit={mockOnSubmit}
-          submitLabel="Save Recipe with Unresolved"
-        />
+        <RecipeForm onSubmit={mockOnSubmit} submitLabel="Save Recipe with Unresolved" />
       </MemoryRouter>,
     );
 
@@ -267,9 +245,7 @@ describe("RecipeForm", () => {
     const submitBtn = screen.getByText("Save Recipe with Unresolved");
     fireEvent.click(submitBtn);
 
-    expect(
-      await screen.findByText(/Please create or select an existing ingredient/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Please create or select an existing ingredient/)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
     expect(nameInput).toHaveClass("border-red-500");
   });
@@ -284,9 +260,7 @@ describe("RecipeForm", () => {
     const submitBtn = screen.getByText("Save Invalid Recipe");
     fireEvent.click(submitBtn);
 
-    expect(
-      await screen.findByText(/Please fill out all required fields/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Please fill out all required fields/)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
 
     const titleInput = screen.getByLabelText(/Title/i);

@@ -10,12 +10,7 @@ import globals from "globals";
 
 export default [
   {
-    ignores: [
-      "**/dist/**",
-      "**/node_modules/**",
-      "**/coverage/**",
-      ".github/**",
-    ],
+    ignores: ["**/dist/**", "**/node_modules/**", "**/coverage/**", ".github/**"],
   },
 
   // React Frontend Code (apps and shared directories)
@@ -49,10 +44,7 @@ export default [
       ...react.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
       "react/prop-types": "off",
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "simple-import-sort/imports": [
         "error",
         {
@@ -71,7 +63,7 @@ export default [
       "import/first": "error",
       "import/newline-after-import": "error",
       "import/no-duplicates": "error",
-      "prettier/prettier": "error",
+      "prettier/prettier": ["error", { printWidth: 120 }],
       ...eslintConfigPrettier.rules,
     },
   },
@@ -92,7 +84,7 @@ export default [
       ...js.configs.recommended.rules,
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
-      "prettier/prettier": "error",
+      "prettier/prettier": ["error", { printWidth: 120 }],
       ...eslintConfigPrettier.rules,
     },
   },
@@ -123,7 +115,7 @@ export default [
       ...js.configs.recommended.rules,
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
-      "prettier/prettier": "error",
+      "prettier/prettier": ["error", { printWidth: 120 }],
       ...eslintConfigPrettier.rules,
     },
   },

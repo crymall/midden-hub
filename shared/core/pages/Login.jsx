@@ -57,15 +57,9 @@ export default function Login() {
     setRememberMe(false);
   };
 
-  const headerText =
-    mode === "2fa"
-      ? "2-Factor Verification"
-      : mode === "register"
-        ? "Create Account"
-        : "Log In";
+  const headerText = mode === "2fa" ? "2-Factor Verification" : mode === "register" ? "Create Account" : "Log In";
 
-  const submitButtonText =
-    mode === "2fa" ? "Verify" : mode === "register" ? "Register" : "Login";
+  const submitButtonText = mode === "2fa" ? "Verify" : mode === "register" ? "Register" : "Login";
 
   const pageInput = (label, type, placeholder, value, onInputChange) => (
     <Field>
@@ -82,11 +76,7 @@ export default function Login() {
   );
 
   const pageButton = (innerText, onClick = null) => (
-    <Button
-      type="button"
-      {...(onClick && { onClick })}
-      className="text-lightGrey text-sm underline hover:text-white"
-    >
+    <Button type="button" {...(onClick && { onClick })} className="text-lightGrey text-sm underline hover:text-white">
       {innerText}
     </Button>
   );
@@ -98,16 +88,8 @@ export default function Login() {
           {headerText}
         </h1>
 
-        {error && (
-          <div className="mb-4 border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">
-            {error}
-          </div>
-        )}
-        {info && (
-          <div className="mb-4 border border-blue-500 bg-blue-900/50 p-3 text-sm text-blue-200">
-            {info}
-          </div>
-        )}
+        {error && <div className="mb-4 border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">{error}</div>}
+        {info && <div className="mb-4 border border-blue-500 bg-blue-900/50 p-3 text-sm text-blue-200">{info}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-6 md:space-y-4">
           {mode === "2fa" ? (
@@ -121,32 +103,16 @@ export default function Login() {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="size-4 cursor-pointer"
                 />
-                <Label
-                  htmlFor="rememberMe"
-                  className="cursor-pointer text-sm font-bold"
-                >
+                <Label htmlFor="rememberMe" className="cursor-pointer text-sm font-bold">
                   Remember This Device
                 </Label>
               </Field>
             </>
           ) : (
             <>
-              {pageInput(
-                "Username",
-                "text",
-                "Your username",
-                username,
-                setUsername,
-              )}
-              {mode === "register" &&
-                pageInput("Email", "email", "you@example.com", email, setEmail)}
-              {pageInput(
-                "Password",
-                "password",
-                "Your password",
-                password,
-                setPassword,
-              )}
+              {pageInput("Username", "text", "Your username", username, setUsername)}
+              {mode === "register" && pageInput("Email", "email", "you@example.com", email, setEmail)}
+              {pageInput("Password", "password", "Your password", password, setPassword)}
             </>
           )}
 
@@ -158,16 +124,11 @@ export default function Login() {
               {submitButtonText}
             </Button>
 
-            {mode === "register" &&
-              pageButton("Already have an account? Login", () =>
-                setCleanMode("login"),
-              )}
+            {mode === "register" && pageButton("Already have an account? Login", () => setCleanMode("login"))}
 
-            {mode === "2fa" &&
-              pageButton("Back to Login", () => setCleanMode("login"))}
+            {mode === "2fa" && pageButton("Back to Login", () => setCleanMode("login"))}
 
-            {mode === "login" &&
-              pageButton("Create Account", () => setCleanMode("register"))}
+            {mode === "login" && pageButton("Create Account", () => setCleanMode("register"))}
           </div>
         </form>
       </div>

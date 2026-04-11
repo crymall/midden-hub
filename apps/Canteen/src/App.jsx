@@ -20,9 +20,7 @@ const ListView = lazy(() => import("./pages/ListView"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Conversation = lazy(() => import("./pages/Conversation"));
-const FollowerFollowingLists = lazy(
-  () => import("./pages/FollowerFollowingLists"),
-);
+const FollowerFollowingLists = lazy(() => import("./pages/FollowerFollowingLists"));
 
 function App() {
   return (
@@ -44,10 +42,7 @@ function App() {
               <Route path="my-lists/:id" element={<ListView />} />
               <Route path="messages" element={<Messages />} />
               <Route path="messages/:id" element={<Conversation />} />
-              <Route
-                path="user/:id/network"
-                element={<FollowerFollowingLists />}
-              />
+              <Route path="user/:id/network" element={<FollowerFollowingLists />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

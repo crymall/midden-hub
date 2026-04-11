@@ -117,9 +117,7 @@ describe("MobileBurgerMenu Component", () => {
   });
 
   it("closes the menu after navigation", async () => {
-    const navLinks = [
-      { to: "/destination", label: "Go There", ariaLabel: "Go There" },
-    ];
+    const navLinks = [{ to: "/destination", label: "Go There", ariaLabel: "Go There" }];
     const user = userEvent.setup();
     render(
       <MemoryRouter initialEntries={["/"]}>

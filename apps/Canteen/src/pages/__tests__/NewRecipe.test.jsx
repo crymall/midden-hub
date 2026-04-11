@@ -22,10 +22,7 @@ vi.mock("../../components/RecipeForm", () => ({
   default: ({ onSubmit, isSubmitting, error, submitLabel }) => (
     <div data-testid="mock-recipe-form">
       {error && <div data-testid="form-error">{error}</div>}
-      <button
-        disabled={isSubmitting}
-        onClick={() => onSubmit({ title: "Mock Recipe" })}
-      >
+      <button disabled={isSubmitting} onClick={() => onSubmit({ title: "Mock Recipe" })}>
         {submitLabel}
       </button>
     </div>

@@ -37,10 +37,7 @@ describe("UserList Component", () => {
     });
   });
 
-  const renderWithClient = (ui) =>
-    render(
-      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
-    );
+  const renderWithClient = (ui) => render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 
   it("renders loading state", () => {
     iamApi.fetchUsers.mockImplementation(() => new Promise(() => {}));
@@ -73,9 +70,7 @@ describe("UserList Component", () => {
     });
     iamApi.deleteUser.mockResolvedValue({});
 
-    const confirmSpy = vi
-      .spyOn(window, "confirm")
-      .mockImplementation(() => true);
+    const confirmSpy = vi.spyOn(window, "confirm").mockImplementation(() => true);
     const user = userEvent.setup();
 
     renderWithClient(<UserList />);

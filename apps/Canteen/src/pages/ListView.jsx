@@ -2,10 +2,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
-import {
-  fetchListRecipes,
-  fetchUserLists,
-} from "@shared/core/services/canteenApi";
+import { fetchListRecipes, fetchUserLists } from "@shared/core/services/canteenApi";
 
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import RecipeList from "../components/RecipeList";
@@ -42,13 +39,9 @@ const ListView = () => {
   if (isNotFound) {
     return (
       <MiddenCard>
-        <h2 className="mb-4 font-gothic text-4xl font-bold text-white">
-          List Not Found
-        </h2>
+        <h2 className="mb-4 font-gothic text-4xl font-bold text-white">List Not Found</h2>
         <div className="flex flex-col items-center gap-4 p-8">
-          <p className="text-lightGrey font-mono">
-            The requested list could not be found.
-          </p>
+          <p className="text-lightGrey font-mono">The requested list could not be found.</p>
           <Link
             to="/my-lists"
             state={!hasHistory ? { hideBack: true } : null}
@@ -83,9 +76,7 @@ const ListView = () => {
               D
             </Link>
           )}
-          <h2 className="font-gothic text-4xl font-bold text-white">
-            {currentList?.name || "Loading List..."}
-          </h2>
+          <h2 className="font-gothic text-4xl font-bold text-white">{currentList?.name || "Loading List..."}</h2>
         </div>
       </div>
 

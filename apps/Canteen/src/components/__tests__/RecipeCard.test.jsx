@@ -53,9 +53,7 @@ describe("RecipeCard", () => {
         <RecipeCard recipe={mockRecipe} />
       </MemoryRouter>,
     );
-    expect(
-      screen.getByText("Delicious tacos with spicy salsa."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Delicious tacos with spicy salsa.")).toBeInTheDocument();
   });
 
   it("truncates the description at the last complete word within 150 characters", () => {

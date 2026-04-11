@@ -18,7 +18,7 @@ describe("useAuth hook", () => {
     queryClient = new QueryClient({
       defaultOptions: {
         queries: {
-          retry: false, // Turn off retries so tests fail fast
+          retry: false,
         },
       },
     });
@@ -138,10 +138,7 @@ describe("useAuth hook", () => {
     });
 
     expect(iamApi.verify2FA).toHaveBeenCalledWith(1, "123456", false);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Failed to fetch Canteen user",
-      expect.any(Error),
-    );
+    expect(consoleSpy).toHaveBeenCalledWith("Failed to fetch Canteen user", expect.any(Error));
 
     const cachedUser = queryClient.getQueryData(["currentUser"]);
     expect(cachedUser).toEqual({
@@ -175,11 +172,15 @@ describe("useAuth hook", () => {
       canteenId: "canteen123",
     });
 
+    iamApi.verify.mockRejectedValue(new Error("Not authenticated"));
+
     await act(async () => {
       await result.current.logout();
     });
 
-    expect(iamApi.logout).toHaveBeenCalled();
-    expect(queryClient.getQueryData(["currentUser"])).toBeUndefined();
+    await waitFor(() => {
+      expect(iamApi.logout).toHaveBeenCalled();
+      expect(queryClient.getQueryData(["currentUser"])).toBeUndefined();
+    });
   });
 });

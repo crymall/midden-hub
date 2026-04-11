@@ -70,9 +70,6 @@ describe("ListList", () => {
 
   it("renders links pointing to correct list details", () => {
     renderComponent();
-    expect(screen.getByText("View Favorites").closest("a")).toHaveAttribute(
-      "href",
-      "/my-lists/1",
-    );
+    expect(screen.getByText("View Favorites").closest("a")).toHaveAttribute("href", "/my-lists/1");
   });
 });

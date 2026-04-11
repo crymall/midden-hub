@@ -61,9 +61,7 @@ describe("Header Component", () => {
         <Header {...defaultProps} title="Canteen" />
       </MemoryRouter>,
     );
-    expect(
-      screen.queryByRole("button", { name: /settings/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /settings/i })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /logout/i })).toBeInTheDocument();
   });
 

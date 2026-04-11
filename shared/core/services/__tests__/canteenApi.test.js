@@ -2,15 +2,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as api from "../canteenApi";
 
-const { mockGet, mockPost, mockPut, mockDelete, mockPatch, mockUse } =
-  vi.hoisted(() => ({
-    mockGet: vi.fn(),
-    mockPost: vi.fn(),
-    mockPut: vi.fn(),
-    mockDelete: vi.fn(),
-    mockPatch: vi.fn(),
-    mockUse: vi.fn(),
-  }));
+const { mockGet, mockPost, mockPut, mockDelete, mockPatch, mockUse } = vi.hoisted(() => ({
+  mockGet: vi.fn(),
+  mockPost: vi.fn(),
+  mockPut: vi.fn(),
+  mockDelete: vi.fn(),
+  mockPatch: vi.fn(),
+  mockUse: vi.fn(),
+}));
 
 vi.mock("axios", () => ({
   default: {

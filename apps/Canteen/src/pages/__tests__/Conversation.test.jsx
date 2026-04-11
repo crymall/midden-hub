@@ -1,12 +1,6 @@
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
@@ -18,9 +12,7 @@ vi.mock("@shared/core/services/canteenApi");
 vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
-  default: ({ children, className }) => (
-    <div className={className}>{children}</div>
-  ),
+  default: ({ children, className }) => <div className={className}>{children}</div>,
 }));
 
 vi.mock("../../components/RecipeCard", () => ({
@@ -81,9 +73,7 @@ describe("Conversation", () => {
 
     canteenApi.fetchUser.mockResolvedValue({ id: "2", username: "Friend1" });
     canteenApi.fetchConversation.mockResolvedValue(mockConversation);
-    canteenApi.fetchRecipes.mockResolvedValue([
-      { id: "100", title: "Test Recipe", tags: [], likes: [] },
-    ]);
+    canteenApi.fetchRecipes.mockResolvedValue([{ id: "100", title: "Test Recipe", tags: [], likes: [] }]);
     canteenApi.sendMessage.mockResolvedValue({});
     canteenApi.markMessagesAsRead.mockResolvedValue({});
   });
@@ -128,9 +118,7 @@ describe("Conversation", () => {
   });
 
   it("shows loading state", async () => {
-    canteenApi.fetchConversation.mockImplementation(
-      () => new Promise(() => {}),
-    ); // Hang to simulate loading
+    canteenApi.fetchConversation.mockImplementation(() => new Promise(() => {})); // Hang to simulate loading
     await renderComponent();
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
@@ -180,12 +168,8 @@ describe("Conversation", () => {
     await renderComponent();
     const date1 = new Date("2023-01-01T10:00:00.000Z");
     const formattedStr =
-      date1.toLocaleDateString() +
-      " " +
-      date1.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    await waitFor(() =>
-      expect(screen.getAllByText(formattedStr).length).toBeGreaterThan(0),
-    );
+      date1.toLocaleDateString() + " " + date1.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    await waitFor(() => expect(screen.getAllByText(formattedStr).length).toBeGreaterThan(0));
   });
 
   it("logs error if sending message fails", async () => {
@@ -202,10 +186,7 @@ describe("Conversation", () => {
       fireEvent.click(sendButton);
     });
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Failed to send message",
-      expect.any(Error),
-    );
+    expect(consoleSpy).toHaveBeenCalledWith("Failed to send message", expect.any(Error));
     consoleSpy.mockRestore();
   });
 });

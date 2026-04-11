@@ -21,8 +21,7 @@ const FollowerFollowingLists = () => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab =
-    searchParams.get("tab") === "following" ? "following" : "followers";
+  const activeTab = searchParams.get("tab") === "following" ? "following" : "followers";
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
 
@@ -32,24 +31,14 @@ const FollowerFollowingLists = () => {
   const followingOffset = activeTab === "following" ? (page - 1) * limit : 0;
 
   const { data: followers = [], isLoading: followersLoading } = useQuery({
-    queryKey: [
-      "followers",
-      user?.canteenId,
-      { limit: followersLimit, offset: followersOffset },
-    ],
-    queryFn: () =>
-      fetchFollowers(user.canteenId, followersLimit, followersOffset),
+    queryKey: ["followers", user?.canteenId, { limit: followersLimit, offset: followersOffset }],
+    queryFn: () => fetchFollowers(user.canteenId, followersLimit, followersOffset),
     enabled: !!user,
   });
 
   const { data: following = [], isLoading: followingLoading } = useQuery({
-    queryKey: [
-      "following",
-      user?.canteenId,
-      { limit: followingLimit, offset: followingOffset },
-    ],
-    queryFn: () =>
-      fetchFollowing(user.canteenId, followingLimit, followingOffset),
+    queryKey: ["following", user?.canteenId, { limit: followingLimit, offset: followingOffset }],
+    queryFn: () => fetchFollowing(user.canteenId, followingLimit, followingOffset),
     enabled: !!user,
   });
 
@@ -110,30 +99,20 @@ const FollowerFollowingLists = () => {
           >
             D
           </Link>
-          <h2 className="font-gothic text-4xl font-bold text-white">
-            My Network
-          </h2>
+          <h2 className="font-gothic text-4xl font-bold text-white">My Network</h2>
         </div>
       </div>
 
       <div className="border-grey mb-6 flex border-b">
         <button
           onClick={() => switchTab("followers")}
-          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${
-            activeTab === "followers"
-              ? "border-accent text-accent border-b-2"
-              : "text-lightGrey hover:text-white"
-          }`}
+          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${activeTab === "followers" ? "border-accent text-accent border-b-2" : "text-lightGrey hover:text-white"}`}
         >
           Followers ({relationshipCounts?.followers || 0})
         </button>
         <button
           onClick={() => switchTab("following")}
-          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${
-            activeTab === "following"
-              ? "border-accent text-accent border-b-2"
-              : "text-lightGrey hover:text-white"
-          }`}
+          className={`px-6 py-2 font-mono text-lg font-bold transition-colors ${activeTab === "following" ? "border-accent text-accent border-b-2" : "text-lightGrey hover:text-white"}`}
         >
           Following ({relationshipCounts?.following || 0})
         </button>

@@ -18,13 +18,7 @@ const Dashboard = ({ navMeta }) => {
 
   return (
     <div>
-      <Header
-        user={user}
-        logout={logout}
-        title={title}
-        titleLink={titleLink}
-        navLinks={navLinks}
-      />
+      <Header user={user} logout={logout} title={title} titleLink={titleLink} navLinks={navLinks} />
       <main className="bg-dark flex min-h-[calc(100vh-80px)] items-start justify-center md:pt-5">
         <Suspense fallback={<Loading />}>
           <Outlet />

@@ -1,12 +1,6 @@
 import { Link, MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
@@ -18,19 +12,13 @@ vi.mock("@shared/core/services/canteenApi");
 vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("../../components/RecipeList", () => ({
-  default: ({ recipes }) => (
-    <div data-testid="recipe-list">{recipes.length} Recipes</div>
-  ),
+  default: ({ recipes }) => <div data-testid="recipe-list">{recipes.length} Recipes</div>,
 }));
 vi.mock("../../components/ListList", () => ({
-  default: ({ userLists }) => (
-    <div data-testid="list-list">{userLists.length} Lists</div>
-  ),
+  default: ({ userLists }) => <div data-testid="list-list">{userLists.length} Lists</div>,
 }));
 vi.mock("../../components/PaginationControls", () => ({
-  default: ({ onPageChange, page }) => (
-    <button onClick={() => onPageChange(page + 1)}>Next Page</button>
-  ),
+  default: ({ onPageChange, page }) => <button onClick={() => onPageChange(page + 1)}>Next Page</button>,
 }));
 
 vi.mock("@shared/ui/components/MiddenModal", () => ({
@@ -124,9 +112,7 @@ describe("UserProfile", () => {
 
   it("switches tabs, and fetches data only on first click for each tab", async () => {
     renderComponent();
-    await waitFor(() =>
-      expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
     expect(canteenApi.fetchUserRecipes).toHaveBeenCalledTimes(1);
     expect(canteenApi.fetchUserLists).not.toHaveBeenCalled();
@@ -147,24 +133,18 @@ describe("UserProfile", () => {
       fireEvent.click(recipesTab);
     });
 
-    await waitFor(() =>
-      expect(canteenApi.fetchUserRecipes).toHaveBeenCalledTimes(1),
-    );
+    await waitFor(() => expect(canteenApi.fetchUserRecipes).toHaveBeenCalledTimes(1));
 
     await act(async () => {
       fireEvent.click(listsTab);
     });
 
-    await waitFor(() =>
-      expect(canteenApi.fetchUserLists).toHaveBeenCalledTimes(1),
-    );
+    await waitFor(() => expect(canteenApi.fetchUserLists).toHaveBeenCalledTimes(1));
   });
 
   it("loads the correct tab and fetches data when URL has a tab parameter", async () => {
     renderComponent("2", "/user/2?tab=lists");
-    await waitFor(() =>
-      expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
     await waitFor(() => {
       expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("2", 20, 0);
       expect(canteenApi.fetchUserRecipes).not.toHaveBeenCalled();
@@ -177,9 +157,7 @@ describe("UserProfile", () => {
     });
     renderComponent("2");
 
-    await waitFor(() =>
-      expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
     await act(async () => {
       fireEvent.click(screen.getByText("Lists"));
@@ -194,9 +172,7 @@ describe("UserProfile", () => {
     });
     renderComponent("2");
 
-    await waitFor(() =>
-      expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
     await act(async () => {
       fireEvent.click(screen.getByText("Lists"));
@@ -210,9 +186,7 @@ describe("UserProfile", () => {
       user: { id: "iam2", canteenId: "2", username: "ViewedUser" },
     });
     renderComponent("2");
-    await waitFor(() =>
-      expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
     expect(screen.getByText("+ List")).toBeInTheDocument();
     expect(screen.getByText("+ Recipe")).toBeInTheDocument();
@@ -223,9 +197,7 @@ describe("UserProfile", () => {
       user: { id: "iam2", canteenId: "2", username: "ViewedUser" },
     });
     renderComponent("2");
-    await waitFor(() =>
-      expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
     await act(async () => {
       fireEvent.click(screen.getByText("+ List"));
@@ -245,9 +217,7 @@ describe("UserProfile", () => {
       </QueryClientProvider>,
     );
 
-    await waitFor(() =>
-      expect(canteenApi.fetchUserRecipes).toHaveBeenCalledTimes(1),
-    );
+    await waitFor(() => expect(canteenApi.fetchUserRecipes).toHaveBeenCalledTimes(1));
 
     canteenApi.fetchUser.mockResolvedValue({ id: "3", username: "NewUser" });
     await act(async () => {
@@ -268,9 +238,7 @@ describe("UserProfile", () => {
       });
 
       renderComponent();
-      await waitFor(() =>
-        expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-      );
+      await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
       expect(screen.getByText("1")).toBeInTheDocument();
       const followersElement = screen.getByText(/Followers/);
@@ -293,44 +261,28 @@ describe("UserProfile", () => {
       });
 
       renderComponent("2");
-      await waitFor(() =>
-        expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-      );
+      await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
       const followersLink = screen.getByText(/Followers/).closest("a");
       expect(followersLink).toBeInTheDocument();
-      expect(followersLink).toHaveAttribute(
-        "href",
-        "/user/2/network?tab=followers",
-      );
+      expect(followersLink).toHaveAttribute("href", "/user/2/network?tab=followers");
 
       const followingLink = screen.getByText(/Following/).closest("a");
       expect(followingLink).toBeInTheDocument();
-      expect(followingLink).toHaveAttribute(
-        "href",
-        "/user/2/network?tab=following",
-      );
+      expect(followingLink).toHaveAttribute("href", "/user/2/network?tab=following");
     });
 
     it("shows Follow button for other users", async () => {
       renderComponent("2");
-      await waitFor(() =>
-        expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-      );
-      expect(
-        screen.getByRole("button", { name: "Follow" }),
-      ).toBeInTheDocument();
+      await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
+      expect(screen.getByRole("button", { name: "Follow" })).toBeInTheDocument();
     });
 
     it("shows Unfollow button if already following", async () => {
-      canteenApi.fetchFollowers.mockResolvedValue([
-        { id: "1", username: "TestUser" },
-      ]);
+      canteenApi.fetchFollowers.mockResolvedValue([{ id: "1", username: "TestUser" }]);
 
       renderComponent("2");
-      await waitFor(() =>
-        expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-      );
+      await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
       const unfollowBtn = await screen.findByRole("button", {
         name: "Unfollow",
       });
@@ -338,13 +290,9 @@ describe("UserProfile", () => {
     });
 
     it("calls followUser and refreshes followers on follow button click", async () => {
-      canteenApi.fetchFollowers
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([{ id: "1", username: "TestUser" }]);
+      canteenApi.fetchFollowers.mockResolvedValueOnce([]).mockResolvedValueOnce([{ id: "1", username: "TestUser" }]);
       renderComponent("2");
-      await waitFor(() =>
-        expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
-      );
+      await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
       const followButton = await screen.findByRole("button", {
         name: "Follow",
@@ -365,9 +313,7 @@ describe("UserProfile", () => {
     });
 
     it("calls unfollowUser and refreshes followers on unfollow button click", async () => {
-      canteenApi.fetchFollowers
-        .mockResolvedValueOnce([{ id: "1", username: "TestUser" }])
-        .mockResolvedValueOnce([]);
+      canteenApi.fetchFollowers.mockResolvedValueOnce([{ id: "1", username: "TestUser" }]).mockResolvedValueOnce([]);
       renderComponent("2");
       const unfollowBtn = await screen.findByRole("button", {
         name: "Unfollow",

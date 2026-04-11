@@ -30,10 +30,7 @@ describe("Settings Component", () => {
     iamApi.fetchUser.mockResolvedValue({ user: { email: "test@example.com" } });
   });
 
-  const renderWithQueryClient = (ui) =>
-    render(
-      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
-    );
+  const renderWithQueryClient = (ui) => render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 
   it("renders profile information from user object and fetched email", async () => {
     useAuth.mockReturnValue({

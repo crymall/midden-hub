@@ -31,5 +31,8 @@
     "jsdom": "^26.0.0",
     "prettier": "^3.8.1",
     "vitest": "^3.0.5"
+  },
+  "prettier": {
+    "printWidth": 120
   }
 }

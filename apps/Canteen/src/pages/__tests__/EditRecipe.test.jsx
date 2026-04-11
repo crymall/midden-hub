@@ -51,9 +51,7 @@ describe("EditRecipe", () => {
     servings: 4,
     instructions: "Mix and match",
     tags: [{ id: "t1", name: "Vegan" }],
-    ingredients: [
-      { id: "i1", name: "Salt", quantity: "1", unit: "tsp", notes: "" },
-    ],
+    ingredients: [{ id: "i1", name: "Salt", quantity: "1", unit: "tsp", notes: "" }],
   };
 
   let queryClient;
@@ -91,9 +89,7 @@ describe("EditRecipe", () => {
       expect(screen.getByDisplayValue("Original Recipe")).toBeInTheDocument();
     });
 
-    expect(
-      screen.getByDisplayValue("Original description"),
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Original description")).toBeInTheDocument();
 
     expect(screen.getByTestId("duration-input-Prep Time")).toHaveValue("10");
     expect(screen.getByTestId("duration-input-Cook Time")).toHaveValue("20");

@@ -1,12 +1,6 @@
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
@@ -25,16 +19,10 @@ vi.mock("../../components/CanteenUserList", () => ({
   default: ({ users, onToggleFollow, onPageChange, onLimitChange }) => (
     <div data-testid="canteen-user-list">
       <div>Users Count: {users.length}</div>
-      <button onClick={() => onToggleFollow("targetId", false)}>
-        Mock Follow
-      </button>
-      <button onClick={() => onToggleFollow("targetId", true)}>
-        Mock Unfollow
-      </button>
+      <button onClick={() => onToggleFollow("targetId", false)}>Mock Follow</button>
+      <button onClick={() => onToggleFollow("targetId", true)}>Mock Unfollow</button>
       <button onClick={() => onPageChange(2)}>Next Page</button>
-      <button onClick={() => onLimitChange({ target: { value: 50 } })}>
-        Change Limit
-      </button>
+      <button onClick={() => onLimitChange({ target: { value: 50 } })}>Change Limit</button>
     </div>
   ),
 }));
@@ -68,12 +56,7 @@ describe("FollowerFollowingLists", () => {
         <MemoryRouter initialEntries={[initialRoute]}>
           <Routes>
             <Route path="/network/:id" element={<FollowerFollowingLists />} />
-            <Route
-              path="/user/:id"
-              element={
-                <div data-testid="profile-redirect">Redirected to Profile</div>
-              }
-            />
+            <Route path="/user/:id" element={<div data-testid="profile-redirect">Redirected to Profile</div>} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>,

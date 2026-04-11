@@ -19,13 +19,7 @@ import { fetchFriends, sendMessage } from "@shared/core/services/canteenApi";
 
 import MiddenModal from "@shared/ui/components/MiddenModal";
 
-const ShareRecipePopover = ({
-  recipe,
-  className = "",
-  buttonClassName = "",
-  panelClassName = "",
-  label = "Share",
-}) => {
+const ShareRecipePopover = ({ recipe, className = "", buttonClassName = "", panelClassName = "", label = "Share" }) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,11 +44,7 @@ const ShareRecipePopover = ({
   }, []);
 
   const filteredFriends =
-    query === ""
-      ? friends
-      : friends.filter((friend) =>
-          friend.username.toLowerCase().includes(query.toLowerCase()),
-        );
+    query === "" ? friends : friends.filter((friend) => friend.username.toLowerCase().includes(query.toLowerCase()));
 
   const handleComboboxChange = (friend, close) => {
     if (friend) {
@@ -66,8 +56,7 @@ const ShareRecipePopover = ({
   };
 
   const sendMessageMutation = useMutation({
-    mutationFn: ({ receiverId, content, recipeId }) =>
-      sendMessage(receiverId, content, recipeId),
+    mutationFn: ({ receiverId, content, recipeId }) => sendMessage(receiverId, content, recipeId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
       queryClient.invalidateQueries({ queryKey: ["threads"] });
@@ -98,10 +87,7 @@ const ShareRecipePopover = ({
       if (copyTimeoutRef.current) {
         clearTimeout(copyTimeoutRef.current);
       }
-      copyTimeoutRef.current = setTimeout(
-        () => setCopyStatus("Copy Link"),
-        2000,
-      );
+      copyTimeoutRef.current = setTimeout(() => setCopyStatus("Copy Link"), 2000);
     });
   };
 
@@ -110,12 +96,8 @@ const ShareRecipePopover = ({
       <Popover className={className}>
         {({ close }) => (
           <>
-            <PopoverButton className={`focus:outline-none ${buttonClassName}`}>
-              {label}
-            </PopoverButton>
-            <PopoverPanel
-              className={`bg-dark border-grey absolute z-50 w-64 border p-2 shadow-xl ${panelClassName}`}
-            >
+            <PopoverButton className={`focus:outline-none ${buttonClassName}`}>{label}</PopoverButton>
+            <PopoverPanel className={`bg-dark border-grey absolute z-50 w-64 border p-2 shadow-xl ${panelClassName}`}>
               <div className="flex items-center gap-2">
                 <Combobox
                   as="div"
@@ -156,9 +138,7 @@ const ShareRecipePopover = ({
                 </Button>
               </div>
               {filteredFriends.length === 0 && query !== "" && (
-                <div className="text-lightGrey pt-2 text-center text-sm italic">
-                  No friends found.
-                </div>
+                <div className="text-lightGrey pt-2 text-center text-sm italic">No friends found.</div>
               )}
             </PopoverPanel>
           </>
@@ -172,17 +152,11 @@ const ShareRecipePopover = ({
       >
         <form onSubmit={handleSend} className="flex flex-col gap-4">
           <div className="bg-primary/20 border-accent/50 border border-dashed p-3">
-            <h4 className="font-mono font-bold text-white mb-1">
-              {recipe?.title}
-            </h4>
-            <p className="text-lightGrey truncate font-mono text-sm">
-              {recipe?.description}
-            </p>
+            <h4 className="font-mono font-bold text-white mb-1">{recipe?.title}</h4>
+            <p className="text-lightGrey truncate font-mono text-sm">{recipe?.description}</p>
           </div>
           <Field>
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              Message (optional)
-            </Label>
+            <Label className="text-lightestGrey mb-1 block text-sm font-bold">Message (optional)</Label>
             <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}

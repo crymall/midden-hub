@@ -36,13 +36,11 @@ const RecipeCard = ({ recipe, inverse = false }) => {
 
   let maskImage = "none";
   if (showLeft && showRight) {
-    maskImage =
-      "linear-gradient(to right, transparent, black 2rem, black calc(100% - 2rem), transparent)";
+    maskImage = "linear-gradient(to right, transparent, black 2rem, black calc(100% - 2rem), transparent)";
   } else if (showLeft) {
     maskImage = "linear-gradient(to right, transparent, black 2rem)";
   } else if (showRight) {
-    maskImage =
-      "linear-gradient(to right, black calc(100% - 2rem), transparent)";
+    maskImage = "linear-gradient(to right, black calc(100% - 2rem), transparent)";
   }
 
   return (
@@ -88,10 +86,7 @@ const RecipeCard = ({ recipe, inverse = false }) => {
           <div className="flex shrink-0 items-center gap-3">
             {recipe.likes && recipe.likes.length > 0 && (
               <span className="text-accent font-mono text-xs font-bold">
-                ♥{" "}
-                {Intl.NumberFormat("en-US", { notation: "compact" }).format(
-                  recipe.likes.length,
-                )}
+                ♥ {Intl.NumberFormat("en-US", { notation: "compact" }).format(recipe.likes.length)}
               </span>
             )}
             <Can perform={PERMISSIONS.writeData}>

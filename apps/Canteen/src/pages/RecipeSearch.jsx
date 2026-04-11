@@ -22,14 +22,7 @@ const RecipeSearch = () => {
     queryKey: ["searchedRecipes", { limit, page, filters }],
     queryFn: () => {
       const { tags, ingredients, title, ids } = filters;
-      return fetchRecipes(
-        limit,
-        (page - 1) * limit,
-        tags,
-        ingredients,
-        title,
-        ids,
-      );
+      return fetchRecipes(limit, (page - 1) * limit, tags, ingredients, title, ids);
     },
   });
 
@@ -53,9 +46,7 @@ const RecipeSearch = () => {
   return (
     <MiddenCard>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-gothic text-4xl font-bold text-white">
-          Find Recipes
-        </h2>
+        <h2 className="font-gothic text-4xl font-bold text-white">Find Recipes</h2>
         <Can perform={PERMISSIONS.writeData}>
           <Link to="/recipes/new">
             <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">
@@ -68,11 +59,7 @@ const RecipeSearch = () => {
       <RecipeList
         recipes={recipes}
         loading={recipesLoading}
-        emptyMessage={
-          hasFilters
-            ? "No recipes found matching your search."
-            : "No recipes found in the canteen."
-        }
+        emptyMessage={hasFilters ? "No recipes found matching your search." : "No recipes found in the canteen."}
       />
 
       <PaginationControls

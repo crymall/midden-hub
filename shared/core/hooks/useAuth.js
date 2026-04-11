@@ -54,8 +54,7 @@ export const useAuth = () => {
   });
 
   const registerMutation = useMutation({
-    mutationFn: ({ username, email, password }) =>
-      iamApi.register(username, email, password),
+    mutationFn: ({ username, email, password }) => iamApi.register(username, email, password),
   });
 
   const logoutMutation = useMutation({

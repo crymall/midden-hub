@@ -57,18 +57,14 @@ describe("MyLists", () => {
 
   it("renders lists", async () => {
     renderComponent(<MyLists />);
-    await waitFor(() =>
-      expect(screen.getByText("Favorites")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
     expect(screen.getByText("Weekly")).toBeInTheDocument();
   });
 
   it("does not fetch lists on mount if cache exists", async () => {
     canteenApi.createList.mockResolvedValue({});
     renderComponent(<MyLists />);
-    await waitFor(() =>
-      expect(screen.getByText("Favorites")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
     expect(canteenApi.fetchUserLists).toHaveBeenCalledTimes(1); // Once on mount by useQuery
   });
 
@@ -77,14 +73,7 @@ describe("MyLists", () => {
     renderComponent(<MyLists />);
 
     await waitFor(() => {
-      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith(
-        "user1",
-        20,
-        0,
-        "",
-        "created_at",
-        "DESC",
-      );
+      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("user1", 20, 0, "", "created_at", "DESC");
     });
   });
 
@@ -98,9 +87,7 @@ describe("MyLists", () => {
     fireEvent.click(deleteBtn);
 
     expect(screen.getByText("Delete List")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Are you sure you want to delete this list/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to delete this list/)).toBeInTheDocument();
 
     const confirmBtn = screen.getByText("Delete");
     fireEvent.click(confirmBtn);
@@ -138,9 +125,7 @@ describe("MyLists", () => {
       </QueryClientProvider>,
     );
 
-    await waitFor(() =>
-      expect(screen.getByText("Favorites")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
 
     const backBtn = screen.getByRole("button", { name: "Go back" });
     expect(backBtn).toBeInTheDocument();
@@ -157,22 +142,15 @@ describe("MyLists", () => {
       </QueryClientProvider>,
     );
 
-    await waitFor(() =>
-      expect(screen.getByText("Favorites")).toBeInTheDocument(),
-    );
-    expect(
-      screen.queryByRole("button", { name: "Go back" }),
-    ).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
   });
 
   it("does not render back button if navigated with hideBack state", async () => {
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter
-          initialEntries={[
-            "/lists/1",
-            { pathname: "/my-lists", state: { hideBack: true } },
-          ]}
+          initialEntries={["/lists/1", { pathname: "/my-lists", state: { hideBack: true } }]}
           initialIndex={1}
         >
           <MyLists />
@@ -180,11 +158,7 @@ describe("MyLists", () => {
       </QueryClientProvider>,
     );
 
-    await waitFor(() =>
-      expect(screen.getByText("Favorites")).toBeInTheDocument(),
-    );
-    expect(
-      screen.queryByRole("button", { name: "Go back" }),
-    ).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
   });
 });
