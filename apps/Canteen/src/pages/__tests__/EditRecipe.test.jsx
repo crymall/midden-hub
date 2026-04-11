@@ -62,6 +62,8 @@ describe("EditRecipe", () => {
     queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
     canteenApi.fetchRecipe.mockResolvedValue(mockRecipe);
     canteenApi.updateRecipe.mockResolvedValue({});
+    canteenApi.fetchTags.mockResolvedValue([]);
+    canteenApi.fetchIngredients.mockResolvedValue([]);
   });
 
   const renderComponent = () => render(

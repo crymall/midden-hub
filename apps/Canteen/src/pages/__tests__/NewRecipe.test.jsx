@@ -62,6 +62,7 @@ describe("NewRecipe", () => {
   });
 
   it("handles submission error", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     canteenApi.createRecipe.mockRejectedValue(new Error("Failed"));
 
     renderComponent();
@@ -72,5 +73,6 @@ describe("NewRecipe", () => {
     await waitFor(() => {
       expect(screen.getByTestId("form-error")).toHaveTextContent("Failed to create recipe. Please check your inputs and try again.");
     });
+    consoleSpy.mockRestore();
   });
 });

@@ -3,10 +3,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import App from "../App";
 import { useAuth } from "@shared/core/hooks/useAuth";
 
-vi.mock("@shared/core/context/auth/AuthProvider", () => ({
-  default: ({ children }) => <>{children}</>,
-}));
-
 vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/core/pages/Login", () => ({ default: () => <div>Login Page</div> }));
