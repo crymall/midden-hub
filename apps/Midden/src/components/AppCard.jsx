@@ -23,7 +23,10 @@ const AppCard = ({ to, symbol, label, description }) => {
     "sm:w-30 md:w-46",
   );
 
-  const contentClass = clsx("flex flex-1 items-center p-4", "sm:flex-col sm:justify-center sm:p-0 sm:w-full sm:h-full");
+  const contentClass = clsx(
+    "flex flex-1 items-center p-4",
+    "sm:flex-col sm:justify-center sm:p-0 sm:w-full sm:h-full",
+  );
 
   const symbolClass = clsx(
     "text-3xl font-icons icon mr-6 text-shadow-hard-grey",
@@ -61,7 +64,9 @@ const AppCard = ({ to, symbol, label, description }) => {
   );
 
   const LinkComponent = isExternal ? "a" : Link;
-  const linkProps = isExternal ? { href: to, target: "_blank", rel: "noopener noreferrer" } : { to };
+  const linkProps = isExternal
+    ? { href: to, target: "_blank", rel: "noopener noreferrer" }
+    : { to };
 
   return (
     <div ref={cardRef} className={wrapperClass} onMouseEnter={handleMouseEnter}>

@@ -59,7 +59,9 @@ const RecipeSearch = () => {
       <RecipeList
         recipes={recipes}
         loading={recipesLoading}
-        emptyMessage={hasFilters ? "No recipes found matching your search." : "No recipes found in the canteen."}
+        emptyMessage={
+          hasFilters ? "No recipes found matching your search." : "No recipes found in the canteen."
+        }
       />
 
       <PaginationControls

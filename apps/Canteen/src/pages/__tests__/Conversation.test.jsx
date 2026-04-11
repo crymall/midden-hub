@@ -73,7 +73,9 @@ describe("Conversation", () => {
 
     canteenApi.fetchUser.mockResolvedValue({ id: "2", username: "Friend1" });
     canteenApi.fetchConversation.mockResolvedValue(mockConversation);
-    canteenApi.fetchRecipes.mockResolvedValue([{ id: "100", title: "Test Recipe", tags: [], likes: [] }]);
+    canteenApi.fetchRecipes.mockResolvedValue([
+      { id: "100", title: "Test Recipe", tags: [], likes: [] },
+    ]);
     canteenApi.sendMessage.mockResolvedValue({});
     canteenApi.markMessagesAsRead.mockResolvedValue({});
   });
@@ -168,7 +170,9 @@ describe("Conversation", () => {
     await renderComponent();
     const date1 = new Date("2023-01-01T10:00:00.000Z");
     const formattedStr =
-      date1.toLocaleDateString() + " " + date1.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      date1.toLocaleDateString() +
+      " " +
+      date1.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     await waitFor(() => expect(screen.getAllByText(formattedStr).length).toBeGreaterThan(0));
   });
 

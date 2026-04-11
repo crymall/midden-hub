@@ -18,7 +18,9 @@ vi.mock("../../components/ListList", () => ({
   default: ({ userLists }) => <div data-testid="list-list">{userLists.length} Lists</div>,
 }));
 vi.mock("../../components/PaginationControls", () => ({
-  default: ({ onPageChange, page }) => <button onClick={() => onPageChange(page + 1)}>Next Page</button>,
+  default: ({ onPageChange, page }) => (
+    <button onClick={() => onPageChange(page + 1)}>Next Page</button>
+  ),
 }));
 
 vi.mock("@shared/ui/components/MiddenModal", () => ({
@@ -290,7 +292,9 @@ describe("UserProfile", () => {
     });
 
     it("calls followUser and refreshes followers on follow button click", async () => {
-      canteenApi.fetchFollowers.mockResolvedValueOnce([]).mockResolvedValueOnce([{ id: "1", username: "TestUser" }]);
+      canteenApi.fetchFollowers
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{ id: "1", username: "TestUser" }]);
       renderComponent("2");
       await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
@@ -313,7 +317,9 @@ describe("UserProfile", () => {
     });
 
     it("calls unfollowUser and refreshes followers on unfollow button click", async () => {
-      canteenApi.fetchFollowers.mockResolvedValueOnce([{ id: "1", username: "TestUser" }]).mockResolvedValueOnce([]);
+      canteenApi.fetchFollowers
+        .mockResolvedValueOnce([{ id: "1", username: "TestUser" }])
+        .mockResolvedValueOnce([]);
       renderComponent("2");
       const unfollowBtn = await screen.findByRole("button", {
         name: "Unfollow",

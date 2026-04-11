@@ -90,11 +90,15 @@ const Messages = () => {
           <div className="text-lightGrey font-mono text-sm">No conversations yet.</div>
         ) : (
           threads.map((thread) => {
-            const isUnread = String(thread.sender_id) !== String(user?.canteenId) && !thread.is_read;
+            const isUnread =
+              String(thread.sender_id) !== String(user?.canteenId) && !thread.is_read;
 
             let threadContent = thread.content;
             if (thread.recipe_id) {
-              const senderName = String(thread.sender_id) === String(user?.canteenId) ? "You" : thread.other_username;
+              const senderName =
+                String(thread.sender_id) === String(user?.canteenId)
+                  ? "You"
+                  : thread.other_username;
               threadContent = `${senderName} shared a recipe${thread.content ? `: ${thread.content}` : ""}`;
             }
 
@@ -111,9 +115,13 @@ const Messages = () => {
                     </span>
                     {isUnread && <span className="bg-accent h-2 w-2 rounded-full" />}
                   </div>
-                  <span className="text-grey text-xs">{new Date(thread.created_at).toLocaleDateString()}</span>
+                  <span className="text-grey text-xs">
+                    {new Date(thread.created_at).toLocaleDateString()}
+                  </span>
                 </div>
-                <p className={`${isUnread ? "text-white font-bold" : "text-lightGrey"} truncate font-mono text-sm`}>
+                <p
+                  className={`${isUnread ? "text-white font-bold" : "text-lightGrey"} truncate font-mono text-sm`}
+                >
                   {threadContent}
                 </p>
               </Link>

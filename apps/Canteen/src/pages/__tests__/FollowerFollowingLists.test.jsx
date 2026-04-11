@@ -56,7 +56,10 @@ describe("FollowerFollowingLists", () => {
         <MemoryRouter initialEntries={[initialRoute]}>
           <Routes>
             <Route path="/network/:id" element={<FollowerFollowingLists />} />
-            <Route path="/user/:id" element={<div data-testid="profile-redirect">Redirected to Profile</div>} />
+            <Route
+              path="/user/:id"
+              element={<div data-testid="profile-redirect">Redirected to Profile</div>}
+            />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>,

@@ -27,7 +27,9 @@ vi.mock("@shared/ui/components/MiddenCard", () => ({
 
 vi.mock("../../components/RecipeList", () => ({
   default: ({ recipes, loading }) => (
-    <div data-testid="recipe-list">{loading ? "Loading Recipes..." : `Recipes: ${recipes?.length || 0}`}</div>
+    <div data-testid="recipe-list">
+      {loading ? "Loading Recipes..." : `Recipes: ${recipes?.length || 0}`}
+    </div>
   ),
 }));
 
@@ -50,7 +52,11 @@ describe("ListView", () => {
     canteenApi.fetchListRecipes.mockResolvedValue([]);
   });
 
-  const renderWithRouter = (listId = "1", initialEntries = [`/lists/${listId}`], initialIndex = 0) => {
+  const renderWithRouter = (
+    listId = "1",
+    initialEntries = [`/lists/${listId}`],
+    initialIndex = 0,
+  ) => {
     render(
       <MemoryRouter initialEntries={initialEntries} initialIndex={initialIndex}>
         <QueryClientProvider client={queryClient}>

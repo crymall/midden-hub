@@ -67,7 +67,9 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
   return (
     <header className="bg-primary border-accent flex items-center justify-between border-b-4 border-dashed p-4">
       <div className="flex items-center gap-4">
-        <div className="xl:hidden">{processedNavLinks.length && <MobileBurgerMenu navLinks={processedNavLinks} />}</div>
+        <div className="xl:hidden">
+          {processedNavLinks.length && <MobileBurgerMenu navLinks={processedNavLinks} />}
+        </div>
 
         <h1
           onClick={() => navigate(titleLink)}
@@ -76,7 +78,9 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
           {title}
         </h1>
 
-        {processedNavLinks.length && <nav className="ml-24 hidden items-center gap-16 xl:flex">{desktopNavLinks}</nav>}
+        {processedNavLinks.length && (
+          <nav className="ml-24 hidden items-center gap-16 xl:flex">{desktopNavLinks}</nav>
+        )}
       </div>
       <div className="flex items-center gap-4 font-mono">
         {user ? (

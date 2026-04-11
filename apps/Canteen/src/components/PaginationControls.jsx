@@ -1,6 +1,13 @@
 import { Button, Select } from "@headlessui/react";
 
-const PaginationControls = ({ page, limit, onPageChange, onLimitChange, loading, isNextDisabled }) => {
+const PaginationControls = ({
+  page,
+  limit,
+  onPageChange,
+  onLimitChange,
+  loading,
+  isNextDisabled,
+}) => {
   return (
     <div className="border-grey mt-6 flex flex-col items-center justify-between gap-4 border-t-2 pt-4 sm:flex-row">
       <div className="flex items-center gap-2">

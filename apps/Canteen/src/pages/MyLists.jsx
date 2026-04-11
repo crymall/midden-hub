@@ -127,12 +127,19 @@ const MyLists = () => {
         loading={createListMutation.isPending}
       />
 
-      <MiddenModal isOpen={!!listToDelete} onClose={() => setListToDelete(null)} title="Delete List">
+      <MiddenModal
+        isOpen={!!listToDelete}
+        onClose={() => setListToDelete(null)}
+        title="Delete List"
+      >
         <p className="text-lightestGrey mb-6 font-mono">
           Are you sure you want to delete this list? This action cannot be undone.
         </p>
         <div className="flex justify-end gap-2">
-          <Button onClick={() => setListToDelete(null)} className="text-lightGrey px-4 py-2 font-bold hover:text-white">
+          <Button
+            onClick={() => setListToDelete(null)}
+            className="text-lightGrey px-4 py-2 font-bold hover:text-white"
+          >
             Cancel
           </Button>
           <Button

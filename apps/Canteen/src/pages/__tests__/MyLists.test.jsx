@@ -73,7 +73,14 @@ describe("MyLists", () => {
     renderComponent(<MyLists />);
 
     await waitFor(() => {
-      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("user1", 20, 0, "", "created_at", "DESC");
+      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith(
+        "user1",
+        20,
+        0,
+        "",
+        "created_at",
+        "DESC",
+      );
     });
   });
 

@@ -52,7 +52,8 @@ describe("RecipeForm", () => {
     canteenApi.fetchIngredients.mockResolvedValue(defaultIngredients);
   });
 
-  const renderComponent = (ui) => render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+  const renderComponent = (ui) =>
+    render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 
   it("opens create tag modal and creates tag", async () => {
     canteenApi.createTag.mockResolvedValue({ id: "t2", name: "New Tag" });
@@ -202,7 +203,11 @@ describe("RecipeForm", () => {
 
     renderComponent(
       <MemoryRouter>
-        <RecipeForm initialData={initialData} onSubmit={mockOnSubmit} submitLabel="Save Custom Recipe 2" />
+        <RecipeForm
+          initialData={initialData}
+          onSubmit={mockOnSubmit}
+          submitLabel="Save Custom Recipe 2"
+        />
       </MemoryRouter>,
     );
 
@@ -245,7 +250,9 @@ describe("RecipeForm", () => {
     const submitBtn = screen.getByText("Save Recipe with Unresolved");
     fireEvent.click(submitBtn);
 
-    expect(await screen.findByText(/Please create or select an existing ingredient/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Please create or select an existing ingredient/),
+    ).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
     expect(nameInput).toHaveClass("border-red-500");
   });

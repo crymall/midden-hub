@@ -11,7 +11,9 @@ describe("About Component", () => {
     expect(screen.getByText("(noun) /ˈmɪdən/")).toBeInTheDocument();
     expect(screen.getByText("A dung heap.")).toBeInTheDocument();
     expect(screen.getByText("A refuse heap usually near a dwelling.")).toBeInTheDocument();
-    expect(screen.getByText(/An accumulation, deposit, or soil derived from occupation/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/An accumulation, deposit, or soil derived from occupation/i),
+    ).toBeInTheDocument();
     expect(screen.getByText("Excerpt from the Wiktionary entry for “midden”")).toBeInTheDocument();
   });
 

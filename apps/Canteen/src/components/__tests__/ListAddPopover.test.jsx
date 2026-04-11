@@ -39,7 +39,8 @@ describe("ListAddPopover", () => {
     canteenApi.createList.mockResolvedValue({ id: "list3", name: "New List" });
   });
 
-  const renderComponent = (ui) => render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+  const renderComponent = (ui) =>
+    render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 
   it("renders the button correctly", () => {
     renderComponent(<ListAddPopover recipeId="recipe1" />);
@@ -57,7 +58,9 @@ describe("ListAddPopover", () => {
       await screen.findByText("Favorites");
       fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
 
-      await waitFor(() => expect(canteenApi.addRecipeToList).toHaveBeenCalledWith("list1", "recipe1"));
+      await waitFor(() =>
+        expect(canteenApi.addRecipeToList).toHaveBeenCalledWith("list1", "recipe1"),
+      );
     });
 
     it("opens create modal and creates list", async () => {

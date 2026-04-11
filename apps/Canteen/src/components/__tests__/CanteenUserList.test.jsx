@@ -113,7 +113,9 @@ describe("CanteenUserList", () => {
     fireEvent.click(screen.getByText("Friends"));
     expect(screen.getByTestId("midden-modal")).toBeInTheDocument();
 
-    const unfriendConfirmBtn = screen.getAllByText("Unfriend").find((btn) => btn.tagName === "BUTTON");
+    const unfriendConfirmBtn = screen
+      .getAllByText("Unfriend")
+      .find((btn) => btn.tagName === "BUTTON");
     fireEvent.click(unfriendConfirmBtn);
 
     expect(mockOnToggleFollow).toHaveBeenCalledWith("3", true);

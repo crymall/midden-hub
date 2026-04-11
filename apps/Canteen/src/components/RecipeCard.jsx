@@ -36,7 +36,8 @@ const RecipeCard = ({ recipe, inverse = false }) => {
 
   let maskImage = "none";
   if (showLeft && showRight) {
-    maskImage = "linear-gradient(to right, transparent, black 2rem, black calc(100% - 2rem), transparent)";
+    maskImage =
+      "linear-gradient(to right, transparent, black 2rem, black calc(100% - 2rem), transparent)";
   } else if (showLeft) {
     maskImage = "linear-gradient(to right, transparent, black 2rem)";
   } else if (showRight) {

@@ -24,7 +24,11 @@ const MobileBurgerMenu = ({ navLinks }) => {
       >
         ≡
       </Button>
-      <Dialog open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} className="relative z-50">
+      <Dialog
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        className="relative z-50"
+      >
         <DialogPanel className="fixed inset-0 flex flex-col items-center justify-center bg-black p-4">
           <button
             onClick={() => setMobileMenuOpen(false)}

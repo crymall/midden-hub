@@ -5,7 +5,12 @@ import { PERMISSIONS } from "@shared/core/utils/constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { deleteRecipe, fetchRecipe, likeRecipe, unlikeRecipe } from "@shared/core/services/canteenApi";
+import {
+  deleteRecipe,
+  fetchRecipe,
+  likeRecipe,
+  unlikeRecipe,
+} from "@shared/core/services/canteenApi";
 
 import Can from "@shared/core/gateways/Can";
 
@@ -82,7 +87,8 @@ const RecipeDetail = () => {
     );
   }
 
-  const isOwner = user && currentRecipe.author && String(user.canteenId) === String(currentRecipe.author.id);
+  const isOwner =
+    user && currentRecipe.author && String(user.canteenId) === String(currentRecipe.author.id);
 
   const handleLike = () => {
     toggleLikeMutation.mutate();
@@ -120,11 +126,16 @@ const RecipeDetail = () => {
                   </button>
                 )}
                 <div className="flex flex-col gap-0">
-                  <h1 className="font-mono text-3xl leading-none font-bold text-white">{currentRecipe.title}</h1>
+                  <h1 className="font-mono text-3xl leading-none font-bold text-white">
+                    {currentRecipe.title}
+                  </h1>
                   {currentRecipe.author && (
                     <p className="text-lightGrey font-mono text-sm">
                       By{" "}
-                      <Link to={`/user/${currentRecipe.author.id}`} className="text-accent hover:underline">
+                      <Link
+                        to={`/user/${currentRecipe.author.id}`}
+                        className="text-accent hover:underline"
+                      >
                         {currentRecipe.author.username}
                       </Link>
                     </p>
@@ -184,7 +195,11 @@ const RecipeDetail = () => {
                       Z
                     </PopoverButton>
                     <PopoverPanel className="bg-dark border-grey absolute top-full z-10 mt-2 flex w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col gap-2 border p-2 shadow-lg max-sm:right-0 max-sm:left-0 max-sm:mx-auto sm:right-0 sm:w-32">
-                      <Link to={`/recipes/${currentRecipe.id}/edit`} className="w-full" state={{ fromDetail: true }}>
+                      <Link
+                        to={`/recipes/${currentRecipe.id}/edit`}
+                        className="w-full"
+                        state={{ fromDetail: true }}
+                      >
                         <Button className="bg-grey hover:bg-lightGrey text-dark flex h-8 w-full items-center justify-center px-3 text-sm font-bold transition-colors">
                           Edit
                         </Button>
@@ -201,7 +216,9 @@ const RecipeDetail = () => {
               </div>
             </Can>
           </div>
-          <p className="text-lightestGrey mt-4 font-mono text-lg italic md:mt-0">{currentRecipe.description}</p>
+          <p className="text-lightestGrey mt-4 font-mono text-lg italic md:mt-0">
+            {currentRecipe.description}
+          </p>
         </div>
 
         <div className="text-lightestGrey grid grid-cols-2 gap-4 rounded-lg bg-white/5 p-4 text-center font-mono md:grid-cols-4">
@@ -215,7 +232,9 @@ const RecipeDetail = () => {
           </div>
           <div>
             <span className="text-grey block text-xs tracking-wider uppercase">Total Time</span>
-            <span className="text-xl font-bold">{formatTime(currentRecipe.total_time_minutes)}</span>
+            <span className="text-xl font-bold">
+              {formatTime(currentRecipe.total_time_minutes)}
+            </span>
           </div>
           <div>
             <span className="text-grey block text-xs tracking-wider uppercase">Servings</span>
@@ -225,7 +244,9 @@ const RecipeDetail = () => {
 
         <div className="grid gap-8 md:grid-cols-3">
           <div className="md:col-span-1">
-            <h3 className="font-gothic border-grey mb-4 border-b pb-2 text-3xl text-white">Ingredients</h3>
+            <h3 className="font-gothic border-grey mb-4 border-b pb-2 text-3xl text-white">
+              Ingredients
+            </h3>
             <ul className="text-lightestGrey space-y-2 font-mono">
               {currentRecipe.ingredients?.map((ing, index) => (
                 <li key={index} className="flex items-start gap-2">
@@ -240,7 +261,9 @@ const RecipeDetail = () => {
           </div>
 
           <div className="md:col-span-2">
-            <h3 className="font-gothic border-grey mb-4 border-b pb-2 text-3xl text-white">Instructions</h3>
+            <h3 className="font-gothic border-grey mb-4 border-b pb-2 text-3xl text-white">
+              Instructions
+            </h3>
             <div className="text-lightestGrey font-mono leading-relaxed whitespace-pre-wrap">
               {currentRecipe.instructions}
             </div>
@@ -248,7 +271,11 @@ const RecipeDetail = () => {
         </div>
       </div>
 
-      <MiddenModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="Delete Recipe">
+      <MiddenModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Delete Recipe"
+      >
         <p className="text-lightestGrey mb-6 font-mono">
           Are you sure you want to delete this recipe? This action cannot be undone.
         </p>

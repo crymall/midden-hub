@@ -17,12 +17,23 @@ import {
 } from "@headlessui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { createIngredient, createTag, fetchIngredients, fetchTags } from "@shared/core/services/canteenApi";
+import {
+  createIngredient,
+  createTag,
+  fetchIngredients,
+  fetchTags,
+} from "@shared/core/services/canteenApi";
 
 import MiddenModal from "@shared/ui/components/MiddenModal";
 import DurationInput from "./DurationInput";
 
-const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = "Save Recipe" }) => {
+const RecipeForm = ({
+  initialData,
+  onSubmit,
+  isSubmitting,
+  error,
+  submitLabel = "Save Recipe",
+}) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -90,7 +101,9 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
   };
 
   const toggleTag = (tagId) => {
-    setSelectedTags((prev) => (prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]));
+    setSelectedTags((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
+    );
   };
 
   const handleOpenTagModal = () => {
@@ -160,7 +173,8 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
     const newInvalidFields = [];
     if (!formData.title || !formData.title.trim()) newInvalidFields.push("title");
     if (sServings === null) newInvalidFields.push("servings");
-    if (!formData.instructions || !formData.instructions.trim()) newInvalidFields.push("instructions");
+    if (!formData.instructions || !formData.instructions.trim())
+      newInvalidFields.push("instructions");
 
     if (newInvalidFields.length > 0) {
       setInvalidFields(newInvalidFields);
@@ -179,7 +193,9 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
 
     if (unresolvedIndices.length > 0) {
       setUnresolvedIngredients(unresolvedIndices);
-      setValidationError("Please create or select an existing ingredient for the highlighted items.");
+      setValidationError(
+        "Please create or select an existing ingredient for the highlighted items.",
+      );
       return;
     }
 
@@ -219,7 +235,14 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
     </Field>
   );
 
-  const renderTextarea = (label, name, rows = 3, className = "", placeholder = "", required = false) => (
+  const renderTextarea = (
+    label,
+    name,
+    rows = 3,
+    className = "",
+    placeholder = "",
+    required = false,
+  ) => (
     <Field className={className}>
       <Label className="text-lightestGrey mb-1 block text-sm font-bold">
         {label}
@@ -239,9 +262,15 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
   return (
     <>
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
-        {error && <div className="border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">{error}</div>}
+        {error && (
+          <div className="border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">
+            {error}
+          </div>
+        )}
         {validationError && (
-          <div className="border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">{validationError}</div>
+          <div className="border border-red-500 bg-red-900/50 p-3 text-sm text-red-200">
+            {validationError}
+          </div>
         )}
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -297,7 +326,12 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
                           viewBox="0 0 14 14"
                           fill="none"
                         >
-                          <path d="M3 8L6 11L11 3.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                          <path
+                            d="M3 8L6 11L11 3.5"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                       </Checkbox>
                       <Label className="cursor-pointer font-mono text-sm">{tag.name}</Label>
@@ -320,7 +354,11 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
         <div>
           <div className="mb-2 flex items-center justify-between">
             <span className="text-lightestGrey block text-sm font-bold">Ingredients</span>
-            <Button type="button" onClick={addIngredient} className="text-accent text-sm font-bold hover:text-white">
+            <Button
+              type="button"
+              onClick={addIngredient}
+              className="text-accent text-sm font-bold hover:text-white"
+            >
               + Add Ingredient
             </Button>
           </div>
@@ -388,7 +426,9 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
                       />
                       {(searchResults.length > 0 ||
                         ((ing.name || "").trim() !== "" &&
-                          !searchResults.some((r) => r.name.toLowerCase() === (ing.name || "").toLowerCase()))) && (
+                          !searchResults.some(
+                            (r) => r.name.toLowerCase() === (ing.name || "").toLowerCase(),
+                          ))) && (
                         <ComboboxOptions className="bg-dark border-grey absolute z-50 mt-1 max-h-60 w-full overflow-auto border p-1 shadow-xl">
                           {searchResults.map((suggestion) => (
                             <ComboboxOption
@@ -400,7 +440,9 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
                             </ComboboxOption>
                           ))}
                           {(ing.name || "").trim() !== "" &&
-                            !searchResults.some((r) => r.name.toLowerCase() === (ing.name || "").toLowerCase()) && (
+                            !searchResults.some(
+                              (r) => r.name.toLowerCase() === (ing.name || "").toLowerCase(),
+                            ) && (
                               <ComboboxOption
                                 value={{ action: "create", name: ing.name }}
                                 className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-focus:text-white"
@@ -452,7 +494,11 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
         </div>
       </form>
 
-      <MiddenModal isOpen={isTagModalOpen} onClose={() => setIsTagModalOpen(false)} title="Create New Tag">
+      <MiddenModal
+        isOpen={isTagModalOpen}
+        onClose={() => setIsTagModalOpen(false)}
+        title="Create New Tag"
+      >
         <div className="flex flex-col gap-4">
           <Input
             value={newTagName}

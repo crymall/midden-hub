@@ -76,7 +76,9 @@ const ListView = () => {
               D
             </Link>
           )}
-          <h2 className="font-gothic text-4xl font-bold text-white">{currentList?.name || "Loading List..."}</h2>
+          <h2 className="font-gothic text-4xl font-bold text-white">
+            {currentList?.name || "Loading List..."}
+          </h2>
         </div>
       </div>
 

@@ -42,7 +42,9 @@ const CanteenHome = () => {
         </section>
 
         <section>
-          <h3 className="mb-3 text-lg font-bold text-white md:text-2xl">Curate your own recipe book.</h3>
+          <h3 className="mb-3 text-lg font-bold text-white md:text-2xl">
+            Curate your own recipe book.
+          </h3>
           <ul className="text-lightestGrey space-y-2 text-sm md:text-base">
             <li className="flex items-start gap-2">
               <span className="text-accent">•</span>
@@ -62,7 +64,9 @@ const CanteenHome = () => {
           <ul className="text-lightestGrey space-y-2 text-sm md:text-base">
             <li className="flex items-start gap-2">
               <span className="text-accent">•</span>
-              <span>No ads. Ever. Find and reference ingredients and instructions without distraction.</span>
+              <span>
+                No ads. Ever. Find and reference ingredients and instructions without distraction.
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent">•</span>

@@ -180,7 +180,11 @@ describe("ShareRecipePopover", () => {
       });
 
       await waitFor(() => {
-        expect(canteenApi.sendMessage).toHaveBeenCalledWith("friend1", "You should try this!", "recipe456");
+        expect(canteenApi.sendMessage).toHaveBeenCalledWith(
+          "friend1",
+          "You should try this!",
+          "recipe456",
+        );
       });
 
       await waitFor(() => {

@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Button, Checkbox, Field, Input, Label, Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import {
+  Button,
+  Checkbox,
+  Field,
+  Input,
+  Label,
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+} from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
 
 import { fetchTags } from "@shared/core/services/canteenApi";
@@ -22,7 +31,9 @@ const RecipeFilter = ({ onFilter }) => {
   };
 
   const toggleTag = (tagId) => {
-    setSelectedTags((prev) => (prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]));
+    setSelectedTags((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
+    );
   };
 
   const handleClear = () => {
@@ -73,7 +84,12 @@ const RecipeFilter = ({ onFilter }) => {
                           viewBox="0 0 14 14"
                           fill="none"
                         >
-                          <path d="M3 8L6 11L11 3.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                          <path
+                            d="M3 8L6 11L11 3.5"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                       </Checkbox>
                       <Label className="font-mono text-sm cursor-pointer">{tag.name}</Label>
@@ -87,7 +103,10 @@ const RecipeFilter = ({ onFilter }) => {
       </div>
 
       <div className="flex gap-4">
-        <Button type="submit" className="bg-grey hover:bg-lightGrey text-dark px-4 py-2 font-bold transition-colors">
+        <Button
+          type="submit"
+          className="bg-grey hover:bg-lightGrey text-dark px-4 py-2 font-bold transition-colors"
+        >
           Search
         </Button>
         <Button

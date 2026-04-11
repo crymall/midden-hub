@@ -1,4 +1,13 @@
-import { Field, Input, Label, Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import {
+  Field,
+  Input,
+  Label,
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
+} from "@headlessui/react";
 import { PERMISSIONS } from "@shared/core/utils/constants";
 import { useQuery } from "@tanstack/react-query";
 

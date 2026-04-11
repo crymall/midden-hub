@@ -86,7 +86,9 @@ export default function DurationInput({ label, onChange, value }) {
                 >
                   {({ selected }) => (
                     <>
-                      <span className={`block truncate ${selected ? "font-bold" : "font-normal"}`}>{unit.name}</span>
+                      <span className={`block truncate ${selected ? "font-bold" : "font-normal"}`}>
+                        {unit.name}
+                      </span>
                     </>
                   )}
                 </ListboxOption>

@@ -104,10 +104,15 @@ const CanteenUserList = ({
         />
       )}
 
-      <MiddenModal isOpen={!!userToUnfriend} onClose={() => setUserToUnfriend(null)} title="Unfriend User">
+      <MiddenModal
+        isOpen={!!userToUnfriend}
+        onClose={() => setUserToUnfriend(null)}
+        title="Unfriend User"
+      >
         <p className="text-lightestGrey mb-6 font-mono">
-          Are you sure you want to unfollow <strong className="text-white">{userToUnfriend?.username}</strong>? You will
-          no longer be friends.
+          Are you sure you want to unfollow{" "}
+          <strong className="text-white">{userToUnfriend?.username}</strong>? You will no longer be
+          friends.
         </p>
         <div className="flex justify-end gap-2">
           <Button

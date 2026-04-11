@@ -33,6 +33,6 @@
     "vitest": "^3.0.5"
   },
   "prettier": {
-    "printWidth": 120
+    "printWidth": 100
   }
 }

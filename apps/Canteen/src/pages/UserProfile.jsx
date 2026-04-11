@@ -87,7 +87,8 @@ const UserProfile = () => {
     createListMutation.mutate(name);
   };
 
-  const isOwnProfile = currentUser && viewedUser && String(currentUser.canteenId) === String(viewedUser.id);
+  const isOwnProfile =
+    currentUser && viewedUser && String(currentUser.canteenId) === String(viewedUser.id);
 
   const toggleFollowMutation = useMutation({
     mutationFn: async () => {
@@ -141,7 +142,9 @@ const UserProfile = () => {
     <MiddenCard>
       <div className="mb-4 flex items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h1 className="font-gothic text-4xl font-bold text-white truncate">{viewedUser.username}</h1>
+          <h1 className="font-gothic text-4xl font-bold text-white truncate">
+            {viewedUser.username}
+          </h1>
           <div className="text-lightGrey mt-1 hidden gap-4 font-mono text-sm md:flex">
             {isOwnProfile ? (
               <>
@@ -149,22 +152,26 @@ const UserProfile = () => {
                   to={`/user/${viewedUser.id}/network?tab=followers`}
                   className="hover:text-white transition-colors"
                 >
-                  <strong className="text-white">{relationshipCounts?.followers || 0}</strong> Followers
+                  <strong className="text-white">{relationshipCounts?.followers || 0}</strong>{" "}
+                  Followers
                 </Link>
                 <Link
                   to={`/user/${viewedUser.id}/network?tab=following`}
                   className="hover:text-white transition-colors"
                 >
-                  <strong className="text-white">{relationshipCounts?.following || 0}</strong> Following
+                  <strong className="text-white">{relationshipCounts?.following || 0}</strong>{" "}
+                  Following
                 </Link>
               </>
             ) : (
               <>
                 <span>
-                  <strong className="text-white">{relationshipCounts?.followers || 0}</strong> Followers
+                  <strong className="text-white">{relationshipCounts?.followers || 0}</strong>{" "}
+                  Followers
                 </span>
                 <span>
-                  <strong className="text-white">{relationshipCounts?.following || 0}</strong> Following
+                  <strong className="text-white">{relationshipCounts?.following || 0}</strong>{" "}
+                  Following
                 </span>
               </>
             )}
@@ -234,10 +241,17 @@ const UserProfile = () => {
         </div>
       ) : (
         <div>
-          <ListList fetchingLists={listsLoading} userLists={userLists} emptyMessage="No lists found for this user." />
+          <ListList
+            fetchingLists={listsLoading}
+            userLists={userLists}
+            emptyMessage="No lists found for this user."
+          />
           {isOwnProfile && (
             <div className="mt-6 flex justify-end">
-              <Link to="/my-lists" className="text-accent font-mono font-bold transition-colors hover:text-white">
+              <Link
+                to="/my-lists"
+                className="text-accent font-mono font-bold transition-colors hover:text-white"
+              >
                 Manage My Lists →
               </Link>
             </div>

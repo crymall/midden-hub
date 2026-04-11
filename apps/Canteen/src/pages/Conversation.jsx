@@ -35,7 +35,14 @@ const Conversation = () => {
       const recipeIds = [...new Set(conversation.map((msg) => msg.recipe_id).filter(Boolean))];
 
       if (recipeIds.length > 0) {
-        const fetchedRecipes = await fetchRecipes(recipeIds.length, 0, undefined, undefined, undefined, recipeIds);
+        const fetchedRecipes = await fetchRecipes(
+          recipeIds.length,
+          0,
+          undefined,
+          undefined,
+          undefined,
+          recipeIds,
+        );
         const recipesMap = {};
         for (const recipe of fetchedRecipes) {
           recipesMap[String(recipe.id)] = recipe;
@@ -97,7 +104,11 @@ const Conversation = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return (
+      date.toLocaleDateString() +
+      " " +
+      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    );
   };
 
   const displayConversation = [...currentConversation].reverse();
@@ -105,26 +116,42 @@ const Conversation = () => {
   return (
     <div className="flex flex-col p-0 w-full h-[calc(100vh-80px)] md:h-[calc(100vh-120px)] md:w-4/5">
       <div className="border-grey bg-primary/10 flex items-center gap-4 border-b p-4">
-        <Link to="/messages" className="text-white hover:text-accent font-icons icon text-2xl transition-colors">
+        <Link
+          to="/messages"
+          className="text-white hover:text-accent font-icons icon text-2xl transition-colors"
+        >
           D
         </Link>
-        <h3 className="font-mono text-lg font-bold text-white">{conversationPartner?.username || "Chat"}</h3>
+        <h3 className="font-mono text-lg font-bold text-white">
+          {conversationPartner?.username || "Chat"}
+        </h3>
       </div>
 
-      <div ref={scrollContainerRef} className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-scroll p-4">
-        {conversationLoading && <div className="text-lightGrey animate-pulse text-center text-sm">Loading...</div>}
+      <div
+        ref={scrollContainerRef}
+        className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-scroll p-4"
+      >
+        {conversationLoading && (
+          <div className="text-lightGrey animate-pulse text-center text-sm">Loading...</div>
+        )}
         {displayConversation.map((msg) => {
           const isMe = String(msg.sender_id) === String(user.canteenId);
           return (
             <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[75%] p-3 ${isMe ? "bg-accent text-white" : "bg-grey text-dark"}`}>
+              <div
+                className={`max-w-[75%] p-3 ${isMe ? "bg-accent text-white" : "bg-grey text-dark"}`}
+              >
                 {msg.recipe && (
                   <div className="mb-2 max-w-sm sm:min-w-64">
                     <RecipeCard recipe={msg.recipe} inverse={true} />
                   </div>
                 )}
-                {msg.content && <p className="font-mono text-sm whitespace-pre-wrap">{msg.content}</p>}
-                <span className={`mt-1 block text-[10px] ${isMe ? "text-white/70" : "text-dark/70"}`}>
+                {msg.content && (
+                  <p className="font-mono text-sm whitespace-pre-wrap">{msg.content}</p>
+                )}
+                <span
+                  className={`mt-1 block text-[10px] ${isMe ? "text-white/70" : "text-dark/70"}`}
+                >
                   {formatDate(msg.created_at)}
                 </span>
               </div>

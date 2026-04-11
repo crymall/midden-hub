@@ -37,7 +37,8 @@ describe("UserList Component", () => {
     });
   });
 
-  const renderWithClient = (ui) => render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+  const renderWithClient = (ui) =>
+    render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 
   it("renders loading state", () => {
     iamApi.fetchUsers.mockImplementation(() => new Promise(() => {}));

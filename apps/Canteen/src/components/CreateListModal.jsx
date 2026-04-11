@@ -36,7 +36,11 @@ const CreateListModal = ({ isOpen, onClose, onCreate, loading }) => {
           />
         </Field>
         <div className="mt-4 flex justify-end gap-2">
-          <Button type="button" onClick={onClose} className="text-lightGrey px-4 py-2 font-bold hover:text-white">
+          <Button
+            type="button"
+            onClick={onClose}
+            className="text-lightGrey px-4 py-2 font-bold hover:text-white"
+          >
             Cancel
           </Button>
           <Button
