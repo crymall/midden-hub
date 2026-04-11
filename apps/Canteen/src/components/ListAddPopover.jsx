@@ -12,8 +12,9 @@ import {
   ComboboxOptions,
   ComboboxOption,
 } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchUserLists, createList, addRecipeToList } from "@shared/core/services/canteenApi";
 import MiddenModal from "@shared/ui/components/MiddenModal";
 
 const ListAddPopover = ({
@@ -24,30 +25,17 @@ const ListAddPopover = ({
   label = "+ Add",
 }) => {
   const { user } = useAuth();
-  const {
-    canteenApi,
-    comboboxLists,
-    getComboboxLists,
-    hoistComboboxList,
-    comboboxListsLastFetched,
-    currentComboboxQuery,
-    comboboxListsUserId,
-  } = useData();
+  const queryClient = useQueryClient();
   const [isCreateListOpen, setIsCreateListOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [newListName, setNewListName] = useState("");
   const [addListMessage, setAddListMessage] = useState("");
 
-  const ensureListsLoaded = () => {
-    const STALE_TIME = 60 * 1000;
-    const isStale = Date.now() - comboboxListsLastFetched > STALE_TIME;
-    const isSearchData = currentComboboxQuery !== "";
-    const isDifferentUser = comboboxListsUserId !== user?.canteenId;
-
-    if (user && (isStale || isSearchData || isDifferentUser)) {
-      getComboboxLists(user.canteenId);
-    }
-  };
+  const { data: comboboxLists = [] } = useQuery({
+    queryKey: ["comboboxLists", user?.canteenId, query],
+    queryFn: () => fetchUserLists(user.canteenId, 50, 0, query),
+    enabled: !!user,
+  });
 
   const handleComboboxChange = (value, close) => {
     if (typeof value === "object" && value?.action === "create") {
@@ -55,56 +43,53 @@ const ListAddPopover = ({
       setIsCreateListOpen(true);
       close();
     } else if (value?.id) {
-      handleAddToList(value.id);
+      addToListMutation.mutate(value.id);
       close();
     }
   };
 
-  const handleAddToList = async (listId) => {
-    try {
-      await canteenApi.addRecipeToList(listId, recipeId);
+  const addToListMutation = useMutation({
+    mutationFn: (listId) => addRecipeToList(listId, recipeId),
+    onSuccess: () => {
       setAddListMessage("Added!");
-      hoistComboboxList(listId);
-
-      setTimeout(() => {
-        setAddListMessage("");
-      }, 1500);
-    } catch (error) {
+      queryClient.invalidateQueries({ queryKey: ["comboboxLists"] });
+      queryClient.invalidateQueries({ queryKey: ["userLists"] });
+      setTimeout(() => setAddListMessage(""), 1500);
+    },
+    onError: (error) => {
       console.error(error);
       if (error.response && error.response.status === 409) {
         setAddListMessage("Already in list.");
       } else {
         setAddListMessage("Failed.");
       }
-      setTimeout(() => {
-        setAddListMessage("");
-      }, 1500);
+      setTimeout(() => setAddListMessage(""), 1500);
     }
-  };
+  });
 
-  const handleCreateList = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await canteenApi.createList(newListName);
-      await getComboboxLists(user.canteenId, newListName);
+  const createListMutation = useMutation({
+    mutationFn: (name) => createList(name),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["comboboxLists"] });
+      queryClient.invalidateQueries({ queryKey: ["userLists"] });
       if (response?.id) {
-        handleAddToList(response.id);
+        addToListMutation.mutate(response.id);
       }
       setIsCreateListOpen(false);
       setNewListName("");
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error(error);
     }
+  });
+
+  const handleCreateList = (e) => {
+    e.preventDefault();
+    createListMutation.mutate(newListName);
   };
 
   const handleQueryChange = (event) => {
-    const val = event.target.value;
-    setQuery(val);
-    if (val) {
-      getComboboxLists(user.canteenId, val);
-    } else {
-      getComboboxLists(user.canteenId, "");
-    }
+    setQuery(event.target.value);
   };
 
   return (
@@ -113,7 +98,6 @@ const ListAddPopover = ({
         {({ close }) => (
           <>
             <PopoverButton
-              onMouseEnter={ensureListsLoaded}
               className={`focus:outline-none ${buttonClassName}`}
             >
               {addListMessage || label}
@@ -191,9 +175,10 @@ const ListAddPopover = ({
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white"
+                  disabled={createListMutation.isPending || addToListMutation.isPending}
+                  className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
                 >
-                  Create & Add
+                  {createListMutation.isPending || addToListMutation.isPending ? "Adding..." : "Create & Add"}
                 </Button>
               </div>
             </form>

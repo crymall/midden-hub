@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -15,20 +15,14 @@ import {
   ComboboxOptions,
   ComboboxOption,
 } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
 import MiddenModal from "@shared/ui/components/MiddenModal";
 import DurationInput from "./DurationInput";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchTags, fetchIngredients, createTag, createIngredient } from "@shared/core/services/canteenApi";
 
 const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = "Save Recipe" }) => {
   const navigate = useNavigate();
-  const {
-    tags,
-    getTags,
-    createTag,
-    createIngredient,
-    getIngredients,
-    ingredients: searchResults,
-  } = useData();
+  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState(initialData?.formData || {
     title: "",
@@ -54,19 +48,17 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
   const [validationError, setValidationError] = useState("");
   const [unresolvedIngredients, setUnresolvedIngredients] = useState([]);
   const [invalidFields, setInvalidFields] = useState([]);
+  const [ingredientSearchQuery, setIngredientSearchQuery] = useState("");
 
-  const handleSearchIngredients = (query) => {
-    if (!query) {
-      getIngredients(50);
-      return;
-    }
-    getIngredients(10, 0, query);
-  };
+  const { data: tags = [] } = useQuery({
+    queryKey: ["tags"],
+    queryFn: () => fetchTags(500, 0)
+  });
 
-  useEffect(() => {
-    getTags();
-    getIngredients(50);
-  }, [getTags, getIngredients]);
+  const { data: searchResults = [] } = useQuery({
+    queryKey: ["ingredients", ingredientSearchQuery],
+    queryFn: () => fetchIngredients(50, 0, ingredientSearchQuery)
+  });
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -109,16 +101,20 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
     setIsTagModalOpen(true);
   };
 
-  const handleConfirmCreateTag = async () => {
-    if (!newTagName.trim()) return;
-    try {
-      const newTag = await createTag(newTagName);
+  const createTagMutation = useMutation({
+    mutationFn: (name) => createTag(name),
+    onSuccess: (newTag) => {
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
       setSelectedTags((prev) => [...prev, newTag.id]);
       setNewTagName("");
       setIsTagModalOpen(false);
-    } catch (e) {
-      console.error(e);
-    }
+    },
+    onError: (e) => console.error(e)
+  });
+
+  const handleConfirmCreateTag = () => {
+    if (!newTagName.trim()) return;
+    createTagMutation.mutate(newTagName);
   };
 
   const handleOpenIngredientModal = (name, index) => {
@@ -127,9 +123,10 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
     setIsIngredientModalOpen(true);
   };
 
-  const handleConfirmCreateIngredient = async () => {
-    try {
-      const newIng = await createIngredient(pendingIngredientName);
+  const createIngredientMutation = useMutation({
+    mutationFn: (name) => createIngredient(name),
+    onSuccess: (newIng) => {
+      queryClient.invalidateQueries({ queryKey: ["ingredients"] });
       if (pendingIngredientIndex !== null) {
         const newIngredients = [...ingredients];
         newIngredients[pendingIngredientIndex] = {
@@ -142,10 +139,12 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
       setIsIngredientModalOpen(false);
       setPendingIngredientName("");
       setPendingIngredientIndex(null);
-      getIngredients(50);
-    } catch (e) {
-      console.error(e);
-    }
+    },
+    onError: (e) => console.error(e)
+  });
+
+  const handleConfirmCreateIngredient = () => {
+    createIngredientMutation.mutate(pendingIngredientName);
   };
 
   const sanitizeNumber = (val) => {
@@ -439,9 +438,9 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
                             id: null,
                           };
                           setIngredients(newIngredients);
-                          handleSearchIngredients(val);
+                        setIngredientSearchQuery(val);
                         }}
-                        onFocus={() => handleSearchIngredients(ing.name)}
+                      onFocus={() => setIngredientSearchQuery(ing.name)}
                       />
                       {(searchResults.length > 0 ||
                         ((ing.name || "").trim() !== "" &&
@@ -541,9 +540,10 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
                 </Button>
                 <Button
                   onClick={handleConfirmCreateTag}
-                  className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white"
+                  disabled={createTagMutation.isPending}
+                  className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
                 >
-                  Create
+                  {createTagMutation.isPending ? "Creating..." : "Create"}
                 </Button>
               </div>
             </div>
@@ -570,9 +570,10 @@ const RecipeForm = ({ initialData, onSubmit, isSubmitting, error, submitLabel = 
               </Button>
               <Button
                 onClick={handleConfirmCreateIngredient}
-                className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white"
+                disabled={createIngredientMutation.isPending}
+                className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
               >
-                Create
+                {createIngredientMutation.isPending ? "Creating..." : "Create"}
               </Button>
             </div>
       </MiddenModal>

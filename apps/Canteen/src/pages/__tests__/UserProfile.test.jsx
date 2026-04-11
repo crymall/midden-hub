@@ -2,11 +2,12 @@ import { render, screen, fireEvent, waitFor, act } from "@testing-library/react"
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route, Link } from "react-router-dom";
 import UserProfile from "../UserProfile";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as canteenApi from "@shared/core/services/canteenApi";
+import { useAuth } from "@shared/core/hooks/useAuth";
 
-vi.mock("@shared/core/context/data/useData");
-vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/services/canteenApi");
+vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("../../components/RecipeList", () => ({
   default: ({ recipes }) => <div data-testid="recipe-list">{recipes.length} Recipes</div>,
@@ -27,70 +28,46 @@ vi.mock("@shared/ui/components/MiddenModal", () => ({
 }));
 
 describe("UserProfile", () => {
-  const mockCanteenApi = {
-    createList: vi.fn(),
-    fetchFollowers: vi.fn().mockResolvedValue([]),
-  };
-  const mockGetUserProfileRecipes = vi.fn();
-  const mockGetUserLists = vi.fn().mockResolvedValue([]);
-  const mockGetFollowers = vi.fn();
-  const mockGetFollowing = vi.fn();
-  const mockFollowUser = vi.fn();
-  const mockUnfollowUser = vi.fn();
-  const mockGetViewedUser = vi.fn();
-  const mockGetRelationshipCounts = vi.fn();
-
   const defaultUser = { id: "iam1", canteenId: "1", username: "TestUser" };
   const viewedUser = { id: "2", username: "ViewedUser" };
-
-  const defaultContext = {
-    canteenApi: mockCanteenApi,
-    getUserProfileRecipes: mockGetUserProfileRecipes,
-    userProfileRecipes: [],
-    getUserLists: mockGetUserLists,
-    userLists: [],
-    recipesLoading: false,
-    followers: [],
-    following: [],
-    relationshipCounts: { followers: 0, following: 0 },
-    getRelationshipCounts: mockGetRelationshipCounts,
-    getFollowers: mockGetFollowers,
-    getFollowing: mockGetFollowing,
-    followUser: mockFollowUser,
-    unfollowUser: mockUnfollowUser,
-    viewedUser: viewedUser,
-    viewedUserLoading: false,
-    getViewedUser: mockGetViewedUser,
-  };
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
 
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false, staleTime: Infinity },
+        mutations: { retry: false },
+      },
+    });
     useAuth.mockReturnValue({
       user: defaultUser,
     });
 
-    useData.mockReturnValue(defaultContext);
-
-    mockGetViewedUser.mockResolvedValue(viewedUser);
+    canteenApi.fetchUser.mockResolvedValue(viewedUser);
+    canteenApi.fetchUserRecipes.mockResolvedValue([]);
+    canteenApi.fetchUserLists.mockResolvedValue([]);
+    canteenApi.fetchRelationshipCounts.mockResolvedValue({ followers: 0, following: 0 });
+    canteenApi.fetchFollowers.mockResolvedValue([]);
+    canteenApi.followUser.mockResolvedValue({});
+    canteenApi.unfollowUser.mockResolvedValue({});
   });
 
   const renderComponent = (userId = "2", initialRoute = `/user/${userId}`) => {
     return render(
-      <MemoryRouter initialEntries={[initialRoute]}>
-        <Routes>
-          <Route path="/user/:id" element={<UserProfile />} />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={[initialRoute]}>
+          <Routes>
+            <Route path="/user/:id" element={<UserProfile />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
   };
 
   it("renders loading state initially", async () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      viewedUser: null,
-      viewedUserLoading: true,
-    });
+    canteenApi.fetchUser.mockImplementation(() => new Promise(() => {})); // hang
     renderComponent();
     expect(screen.getByText("Loading profile...")).toBeInTheDocument();
   });
@@ -99,74 +76,72 @@ describe("UserProfile", () => {
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText("ViewedUser")).toBeInTheDocument();
+      expect(canteenApi.fetchFollowers).toHaveBeenCalledWith("2", 1, 0, "1");
     });
-    expect(mockCanteenApi.fetchFollowers).toHaveBeenCalledWith("2", 1, 0, "1");
 
     expect(screen.getByText("Recipes")).toBeInTheDocument();
   });
 
   it("handles user not found", async () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      viewedUser: null,
-      viewedUserLoading: false,
-    });
-    mockGetViewedUser.mockResolvedValue(null);
+    canteenApi.fetchUser.mockResolvedValue(null);
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText("User not found.")).toBeInTheDocument();
     });
   });
 
-  it("fetches viewedUser on mount if cache is empty or mismatched", async () => {
-    useData.mockReturnValue({ ...defaultContext, viewedUser: null });
+  it("fetches viewedUser on mount", async () => {
     renderComponent("2");
-    expect(mockGetViewedUser).toHaveBeenCalledWith("2");
+    await waitFor(() => expect(canteenApi.fetchUser).toHaveBeenCalledWith("2"));
   });
 
   it("fetches recipes for the user on mount but not lists", async () => {
     renderComponent();
     await waitFor(() => {
-      expect(mockGetUserProfileRecipes).toHaveBeenCalledWith("2", 20, 0);
+      expect(canteenApi.fetchUserRecipes).toHaveBeenCalledWith("2", 20, 0);
+      expect(canteenApi.fetchUserLists).not.toHaveBeenCalled();
     });
-    expect(mockGetUserLists).not.toHaveBeenCalled();
   });
 
   it("switches tabs, and fetches data only on first click for each tab", async () => {
     renderComponent();
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
 
-    expect(mockGetUserProfileRecipes).toHaveBeenCalledTimes(1);
-    expect(mockGetUserLists).not.toHaveBeenCalled();
+    expect(canteenApi.fetchUserRecipes).toHaveBeenCalledTimes(1);
+    expect(canteenApi.fetchUserLists).not.toHaveBeenCalled();
 
     const listsTab = screen.getByText("Lists");
     await act(async () => {
       fireEvent.click(listsTab);
     });
 
-    expect(mockGetUserLists).toHaveBeenCalledWith("2", 20, 0);
-    expect(mockGetUserLists).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("list-list")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("2", 20, 0);
+      expect(canteenApi.fetchUserLists).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId("list-list")).toBeInTheDocument();
+    });
 
     const recipesTab = screen.getByText("Recipes");
     await act(async () => {
       fireEvent.click(recipesTab);
     });
 
-    expect(mockGetUserProfileRecipes).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(canteenApi.fetchUserRecipes).toHaveBeenCalledTimes(1));
 
     await act(async () => {
       fireEvent.click(listsTab);
     });
 
-    expect(mockGetUserLists).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(canteenApi.fetchUserLists).toHaveBeenCalledTimes(1));
   });
 
   it("loads the correct tab and fetches data when URL has a tab parameter", async () => {
     renderComponent("2", "/user/2?tab=lists");
     await waitFor(() => expect(screen.getByText("ViewedUser")).toBeInTheDocument());
-    expect(mockGetUserLists).toHaveBeenCalledWith("2", 20, 0);
-    expect(mockGetUserProfileRecipes).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("2", 20, 0);
+      expect(canteenApi.fetchUserRecipes).not.toHaveBeenCalled();
+    });
   });
 
   it("shows 'Manage My Lists' only for own profile", async () => {
@@ -217,31 +192,32 @@ describe("UserProfile", () => {
 
   it("clears cache and fetches new data when navigating to a different user profile", async () => {
     render(
-      <MemoryRouter initialEntries={[`/user/2`]}>
-        <Link to="/user/3">Navigate</Link>
-        <Routes>
-          <Route path="/user/:id" element={<UserProfile />} />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={[`/user/2`]}>
+          <Link to="/user/3">Navigate</Link>
+          <Routes>
+            <Route path="/user/:id" element={<UserProfile />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
 
-    await waitFor(() => expect(mockGetUserProfileRecipes).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(canteenApi.fetchUserRecipes).toHaveBeenCalledTimes(1));
 
-    mockGetViewedUser.mockResolvedValue({ id: "3", username: "NewUser" });
+    canteenApi.fetchUser.mockResolvedValue({ id: "3", username: "NewUser" });
     await act(async () => {
       fireEvent.click(screen.getByText("Navigate"));
     });
 
-    await waitFor(() => expect(mockGetUserProfileRecipes).toHaveBeenCalledTimes(2));
-    expect(mockGetUserProfileRecipes).toHaveBeenLastCalledWith("3", 20, 0);
+    await waitFor(() => {
+      expect(canteenApi.fetchUserRecipes).toHaveBeenCalledTimes(2);
+      expect(canteenApi.fetchUserRecipes).toHaveBeenLastCalledWith("3", 20, 0);
+    });
   });
 
   describe("Relationships", () => {
     it("displays follower and following counts as text for other profiles", async () => {
-      useData.mockReturnValue({
-        ...defaultContext,
-        relationshipCounts: { followers: 1, following: 2 },
-      });
+      canteenApi.fetchRelationshipCounts.mockResolvedValue({ followers: 1, following: 2 });
 
       renderComponent();
       await waitFor(() =>
@@ -261,10 +237,7 @@ describe("UserProfile", () => {
 
     it("displays follower and following counts as links to network page for own profile", async () => {
       useAuth.mockReturnValue({ user: { id: "iam2", canteenId: "2", username: "ViewedUser" } });
-      useData.mockReturnValue({
-        ...defaultContext,
-        relationshipCounts: { followers: 1, following: 2 },
-      });
+      canteenApi.fetchRelationshipCounts.mockResolvedValue({ followers: 1, following: 2 });
 
       renderComponent("2");
       await waitFor(() =>
@@ -291,7 +264,7 @@ describe("UserProfile", () => {
     });
 
     it("shows Unfollow button if already following", async () => {
-      mockCanteenApi.fetchFollowers.mockResolvedValueOnce([{ id: "1", username: "TestUser" }]);
+      canteenApi.fetchFollowers.mockResolvedValue([{ id: "1", username: "TestUser" }]);
 
       renderComponent("2");
       await waitFor(() =>
@@ -302,6 +275,9 @@ describe("UserProfile", () => {
     });
 
     it("calls followUser and refreshes followers on follow button click", async () => {
+      canteenApi.fetchFollowers
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{ id: "1", username: "TestUser" }]);
       renderComponent("2");
       await waitFor(() =>
         expect(screen.getByText("ViewedUser")).toBeInTheDocument(),
@@ -312,21 +288,25 @@ describe("UserProfile", () => {
         fireEvent.click(followButton);
       });
 
-      expect(mockFollowUser).toHaveBeenCalledWith("2");
+      expect(canteenApi.followUser).toHaveBeenCalledWith("2");
       
       const unfollowBtn = await screen.findByRole("button", { name: "Unfollow" });
       expect(unfollowBtn).toBeInTheDocument();
-      expect(mockGetRelationshipCounts).toHaveBeenCalledTimes(2);
+      await waitFor(() => {
+        expect(canteenApi.fetchRelationshipCounts).toHaveBeenCalledTimes(2);
+      });
     });
 
     it("calls unfollowUser and refreshes followers on unfollow button click", async () => {
-      mockCanteenApi.fetchFollowers.mockResolvedValueOnce([{ id: "1", username: "TestUser" }]);
+      canteenApi.fetchFollowers
+        .mockResolvedValueOnce([{ id: "1", username: "TestUser" }])
+        .mockResolvedValueOnce([]);
       renderComponent("2");
       const unfollowBtn = await screen.findByRole("button", { name: "Unfollow" });
       await act(async () => {
         fireEvent.click(unfollowBtn);
       });
-      expect(mockUnfollowUser).toHaveBeenCalledWith("2");
+      expect(canteenApi.unfollowUser).toHaveBeenCalledWith("2");
       const followBtn = await screen.findByRole("button", { name: "Follow" });
       expect(followBtn).toBeInTheDocument();
     });

@@ -1,39 +1,45 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import RecipeFilter from "../RecipeFilter";
-import useData from "@shared/core/context/data/useData";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as canteenApi from "@shared/core/services/canteenApi";
 
-vi.mock("@shared/core/context/data/useData")
+vi.mock("@shared/core/services/canteenApi");
 
 describe("RecipeFilter", () => {
   const mockOnFilter = vi.fn();
-  const mockGetTags = vi.fn();
   const mockTags = [
     { id: "1", name: "Vegetarian" },
     { id: "2", name: "Spicy" },
   ];
 
+  let queryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    useData.mockReturnValue({
-      tags: mockTags,
-      getTags: mockGetTags,
-    });
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    canteenApi.fetchTags.mockResolvedValue(mockTags);
   });
 
-  it("renders correctly and fetches tags on mount", () => {
-    render(<RecipeFilter onFilter={mockOnFilter} />);
+  const renderComponent = (ui) => render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+  );
+
+  it("renders correctly and fetches tags on mount", async () => {
+    renderComponent(<RecipeFilter onFilter={mockOnFilter} />);
 
     expect(
       screen.getByPlaceholderText("Search by title...")
     ).toBeInTheDocument();
     expect(screen.getByText("Search")).toBeInTheDocument();
     expect(screen.getByText("Clear")).toBeInTheDocument();
-    expect(mockGetTags).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(canteenApi.fetchTags).toHaveBeenCalledTimes(1);
+    });
   });
 
   it("updates search term and submits filter", () => {
-    render(<RecipeFilter onFilter={mockOnFilter} />);
+    renderComponent(<RecipeFilter onFilter={mockOnFilter} />);
 
     const input = screen.getByPlaceholderText("Search by title...");
     fireEvent.change(input, { target: { value: "Pasta" } });
@@ -48,13 +54,13 @@ describe("RecipeFilter", () => {
   });
 
   it("handles tag selection", async () => {
-    render(<RecipeFilter onFilter={mockOnFilter} />);
+    renderComponent(<RecipeFilter onFilter={mockOnFilter} />);
 
-    const trigger = screen.getByText("Select tags...");
+    const trigger = await screen.findByText("Select tags...");
     fireEvent.click(trigger);
 
-    expect(screen.getByText("Vegetarian")).toBeInTheDocument();
-    expect(screen.getByText("Spicy")).toBeInTheDocument();
+    expect(await screen.findByText("Vegetarian")).toBeInTheDocument();
+    expect(await screen.findByText("Spicy")).toBeInTheDocument();
 
     const checkbox = screen.getByRole("checkbox", { name: "Vegetarian" });
     fireEvent.click(checkbox);
@@ -73,7 +79,7 @@ describe("RecipeFilter", () => {
   });
 
   it("clears filters", () => {
-    render(<RecipeFilter onFilter={mockOnFilter} />);
+    renderComponent(<RecipeFilter onFilter={mockOnFilter} />);
 
     const input = screen.getByPlaceholderText("Search by title...");
     fireEvent.change(input, { target: { value: "Soup" } });
@@ -86,12 +92,9 @@ describe("RecipeFilter", () => {
   });
 
   it("does not render tag filter if no tags available", () => {
-    useData.mockReturnValue({
-      tags: [],
-      getTags: mockGetTags,
-    });
+    canteenApi.fetchTags.mockResolvedValue([]);
 
-    render(<RecipeFilter onFilter={mockOnFilter} />);
+    renderComponent(<RecipeFilter onFilter={mockOnFilter} />);
 
     expect(screen.queryByText("Select tags...")).not.toBeInTheDocument();
     expect(screen.queryByText("Filter by Tags")).not.toBeInTheDocument();

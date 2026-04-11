@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import CanteenHome from "../CanteenHome";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
 
 const mockNavigate = vi.fn();
 const mockLocation = { pathname: "" };
@@ -16,7 +16,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
   default: ({ children }) => <div data-testid="midden-card">{children}</div>,

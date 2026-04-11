@@ -2,11 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import RecipeCard from '../RecipeCard';
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
 
-vi.mock("@shared/core/context/data/useData");
-vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/hooks/useAuth");
 vi.mock("@shared/core/gateways/Can", () => ({
   default: ({ children }) => <div data-testid="can-gate">{children}</div>,
 }));
@@ -22,9 +20,6 @@ vi.mock("../ListAddPopover", () => ({
 describe("RecipeCard", () => {
   const mockUser = { id: "iam123", canteenId: "user123" };
 
-  const defaultContext = {
-  };
-
   const mockRecipe = {
     id: "123",
     title: "Spicy Tacos",
@@ -39,7 +34,6 @@ describe("RecipeCard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useAuth.mockReturnValue({ user: mockUser });
-    useData.mockReturnValue(defaultContext);
   });
 
   it("renders the recipe title", () => {

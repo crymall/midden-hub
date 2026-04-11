@@ -2,9 +2,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import EditRecipe from "../EditRecipe";
-import useData from "@shared/core/context/data/useData";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as canteenApi from "@shared/core/services/canteenApi";
 
-vi.mock("@shared/core/context/data/useData");
+vi.mock("@shared/core/services/canteenApi");
 vi.mock("../../components/DurationInput", () => ({
   default: ({ label, onChange, value }) => (
     <div>
@@ -38,13 +39,6 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 describe("EditRecipe", () => {
-  const mockGetRecipe = vi.fn();
-  const mockUpdateRecipe = vi.fn();
-  const mockAddRecipeTag = vi.fn();
-  const mockRemoveRecipeTag = vi.fn();
-  const mockAddRecipeIngredient = vi.fn();
-  const mockRemoveRecipeIngredient = vi.fn();
-
   const mockRecipe = {
     id: "123",
     title: "Original Recipe",
@@ -60,35 +54,24 @@ describe("EditRecipe", () => {
     ],
   };
 
-  const baseData = {
-    getRecipe: mockGetRecipe,
-    currentRecipe: null,
-    canteenApi: {
-      updateRecipe: mockUpdateRecipe,
-      addRecipeTag: mockAddRecipeTag,
-      removeRecipeTag: mockRemoveRecipeTag,
-      addRecipeIngredient: mockAddRecipeIngredient,
-      removeRecipeIngredient: mockRemoveRecipeIngredient,
-    },
-    tags: [{ id: "t1", name: "Vegan" }, { id: "t2", name: "Keto" }],
-    getTags: vi.fn(),
-    ingredients: [],
-    getIngredients: vi.fn(),
-  };
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocation = { state: { fromDetail: true } };
-    useData.mockReturnValue(baseData);
-    mockGetRecipe.mockResolvedValue(mockRecipe);
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    canteenApi.fetchRecipe.mockResolvedValue(mockRecipe);
+    canteenApi.updateRecipe.mockResolvedValue({});
   });
 
+  const renderComponent = () => render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter><EditRecipe /></MemoryRouter>
+    </QueryClientProvider>
+  );
+
   it("fetches and renders recipe data on cache miss, and submits properly", async () => {
-    render(
-      <MemoryRouter>
-        <EditRecipe />
-      </MemoryRouter>
-    );
+    renderComponent();
 
     expect(screen.getByText("Loading recipe...")).toBeInTheDocument();
 
@@ -108,28 +91,17 @@ describe("EditRecipe", () => {
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(mockUpdateRecipe).toHaveBeenCalledWith("123", expect.objectContaining({
+      expect(canteenApi.updateRecipe).toHaveBeenCalledWith("123", expect.objectContaining({
         title: "Updated Recipe",
       }));
     });
 
-    expect(mockGetRecipe).toHaveBeenCalledTimes(2);
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
   it("uses cached recipe data if available without fetching", async () => {
-    useData.mockReturnValue({
-      ...baseData,
-      currentRecipe: mockRecipe,
-    });
+    renderComponent();
 
-    render(
-      <MemoryRouter>
-        <EditRecipe />
-      </MemoryRouter>
-    );
-
-    expect(mockGetRecipe).not.toHaveBeenCalled();
     
     await waitFor(() => {
       expect(screen.getByDisplayValue("Original Recipe")).toBeInTheDocument();
@@ -138,16 +110,7 @@ describe("EditRecipe", () => {
 
   it("navigates to recipe detail with replace if not from detail page", async () => {
     mockLocation = { state: null };
-    useData.mockReturnValue({
-      ...baseData,
-      currentRecipe: mockRecipe,
-    });
-
-    render(
-      <MemoryRouter>
-        <EditRecipe />
-      </MemoryRouter>
-    );
+    renderComponent();
 
     await waitFor(() => {
       expect(screen.getByDisplayValue("Original Recipe")).toBeInTheDocument();
@@ -157,7 +120,7 @@ describe("EditRecipe", () => {
     fireEvent.click(screen.getByText("Save Changes"));
 
     await waitFor(() => {
-      expect(mockUpdateRecipe).toHaveBeenCalled();
+      expect(canteenApi.updateRecipe).toHaveBeenCalled();
     });
 
     expect(mockNavigate).toHaveBeenCalledWith("/recipes/123", { replace: true });

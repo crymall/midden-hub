@@ -2,9 +2,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import RecipeForm from "../RecipeForm";
-import useData from "@shared/core/context/data/useData";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as canteenApi from "@shared/core/services/canteenApi";
 
-vi.mock("@shared/core/context/data/useData");
+vi.mock("@shared/core/services/canteenApi");
 vi.mock("../DurationInput", () => ({
   default: ({ label, onChange, value }) => (
     <div>
@@ -34,33 +35,28 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 describe("RecipeForm", () => {
-  const mockCreateTag = vi.fn();
-  const mockCreateIngredient = vi.fn();
-  const mockGetTags = vi.fn();
-  const mockGetIngredients = vi.fn();
   const mockOnSubmit = vi.fn();
 
   const defaultTags = [{ id: "t1", name: "Vegan" }];
   const defaultIngredients = [{ id: "i1", name: "Salt" }];
 
-  const baseData = {
-    tags: defaultTags,
-    getTags: mockGetTags,
-    ingredients: defaultIngredients,
-    getIngredients: mockGetIngredients,
-    createTag: mockCreateTag,
-    createIngredient: mockCreateIngredient,
-  };
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useData.mockReturnValue(baseData);
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    canteenApi.fetchTags.mockResolvedValue(defaultTags);
+    canteenApi.fetchIngredients.mockResolvedValue(defaultIngredients);
   });
 
-  it("opens create tag modal and creates tag", async () => {
-    mockCreateTag.mockResolvedValue({ id: "t2", name: "New Tag" });
+  const renderComponent = (ui) => render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+  );
 
-    render(
+  it("opens create tag modal and creates tag", async () => {
+    canteenApi.createTag.mockResolvedValue({ id: "t2", name: "New Tag" });
+
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} />
       </MemoryRouter>
@@ -81,19 +77,16 @@ describe("RecipeForm", () => {
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-      expect(mockCreateTag).toHaveBeenCalledWith("New Tag");
+      expect(canteenApi.createTag).toHaveBeenCalledWith("New Tag");
     });
   });
 
   it("opens create ingredient modal and creates ingredient", async () => {
-    useData.mockReturnValue({
-      ...baseData,
-      ingredients: [],
-    });
+    canteenApi.fetchIngredients.mockResolvedValue([]);
 
-    mockCreateIngredient.mockResolvedValue({ id: "i2", name: "New Ing" });
+    canteenApi.createIngredient.mockResolvedValue({ id: "i2", name: "New Ing" });
 
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} />
       </MemoryRouter>
@@ -114,13 +107,12 @@ describe("RecipeForm", () => {
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-      expect(mockCreateIngredient).toHaveBeenCalledWith("New Ing");
-      expect(mockGetIngredients).toHaveBeenCalled();
+      expect(canteenApi.createIngredient).toHaveBeenCalledWith("New Ing");
     });
   });
 
   it("submits form with all fields including wait time", async () => {
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} submitLabel="Save Custom Recipe" />
       </MemoryRouter>
@@ -163,7 +155,7 @@ describe("RecipeForm", () => {
       selectedTags: ["t1"],
     };
 
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm initialData={initialData} onSubmit={mockOnSubmit} />
       </MemoryRouter>
@@ -190,7 +182,7 @@ describe("RecipeForm", () => {
       selectedTags: [],
     };
 
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm initialData={initialData} onSubmit={mockOnSubmit} submitLabel="Save Custom Recipe 2" />
       </MemoryRouter>
@@ -211,7 +203,7 @@ describe("RecipeForm", () => {
   });
 
   it("prevents submission if there are unresolved ingredients", async () => {
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} submitLabel="Save Recipe with Unresolved" />
       </MemoryRouter>
@@ -233,7 +225,7 @@ describe("RecipeForm", () => {
   });
 
   it("prevents submission if required fields are missing", async () => {
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} submitLabel="Save Invalid Recipe" />
       </MemoryRouter>

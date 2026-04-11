@@ -1,63 +1,34 @@
-import { useEffect, useEffectEvent, useState } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { fetchUserLists, fetchListRecipes } from "@shared/core/services/canteenApi";
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import RecipeList from "../components/RecipeList";
 
 const ListView = () => {
   const { id } = useParams();
   const { user } = useAuth();
-  const { userLists, recipesLoading, getUserLists, getListRecipes, currentListRecipes, currentListId } = useData();
   const navigate = useNavigate();
   const location = useLocation();
   const hasHistory = location.key !== "default";
 
+  const { data: userLists = [], isLoading: listsLoading } = useQuery({
+    queryKey: ["userLists", user?.canteenId],
+    queryFn: () => fetchUserLists(user.canteenId, 50, 0),
+    enabled: !!user,
+  });
+
+  const { data: currentListRecipes = [], isLoading: recipesLoading, isError: recipesFetchFailed } = useQuery({
+    queryKey: ["listRecipes", id],
+    queryFn: () => fetchListRecipes(id),
+    enabled: !!id,
+    retry: false,
+  });
+
   const currentList = userLists.find((list) => String(list.id) === String(id));
 
-  const [listFetchCompleted, setListFetchCompleted] = useState(!!currentList);
-  const [recipesFetchFailed, setRecipesFetchFailed] = useState(false);
-
-  const setListFetchCompletedEvent = useEffectEvent(() => {
-    setListFetchCompleted(true);
-  });
-
-  const setListFetchNotCompletedEvent = useEffectEvent(() => {
-    setListFetchCompleted(false);
-  });
-
-  const setRecipesFetchFailedEvent = useEffectEvent(() => {
-    setRecipesFetchFailed(true);
-  });
-
-  const setRecipesFetchNotFailedEvent = useEffectEvent(() => {
-    setRecipesFetchFailed(false);
-  });
-
-  useEffect(() => {
-    if (user) {
-      if (!currentList) {
-        setListFetchNotCompletedEvent();
-        getUserLists(user.canteenId).finally(() => setListFetchCompletedEvent());
-      } else {
-        setListFetchCompletedEvent();
-      }
-    }
-  }, [user, currentList, getUserLists]);
-
-  useEffect(() => {
-    if (id) {
-      if (String(currentListId) !== String(id)) {
-        setRecipesFetchNotFailedEvent();
-        getListRecipes(id).then((res) => {
-          if (!res) setRecipesFetchFailedEvent();
-        });
-      }
-    }
-  }, [id, currentListId, getListRecipes]);
-
-  const isLoading = (!listFetchCompleted) || recipesLoading || (String(currentListId) !== String(id) && !recipesFetchFailed);
-  const isNotFound = (listFetchCompleted && !currentList) || recipesFetchFailed;
+  const isLoading = listsLoading || recipesLoading;
+  const isNotFound = (!listsLoading && !currentList) || recipesFetchFailed;
 
   if (isNotFound) {
     return (

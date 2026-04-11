@@ -1,43 +1,64 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button, Textarea, Field } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchConversation, fetchUser, markMessagesAsRead, sendMessage, fetchRecipes } from "@shared/core/services/canteenApi";
 import RecipeCard from "../components/RecipeCard";
 
 const Conversation = () => {
   const { id } = useParams();
   const { user } = useAuth();
-  const {
-    currentConversation,
-    getConversation,
-    sendMessage,
-    markMessagesAsRead,
-    messagesLoading,
-    canteenApi,
-  } = useData();
+  const queryClient = useQueryClient();
 
   const [newMessage, setNewMessage] = useState("");
-  const [otherUser, setOtherUser] = useState(null);
   const scrollContainerRef = useRef(null);
 
-  useEffect(() => {
-    if (id) {
-      getConversation(id);
-      canteenApi.fetchUser(id).then(setOtherUser).catch(console.error);
-    }
-  }, [id, getConversation, canteenApi]);
+  const { data: conversationPartner } = useQuery({
+    queryKey: ["conversationPartner", id],
+    queryFn: () => fetchUser(id),
+    enabled: !!id,
+  });
 
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      setTimeout(() => {
-        if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTop =
-            scrollContainerRef.current.scrollHeight;
+  const { data: currentConversation = [], isLoading: conversationLoading } = useQuery({
+    queryKey: ["conversations", id],
+    queryFn: async () => {
+      const conversation = await fetchConversation(id);
+      const recipeIds = [...new Set(conversation.map((msg) => msg.recipe_id).filter(Boolean))];
+
+      if (recipeIds.length > 0) {
+        const fetchedRecipes = await fetchRecipes(
+          recipeIds.length,
+          0,
+          undefined,
+          undefined,
+          undefined,
+          recipeIds
+        );
+        const recipesMap = {};
+        for (const recipe of fetchedRecipes) {
+          recipesMap[String(recipe.id)] = recipe;
         }
-      }, 0);
-    }
-  }, [currentConversation, messagesLoading]);
+        for (const msg of conversation) {
+          if (msg.recipe_id && recipesMap[String(msg.recipe_id)]) {
+            msg.recipe = recipesMap[String(msg.recipe_id)];
+          }
+        }
+      }
+      return conversation;
+    },
+    enabled: !!id,
+  });
+
+  const { mutate: mutateMarkMessagesAsRead } = useMutation({
+    mutationFn: (unreadIds) => markMessagesAsRead(unreadIds),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["conversations", id] })
+  });
+
+  const handleSendMutation = useMutation({
+    mutationFn: ({ id, newMessage }) => sendMessage(id, newMessage),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["conversations", id] })
+  });
 
   useEffect(() => {
     if (currentConversation.length > 0 && user) {
@@ -48,17 +69,28 @@ const Conversation = () => {
         .map((msg) => msg.id);
 
       if (unreadIds.length > 0) {
-        markMessagesAsRead(unreadIds);
+        mutateMarkMessagesAsRead(unreadIds);
       }
     }
-  }, [currentConversation, user, markMessagesAsRead]);
+  }, [currentConversation, user, mutateMarkMessagesAsRead]);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop =
+            scrollContainerRef.current.scrollHeight;
+        }
+      }, 0);
+    }
+  }, [currentConversation, conversationLoading]);
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !id) return;
 
     try {
-      await sendMessage(id, newMessage);
+      await handleSendMutation.mutateAsync({ id, newMessage });
       setNewMessage("");
     } catch (error) {
       console.error("Failed to send message", error);
@@ -86,7 +118,7 @@ const Conversation = () => {
           D
         </Link>
         <h3 className="font-mono text-lg font-bold text-white">
-          {otherUser?.username || "Chat"}
+          {conversationPartner?.username || "Chat"}
         </h3>
       </div>
 
@@ -94,7 +126,7 @@ const Conversation = () => {
         ref={scrollContainerRef}
         className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-scroll p-4"
       >
-        {messagesLoading && (
+        {conversationLoading && (
           <div className="text-lightGrey animate-pulse text-center text-sm">
             Loading...
           </div>

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { StrictMode } from "react";
 import App from "../App";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const renderMock = vi.fn();
 const createRootMock = vi.fn(() => ({ render: renderMock }));
@@ -30,7 +31,9 @@ describe("main.jsx", () => {
     expect(createRootMock).toHaveBeenCalledWith(rootElement);
     expect(renderMock).toHaveBeenCalledWith(
       <StrictMode>
-        <App />
+        <QueryClientProvider client={expect.any(QueryClient)}>
+          <App />
+        </QueryClientProvider>
       </StrictMode>
     );
   });

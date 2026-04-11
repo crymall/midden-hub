@@ -6,9 +6,6 @@ import { useAuth } from "@shared/core/hooks/useAuth";
 vi.mock("@shared/core/context/auth/AuthProvider", () => ({
   default: ({ children }) => <>{children}</>,
 }));
-vi.mock("@shared/core/context/data/DataProvider", () => ({
-  default: ({ children }) => <>{children}</>,
-}));
 
 vi.mock("@shared/core/hooks/useAuth");
 

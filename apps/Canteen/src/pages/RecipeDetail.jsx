@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useState } from "react";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Button,
@@ -6,8 +6,9 @@ import {
   PopoverButton,
   PopoverPanel,
 } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchRecipe, likeRecipe, unlikeRecipe, deleteRecipe } from "@shared/core/services/canteenApi";
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import Can from "@shared/core/gateways/Can";
 import ListAddPopover from "../components/ListAddPopover";
@@ -17,50 +18,51 @@ import { PERMISSIONS } from "@shared/core/utils/constants";
 
 const RecipeDetail = () => {
   const { id } = useParams();
-  const {
-    currentRecipe,
-    recipesLoading,
-    getRecipe,
-    toggleRecipeLike,
-    getUserLists,
-    deleteRecipe,
-  } = useData();
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const hasHistory = location.key !== "default";
-  const [fetchFailed, setFetchFailed] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const setFetchFailedEvent = useEffectEvent(() => {
-    setFetchFailed(true);
+  const { data: currentRecipe, isLoading: recipesLoading, isError: fetchFailed } = useQuery({
+    queryKey: ["recipe", id],
+    queryFn: () => fetchRecipe(id),
+    enabled: !!id,
+    retry: false,
   });
 
-  const setFetchNotFailedEvent = useEffectEvent(() => {
-    setFetchFailed(false);
-  });
+  const isLiked = currentRecipe?.likes?.some(
+    (like) => like.user_id === user?.canteenId,
+  );
 
-  useEffect(() => {
-    if (id) {
-      if (String(currentRecipe?.id) !== String(id)) {
-        setFetchNotFailedEvent(false);
-        getRecipe(id).then((res) => {
-          if (!res) setFetchFailedEvent(true);
-        });
+  const toggleLikeMutation = useMutation({
+    mutationFn: async () => {
+      if (isLiked) {
+        await unlikeRecipe(currentRecipe.id);
+      } else {
+        await likeRecipe(currentRecipe.id);
       }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recipe", id] });
     }
-  }, [id, currentRecipe?.id, getRecipe]);
+  });
 
-  useEffect(() => {
-    if (user) {
-      getUserLists(user.canteenId);
+  const deleteRecipeMutation = useMutation({
+    mutationFn: () => deleteRecipe(currentRecipe.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["searchedRecipes"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfileRecipes"] });
+      setIsDeleteModalOpen(false);
+      navigate("/recipes");
+    },
+    onError: (err) => {
+      console.error("Failed to delete recipe", err);
     }
-  }, [user, getUserLists]);
+  });
 
-  if (
-    recipesLoading ||
-    (String(currentRecipe?.id) !== String(id) && !fetchFailed)
-  ) {
+  if (recipesLoading) {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
@@ -82,17 +84,13 @@ const RecipeDetail = () => {
     );
   }
 
-  const isLiked = currentRecipe.likes?.some(
-    (like) => like.user_id === user?.canteenId,
-  );
-
   const isOwner =
     user &&
     currentRecipe.author &&
     String(user.canteenId) === String(currentRecipe.author.id);
 
   const handleLike = () => {
-    toggleRecipeLike(currentRecipe.id, isLiked);
+    toggleLikeMutation.mutate();
   };
 
   const formatTime = (minutes) => {
@@ -107,14 +105,8 @@ const RecipeDetail = () => {
     return `${hrs}h${mins.toString().padStart(2, "0")}m`;
   };
 
-  const confirmDelete = async () => {
-    try {
-      await deleteRecipe(currentRecipe.id);
-      setIsDeleteModalOpen(false);
-      navigate("/recipes");
-    } catch (err) {
-      console.error("Failed to delete recipe", err);
-    }
+  const confirmDelete = () => {
+    deleteRecipeMutation.mutate();
   };
 
   return (
@@ -165,7 +157,8 @@ const RecipeDetail = () => {
               <div className="flex flex-wrap gap-2 max-sm:relative md:justify-end">
                 <Button
                   onClick={handleLike}
-                  className={`flex h-8 items-center justify-center gap-2.5 border px-3 text-sm font-bold transition-colors ${
+                  disabled={toggleLikeMutation.isPending}
+                  className={`flex h-8 items-center justify-center gap-2.5 border px-3 text-sm font-bold transition-colors disabled:opacity-50 ${
                     isLiked
                       ? "bg-accent border-accent text-white"
                       : "text-lightestGrey border-grey hover:border-lightestGrey bg-transparent"
@@ -315,9 +308,10 @@ const RecipeDetail = () => {
           </Button>
           <Button
             onClick={confirmDelete}
-            className="bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600"
+            disabled={deleteRecipeMutation.isPending}
+            className="bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600 disabled:opacity-50"
           >
-            Delete
+            {deleteRecipeMutation.isPending ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </MiddenModal>

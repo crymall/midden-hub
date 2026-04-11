@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Button,
   Input,
@@ -9,16 +9,17 @@ import {
   PopoverPanel,
   Checkbox,
 } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTags } from "@shared/core/services/canteenApi";
 
 const RecipeFilter = ({ onFilter }) => {
-  const { tags = [], getTags } = useData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
 
-  useEffect(() => {
-    getTags();
-  }, [getTags]);
+  const { data: tags = [] } = useQuery({
+    queryKey: ["filterTags"],
+    queryFn: () => fetchTags(500, 0)
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();

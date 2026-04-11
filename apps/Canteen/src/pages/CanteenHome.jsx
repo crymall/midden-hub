@@ -1,7 +1,7 @@
-import MiddenCard from "@shared/ui/components/MiddenCard";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@headlessui/react";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
+import MiddenCard from "@shared/ui/components/MiddenCard";
 
 const CanteenHome = () => {
   const { user } = useAuth();

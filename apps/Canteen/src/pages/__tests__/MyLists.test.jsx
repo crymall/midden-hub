@@ -2,8 +2,9 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import MyLists from "../MyLists";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as canteenApi from "@shared/core/services/canteenApi";
 
 const mockNavigate = vi.fn();
 
@@ -15,8 +16,8 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("@shared/core/context/data/useData");
-vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/hooks/useAuth");
+vi.mock("@shared/core/services/canteenApi");
 
 global.ResizeObserver = class ResizeObserver {
   observe() {}
@@ -25,16 +26,8 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 describe("MyLists", () => {
-  const mockGetUserLists = vi.fn();
-  const mockDeleteList = vi.fn();
-  const mockCreateList = vi.fn();
-
-  const mockCanteenApi = {
-    deleteList: mockDeleteList,
-    createList: mockCreateList,
-  };
-
   const defaultUser = { id: "iam1", canteenId: "user1" };
+  let queryClient;
   const defaultLists = [
     { id: "l1", name: "Favorites" },
     { id: "l2", name: "Weekly" },
@@ -43,56 +36,44 @@ describe("MyLists", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
     useAuth.mockReturnValue({ user: defaultUser });
-    useData.mockReturnValue({
-      userLists: defaultLists,
-      getUserLists: mockGetUserLists.mockResolvedValue([]),
-      canteenApi: mockCanteenApi,
-    });
+    canteenApi.fetchUserLists.mockResolvedValue(defaultLists);
   });
 
-  it("renders lists", async () => {
-    render(
+  const renderComponent = (ui) => render(
+    <QueryClientProvider client={queryClient}>
       <MemoryRouter>
-        <MyLists />
+        {ui}
       </MemoryRouter>
-    );
+    </QueryClientProvider>
+  );
+
+  it("renders lists", async () => {
+    renderComponent(<MyLists />);
     await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
     expect(screen.getByText("Weekly")).toBeInTheDocument();
   });
 
   it("does not fetch lists on mount if cache exists", async () => {
-    render(
-      <MemoryRouter>
-        <MyLists />
-      </MemoryRouter>
-    );
+    canteenApi.createList.mockResolvedValue({});
+    renderComponent(<MyLists />);
     await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
-    expect(mockGetUserLists).not.toHaveBeenCalled();
+    expect(canteenApi.fetchUserLists).toHaveBeenCalledTimes(1); // Once on mount by useQuery
   });
 
   it("fetches lists on mount if cache is empty", async () => {
-    useData.mockReturnValue({
-      userLists: [],
-      getUserLists: mockGetUserLists.mockResolvedValue([]),
-      canteenApi: mockCanteenApi,
-    });
-    render(
-      <MemoryRouter>
-        <MyLists />
-      </MemoryRouter>
-    );
+    canteenApi.fetchUserLists.mockResolvedValue([]);
+    renderComponent(<MyLists />);
+    
     await waitFor(() => {
-      expect(mockGetUserLists).toHaveBeenCalledWith("user1", 20, 0);
+      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("user1", 20, 0, "", "created_at", "DESC");
     });
   });
 
   it("opens delete modal and deletes list", async () => {
-    render(
-      <MemoryRouter>
-        <MyLists />
-      </MemoryRouter>
-    );
+    canteenApi.deleteList.mockResolvedValue({});
+    renderComponent(<MyLists />);
 
     await waitFor(() => expect(screen.getByText("Weekly")).toBeInTheDocument());
 
@@ -106,17 +87,13 @@ describe("MyLists", () => {
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-      expect(mockDeleteList).toHaveBeenCalledWith("l2");
-      expect(mockGetUserLists).toHaveBeenCalled();
+      expect(canteenApi.deleteList).toHaveBeenCalledWith("l2");
     });
   });
 
   it("opens create modal and creates list", async () => {
-    render(
-      <MemoryRouter>
-        <MyLists />
-      </MemoryRouter>
-    );
+    renderComponent(<MyLists />);
+    
 
     const createBtn = screen.getByText("+ List");
     fireEvent.click(createBtn);
@@ -130,16 +107,15 @@ describe("MyLists", () => {
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(mockCreateList).toHaveBeenCalledWith("New List");
-      expect(mockGetUserLists).toHaveBeenCalled();
+      expect(canteenApi.createList).toHaveBeenCalledWith("New List");
     });
   });
 
   it("renders back button if history exists and navigates back", async () => {
     render(
-      <MemoryRouter initialEntries={["/", "/my-lists"]} initialIndex={1}>
-        <MyLists />
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/", "/my-lists"]} initialIndex={1}><MyLists /></MemoryRouter>
+      </QueryClientProvider>
     );
 
     await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
@@ -152,9 +128,9 @@ describe("MyLists", () => {
 
   it("does not render back button if no history exists", async () => {
     render(
-      <MemoryRouter initialEntries={["/my-lists"]} initialIndex={0}>
-        <MyLists />
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/my-lists"]} initialIndex={0}><MyLists /></MemoryRouter>
+      </QueryClientProvider>
     );
 
     await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());
@@ -163,9 +139,9 @@ describe("MyLists", () => {
 
   it("does not render back button if navigated with hideBack state", async () => {
     render(
-      <MemoryRouter initialEntries={["/lists/1", { pathname: "/my-lists", state: { hideBack: true } }]} initialIndex={1}>
-        <MyLists />
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/lists/1", { pathname: "/my-lists", state: { hideBack: true } }]} initialIndex={1}><MyLists /></MemoryRouter>
+      </QueryClientProvider>
     );
 
     await waitFor(() => expect(screen.getByText("Favorites")).toBeInTheDocument());

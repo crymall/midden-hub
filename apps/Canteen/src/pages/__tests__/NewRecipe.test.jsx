@@ -2,9 +2,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import NewRecipe from "../NewRecipe";
-import useData from "@shared/core/context/data/useData";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as canteenApi from "@shared/core/services/canteenApi";
 
-vi.mock("@shared/core/context/data/useData");
+vi.mock("@shared/core/services/canteenApi");
 
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {
@@ -30,23 +31,21 @@ vi.mock("../../components/RecipeForm", () => ({
 }));
 
 describe("NewRecipe", () => {
-  const mockCreateRecipe = vi.fn();
-
-  const baseData = { createRecipe: mockCreateRecipe };
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useData.mockReturnValue(baseData);
+    queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
   });
 
-  it("renders the page and handles successful submission", async () => {
-    mockCreateRecipe.mockResolvedValue({ id: "123" });
+  const renderComponent = () => render(
+    <QueryClientProvider client={queryClient}><MemoryRouter><NewRecipe /></MemoryRouter></QueryClientProvider>
+  );
 
-    render(
-      <MemoryRouter>
-        <NewRecipe />
-      </MemoryRouter>
-    );
+  it("renders the page and handles successful submission", async () => {
+    canteenApi.createRecipe.mockResolvedValue({ id: "123" });
+
+    renderComponent();
 
     expect(screen.getByText("New Recipe")).toBeInTheDocument();
     
@@ -54,7 +53,7 @@ describe("NewRecipe", () => {
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(mockCreateRecipe).toHaveBeenCalledWith({ title: "Mock Recipe" });
+      expect(canteenApi.createRecipe).toHaveBeenCalledWith({ title: "Mock Recipe" });
     });
 
     expect(mockNavigate).toHaveBeenCalledWith("/recipes/123", {
@@ -63,13 +62,9 @@ describe("NewRecipe", () => {
   });
 
   it("handles submission error", async () => {
-    mockCreateRecipe.mockRejectedValue(new Error("Failed"));
+    canteenApi.createRecipe.mockRejectedValue(new Error("Failed"));
 
-    render(
-      <MemoryRouter>
-        <NewRecipe />
-      </MemoryRouter>
-    );
+    renderComponent();
 
     const submitBtn = screen.getByText("Create Recipe");
     fireEvent.click(submitBtn);

@@ -1,34 +1,31 @@
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Popover, PopoverButton, PopoverPanel, Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
 import MiddenCard from "@shared/ui/components/MiddenCard";
+import { useQuery } from "@tanstack/react-query";
+import { fetchThreads, fetchFriends } from "@shared/core/services/canteenApi";
+import PaginationControls from "../components/PaginationControls";
 
 const Messages = () => {
   const { user } = useAuth();
-  const { threads, getThreads, friends, getFriends } = useData();
   const navigate = useNavigate();
   
   const [searchQuery, setSearchQuery] = useState("");
-  const hasFetchedFriends = useRef(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
 
-  useEffect(() => {
-    getThreads();
-  }, [getThreads]);
+  const { data: threads = [], isLoading: threadsLoading } = useQuery({
+    queryKey: ["threads", user?.canteenId, { page, limit }],
+    queryFn: () => fetchThreads(limit, (page - 1) * limit),
+    enabled: !!user,
+  });
 
-  const handleInteraction = () => {
-    if (!hasFetchedFriends.current && user) {
-      getFriends(user.canteenId, 50, 0, searchQuery);
-      hasFetchedFriends.current = true;
-    }
-  };
-
-  useEffect(() => {
-    if (hasFetchedFriends.current && user) {
-      getFriends(user.canteenId, 50, 0, searchQuery);
-    }
-  }, [searchQuery, user, getFriends]);
+  const { data: friends = [] } = useQuery({
+    queryKey: ["friends", user?.canteenId, searchQuery],
+    queryFn: () => fetchFriends(user.canteenId, 50, 0, searchQuery),
+    enabled: !!user,
+  });
 
   return (
     <MiddenCard>
@@ -38,8 +35,6 @@ const Messages = () => {
         </h2>
         <Popover>
           <PopoverButton
-            onMouseEnter={handleInteraction}
-            onClick={handleInteraction}
             className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors focus:outline-none"
           >
             + Message
@@ -138,6 +133,18 @@ const Messages = () => {
           })
         )}
       </div>
+
+      <PaginationControls
+        page={page}
+        limit={limit}
+        onPageChange={setPage}
+        onLimitChange={(e) => {
+          setLimit(Number(e.target.value));
+          setPage(1);
+        }}
+        loading={threadsLoading}
+        isNextDisabled={threads.length < limit}
+      />
     </MiddenCard>
   );
 };

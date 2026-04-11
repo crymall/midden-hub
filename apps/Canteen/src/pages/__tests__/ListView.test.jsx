@@ -1,9 +1,10 @@
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import ListView from "../ListView";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as canteenApi from "@shared/core/services/canteenApi";
 
 const mockNavigate = vi.fn();
 
@@ -15,8 +16,8 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("@shared/core/context/data/useData");
-vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/hooks/useAuth");
+vi.mock("@shared/core/services/canteenApi");
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
   default: ({ children }) => (
@@ -35,116 +36,69 @@ vi.mock("../../components/RecipeList", () => ({
 }));
 
 describe("ListView", () => {
-  const mockGetUserLists = vi.fn().mockResolvedValue([]);
-  const mockGetListRecipes = vi.fn().mockResolvedValue([]);
   const mockUser = { id: "iam123", canteenId: "user123" };
-
-  const defaultContext = {
-    userLists: [],
-    recipesLoading: false,
-    getUserLists: mockGetUserLists,
-    getListRecipes: mockGetListRecipes,
-    currentListRecipes: [],
-    currentListId: null,
-  };
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
     useAuth.mockReturnValue({ user: mockUser });
-    useData.mockReturnValue(defaultContext);
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    
+    canteenApi.fetchUserLists.mockResolvedValue([]);
+    canteenApi.fetchListRecipes.mockResolvedValue([]);
   });
 
   const renderWithRouter = (listId = "1", initialEntries = [`/lists/${listId}`], initialIndex = 0) => {
     render(
       <MemoryRouter initialEntries={initialEntries} initialIndex={initialIndex}>
-        <Routes>
-          <Route path="/lists/:id" element={<ListView />} />
-        </Routes>
+        <QueryClientProvider client={queryClient}>
+          <Routes>
+            <Route path="/lists/:id" element={<ListView />} />
+          </Routes>
+        </QueryClientProvider>
       </MemoryRouter>
     );
   };
 
-  it("fetches list recipes on mount", async () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      userLists: [{ id: "1", name: "My List" }],
-    });
-
-    renderWithRouter("1");
-
-    expect(mockGetListRecipes).toHaveBeenCalledWith("1");
-    expect(screen.getByText("My List")).toBeInTheDocument();
+  it("fetches user lists and list recipes on mount", async () => {
+    canteenApi.fetchUserLists.mockResolvedValue([{ id: "1", name: "My List" }]);
     
-    await act(async () => {
-      await Promise.resolve();
-    });
-  });
-
-  it("does not fetch if list and recipes are cached", () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      userLists: [{ id: "1", name: "My List" }],
-      currentListRecipes: [{ id: 101, title: "Pasta" }],
-      currentListId: "1",
-    });
-
     renderWithRouter("1");
-
-    expect(mockGetListRecipes).not.toHaveBeenCalled();
-    expect(mockGetUserLists).not.toHaveBeenCalled();
-    expect(screen.getByText("My List")).toBeInTheDocument();
-    expect(screen.getByText("Recipes: 1")).toBeInTheDocument();
-  });
-
-  it("fetches user lists if current list is not found in context", async () => {
-    renderWithRouter("1");
-
-    expect(mockGetUserLists).toHaveBeenCalledWith("user123");
-    expect(mockGetListRecipes).toHaveBeenCalledWith("1");
-
+    
     await waitFor(() => {
-      expect(screen.getByText("List Not Found")).toBeInTheDocument();
+      expect(canteenApi.fetchUserLists).toHaveBeenCalledWith("user123", 50, 0);
+      expect(canteenApi.fetchListRecipes).toHaveBeenCalledWith("1");
+      expect(screen.getByText("My List")).toBeInTheDocument();
     });
   });
 
   it("shows loading state when recipes are loading", async () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      userLists: [{ id: "1", name: "My List" }],
-      recipesLoading: true,
-    });
+    canteenApi.fetchListRecipes.mockImplementation(() => new Promise(() => {})); // Hangs forever
 
     renderWithRouter("1");
 
-    expect(screen.getByText("Loading Recipes...")).toBeInTheDocument();
-
-    await act(async () => {
-      await Promise.resolve();
+    await waitFor(() => {
+      expect(screen.getByText("Loading Recipes...")).toBeInTheDocument();
     });
+
   });
 
-  it("renders list name and recipes when loaded", () => {
+  it("renders list name and recipes when loaded", async () => {
     const mockRecipes = [{ id: 101, title: "Pasta" }, { id: 102, title: "Soup" }];
-    useData.mockReturnValue({
-      ...defaultContext,
-      userLists: [{ id: "1", name: "Dinner Ideas" }],
-      currentListRecipes: mockRecipes,
-      currentListId: "1",
-    });
+    canteenApi.fetchUserLists.mockResolvedValue([{ id: "1", name: "Dinner Ideas" }]);
+    canteenApi.fetchListRecipes.mockResolvedValue(mockRecipes);
 
     renderWithRouter("1");
 
-    expect(screen.getByText("Dinner Ideas")).toBeInTheDocument();
-    expect(screen.getByText("Recipes: 2")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Dinner Ideas")).toBeInTheDocument();
+      expect(screen.getByText("Recipes: 2")).toBeInTheDocument();
+    });
   });
 
   it("handles list not found state correctly", async () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      userLists: [{ id: "2", name: "Other List" }],
-      recipesLoading: false,
-    });
+    canteenApi.fetchUserLists.mockResolvedValue([{ id: "2", name: "Other List" }]);
 
     renderWithRouter("1");
 
@@ -155,52 +109,34 @@ describe("ListView", () => {
   });
 
   it("shows 'Loading List...' title if list is missing but recipes are loading", async () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      userLists: [], 
-      recipesLoading: true,
-    });
+    canteenApi.fetchUserLists.mockImplementation(() => new Promise(() => {}));
 
     renderWithRouter("1");
     
     expect(screen.getByText("Loading List...")).toBeInTheDocument();
-
-    await act(async () => {
-      await Promise.resolve();
-    });
   });
 
   it("renders back button if history exists and navigates back", async () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      userLists: [{ id: "1", name: "My List" }],
-      currentListId: "1",
-    });
+    canteenApi.fetchUserLists.mockResolvedValue([{ id: "1", name: "My List" }]);
+    
     renderWithRouter("1", ["/", "/lists/1"], 1);
 
-    const backBtn = screen.getByRole("button", { name: "Go back" });
-    expect(backBtn).toBeInTheDocument();
-    fireEvent.click(backBtn);
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
-
-    await act(async () => {
-      await Promise.resolve();
+    await waitFor(() => {
+      const backBtn = screen.getByRole("button", { name: "Go back" });
+      expect(backBtn).toBeInTheDocument();
+      fireEvent.click(backBtn);
+      expect(mockNavigate).toHaveBeenCalledWith(-1);
     });
   });
 
   it("renders static link if no history exists", async () => {
-    useData.mockReturnValue({
-      ...defaultContext,
-      userLists: [{ id: "1", name: "My List" }],
-      currentListId: "1",
-    });
+    canteenApi.fetchUserLists.mockResolvedValue([{ id: "1", name: "My List" }]);
+    
     renderWithRouter("1", ["/lists/1"], 0);
 
-    expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Go back to My Lists" })).toBeInTheDocument();
-
-    await act(async () => {
-      await Promise.resolve();
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Go back to My Lists" })).toBeInTheDocument();
     });
   });
 });
