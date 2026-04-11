@@ -1,64 +1,101 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Button, Textarea, Field } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { Button, Field, Textarea } from "@headlessui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import {
+  fetchConversation,
+  fetchRecipes,
+  fetchUser,
+  markMessagesAsRead,
+  sendMessage,
+} from "@shared/core/services/canteenApi";
+
 import RecipeCard from "../components/RecipeCard";
 
 const Conversation = () => {
   const { id } = useParams();
   const { user } = useAuth();
-  const {
-    currentConversation,
-    getConversation,
-    sendMessage,
-    markMessagesAsRead,
-    messagesLoading,
-    canteenApi,
-  } = useData();
+  const queryClient = useQueryClient();
 
   const [newMessage, setNewMessage] = useState("");
-  const [otherUser, setOtherUser] = useState(null);
   const scrollContainerRef = useRef(null);
 
+  const { data: conversationPartner } = useQuery({
+    queryKey: ["conversationPartner", id],
+    queryFn: () => fetchUser(id),
+    enabled: !!id,
+  });
+
+  const { data: currentConversation = [], isLoading: conversationLoading } = useQuery({
+    queryKey: ["conversations", id],
+    queryFn: async () => {
+      const conversation = await fetchConversation(id);
+      const recipeIds = [...new Set(conversation.map((msg) => msg.recipe_id).filter(Boolean))];
+
+      if (recipeIds.length > 0) {
+        const fetchedRecipes = await fetchRecipes(
+          recipeIds.length,
+          0,
+          undefined,
+          undefined,
+          undefined,
+          recipeIds,
+        );
+        const recipesMap = {};
+        for (const recipe of fetchedRecipes) {
+          recipesMap[String(recipe.id)] = recipe;
+        }
+        for (const msg of conversation) {
+          if (msg.recipe_id && recipesMap[String(msg.recipe_id)]) {
+            msg.recipe = recipesMap[String(msg.recipe_id)];
+          }
+        }
+      }
+      return conversation;
+    },
+    enabled: !!id,
+  });
+
+  const { mutate: mutateMarkMessagesAsRead } = useMutation({
+    mutationFn: (unreadIds) => markMessagesAsRead(unreadIds),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["conversations", id] }),
+  });
+
+  const handleSendMutation = useMutation({
+    mutationFn: ({ id, newMessage }) => sendMessage(id, newMessage),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["conversations", id] }),
+  });
+
   useEffect(() => {
-    if (id) {
-      getConversation(id);
-      canteenApi.fetchUser(id).then(setOtherUser).catch(console.error);
+    if (currentConversation.length > 0 && user) {
+      const unreadIds = currentConversation
+        .filter((msg) => String(msg.receiver_id) === String(user.canteenId) && !msg.is_read)
+        .map((msg) => msg.id);
+
+      if (unreadIds.length > 0) {
+        mutateMarkMessagesAsRead(unreadIds);
+      }
     }
-  }, [id, getConversation, canteenApi]);
+  }, [currentConversation, user, mutateMarkMessagesAsRead]);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
       setTimeout(() => {
         if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTop =
-            scrollContainerRef.current.scrollHeight;
+          scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
         }
       }, 0);
     }
-  }, [currentConversation, messagesLoading]);
-
-  useEffect(() => {
-    if (currentConversation.length > 0 && user) {
-      const unreadIds = currentConversation
-        .filter(
-          (msg) => String(msg.receiver_id) === String(user.canteenId) && !msg.is_read,
-        )
-        .map((msg) => msg.id);
-
-      if (unreadIds.length > 0) {
-        markMessagesAsRead(unreadIds);
-      }
-    }
-  }, [currentConversation, user, markMessagesAsRead]);
+  }, [currentConversation, conversationLoading]);
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !id) return;
 
     try {
-      await sendMessage(id, newMessage);
+      await handleSendMutation.mutateAsync({ id, newMessage });
       setNewMessage("");
     } catch (error) {
       console.error("Failed to send message", error);
@@ -86,7 +123,7 @@ const Conversation = () => {
           D
         </Link>
         <h3 className="font-mono text-lg font-bold text-white">
-          {otherUser?.username || "Chat"}
+          {conversationPartner?.username || "Chat"}
         </h3>
       </div>
 
@@ -94,22 +131,15 @@ const Conversation = () => {
         ref={scrollContainerRef}
         className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-scroll p-4"
       >
-        {messagesLoading && (
-          <div className="text-lightGrey animate-pulse text-center text-sm">
-            Loading...
-          </div>
+        {conversationLoading && (
+          <div className="text-lightGrey animate-pulse text-center text-sm">Loading...</div>
         )}
         {displayConversation.map((msg) => {
           const isMe = String(msg.sender_id) === String(user.canteenId);
           return (
-            <div
-              key={msg.id}
-              className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-            >
+            <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-[75%] p-3 ${
-                  isMe ? "bg-accent text-white" : "bg-grey text-dark"
-                }`}
+                className={`max-w-[75%] p-3 ${isMe ? "bg-accent text-white" : "bg-grey text-dark"}`}
               >
                 {msg.recipe && (
                   <div className="mb-2 max-w-sm sm:min-w-64">
@@ -117,9 +147,7 @@ const Conversation = () => {
                   </div>
                 )}
                 {msg.content && (
-                  <p className="font-mono text-sm whitespace-pre-wrap">
-                    {msg.content}
-                  </p>
+                  <p className="font-mono text-sm whitespace-pre-wrap">{msg.content}</p>
                 )}
                 <span
                   className={`mt-1 block text-[10px] ${isMe ? "text-white/70" : "text-dark/70"}`}
@@ -132,10 +160,7 @@ const Conversation = () => {
         })}
       </div>
 
-      <form
-        onSubmit={handleSend}
-        className="border-grey bg-primary/10 border-t p-4"
-      >
+      <form onSubmit={handleSend} className="border-grey bg-primary/10 border-t p-4">
         <div className="flex gap-2">
           <Field className="w-full">
             <Textarea

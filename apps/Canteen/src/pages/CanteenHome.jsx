@@ -1,7 +1,9 @@
-import MiddenCard from "@shared/ui/components/MiddenCard";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@headlessui/react";
-import useAuth from "@shared/core/context/auth/useAuth";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+
+import MiddenCard from "@shared/ui/components/MiddenCard";
 
 const CanteenHome = () => {
   const { user } = useAuth();
@@ -22,11 +24,7 @@ const CanteenHome = () => {
         <section>
           <h3 className="mb-3 text-lg font-bold text-white md:text-2xl">
             Find the{" "}
-            <Link
-              to="/recipes"
-              className="text-accent hover:underline"
-              aria-label="recipe-search"
-            >
+            <Link to="/recipes" className="text-accent hover:underline" aria-label="recipe-search">
               perfect recipe
             </Link>
             , or add your own.
@@ -34,17 +32,11 @@ const CanteenHome = () => {
           <ul className="text-lightestGrey space-y-2 text-sm md:text-base">
             <li className="flex items-start gap-2">
               <span className="text-accent">•</span>
-              <span>
-                Canteen makes the community’s best recipes available and
-                searchable.
-              </span>
+              <span>Canteen makes the community’s best recipes available and searchable.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent">•</span>
-              <span>
-                If you have a dish to share, please contribute. It’s like a
-                potluck.
-              </span>
+              <span>If you have a dish to share, please contribute. It’s like a potluck.</span>
             </li>
           </ul>
         </section>
@@ -56,17 +48,11 @@ const CanteenHome = () => {
           <ul className="text-lightestGrey space-y-2 text-sm md:text-base">
             <li className="flex items-start gap-2">
               <span className="text-accent">•</span>
-              <span>
-                Need all your favorite gluten-free breakfasts in one place? Make
-                a list.
-              </span>
+              <span>Need all your favorite gluten-free breakfasts in one place? Make a list.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent">•</span>
-              <span>
-                Share recipes with other Canteen users with the click of a
-                button.
-              </span>
+              <span>Share recipes with other Canteen users with the click of a button.</span>
             </li>
           </ul>
         </section>
@@ -79,8 +65,7 @@ const CanteenHome = () => {
             <li className="flex items-start gap-2">
               <span className="text-accent">•</span>
               <span>
-                No ads. Ever. Find and reference ingredients and instructions
-                without distraction.
+                No ads. Ever. Find and reference ingredients and instructions without distraction.
               </span>
             </li>
             <li className="flex items-start gap-2">

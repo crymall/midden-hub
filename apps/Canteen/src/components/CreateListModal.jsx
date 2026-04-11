@@ -1,5 +1,6 @@
-import { useState, useEffect, useEffectEvent } from "react";
-import { Button, Field, Label, Input } from "@headlessui/react";
+import { useEffect, useEffectEvent, useState } from "react";
+import { Button, Field, Input, Label } from "@headlessui/react";
+
 import MiddenModal from "@shared/ui/components/MiddenModal";
 
 const CreateListModal = ({ isOpen, onClose, onCreate, loading }) => {
@@ -21,16 +22,10 @@ const CreateListModal = ({ isOpen, onClose, onCreate, loading }) => {
   };
 
   return (
-    <MiddenModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Create New List"
-    >
+    <MiddenModal isOpen={isOpen} onClose={onClose} title="Create New List">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Field>
-          <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-            List Name
-          </Label>
+          <Label className="text-lightestGrey mb-1 block text-sm font-bold">List Name</Label>
           <Input
             required
             value={listName}

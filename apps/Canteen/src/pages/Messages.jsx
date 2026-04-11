@@ -1,47 +1,48 @@
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Popover, PopoverButton, PopoverPanel, Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+} from "@headlessui/react";
+import { useQuery } from "@tanstack/react-query";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { fetchFriends, fetchThreads } from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
+import PaginationControls from "../components/PaginationControls";
 
 const Messages = () => {
   const { user } = useAuth();
-  const { threads, getThreads, friends, getFriends } = useData();
   const navigate = useNavigate();
-  
+
   const [searchQuery, setSearchQuery] = useState("");
-  const hasFetchedFriends = useRef(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
 
-  useEffect(() => {
-    getThreads();
-  }, [getThreads]);
+  const { data: threads = [], isLoading: threadsLoading } = useQuery({
+    queryKey: ["threads", user?.canteenId, { page, limit }],
+    queryFn: () => fetchThreads(limit, (page - 1) * limit),
+    enabled: !!user,
+  });
 
-  const handleInteraction = () => {
-    if (!hasFetchedFriends.current && user) {
-      getFriends(user.canteenId, 50, 0, searchQuery);
-      hasFetchedFriends.current = true;
-    }
-  };
-
-  useEffect(() => {
-    if (hasFetchedFriends.current && user) {
-      getFriends(user.canteenId, 50, 0, searchQuery);
-    }
-  }, [searchQuery, user, getFriends]);
+  const { data: friends = [] } = useQuery({
+    queryKey: ["friends", user?.canteenId, searchQuery],
+    queryFn: () => fetchFriends(user.canteenId, 50, 0, searchQuery),
+    enabled: !!user,
+  });
 
   return (
     <MiddenCard>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-gothic text-4xl font-bold text-white">
-          Messages
-        </h2>
+        <h2 className="font-gothic text-4xl font-bold text-white">Messages</h2>
         <Popover>
-          <PopoverButton
-            onMouseEnter={handleInteraction}
-            onClick={handleInteraction}
-            className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors focus:outline-none"
-          >
+          <PopoverButton className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors focus:outline-none">
             + Message
           </PopoverButton>
           <PopoverPanel
@@ -66,9 +67,7 @@ const Messages = () => {
                 />
                 <ComboboxOptions static className="mt-2 max-h-60 w-full overflow-auto">
                   {friends?.length === 0 ? (
-                    <div className="text-lightGrey p-2 font-mono text-sm">
-                      No friends found.
-                    </div>
+                    <div className="text-lightGrey p-2 font-mono text-sm">No friends found.</div>
                   ) : (
                     friends?.map((friend) => (
                       <ComboboxOption
@@ -88,9 +87,7 @@ const Messages = () => {
       </div>
       <div className="flex flex-col gap-2">
         {threads.length === 0 ? (
-          <div className="text-lightGrey font-mono text-sm">
-            No conversations yet.
-          </div>
+          <div className="text-lightGrey font-mono text-sm">No conversations yet.</div>
         ) : (
           threads.map((thread) => {
             const isUnread =
@@ -102,27 +99,21 @@ const Messages = () => {
                 String(thread.sender_id) === String(user?.canteenId)
                   ? "You"
                   : thread.other_username;
-              threadContent = `${senderName} shared a recipe${
-                thread.content ? `: ${thread.content}` : ""
-              }`;
+              threadContent = `${senderName} shared a recipe${thread.content ? `: ${thread.content}` : ""}`;
             }
 
             return (
               <Link
                 key={thread.other_user_id}
                 to={`/messages/${thread.other_user_id}`}
-                className={`border-grey hover:border-accent group block border-2 border-dashed p-4 transition-colors ${
-                  isUnread ? "bg-accent/10" : ""
-                }`}
+                className={`border-grey hover:border-accent group block border-2 border-dashed p-4 transition-colors ${isUnread ? "bg-accent/10" : ""}`}
               >
                 <div className="mb-1 flex items-baseline justify-between">
                   <div className="flex items-center gap-2">
                     <span className="group-hover:text-accent font-mono text-lg font-bold text-white transition-colors">
                       {thread.other_username}
                     </span>
-                    {isUnread && (
-                      <span className="bg-accent h-2 w-2 rounded-full" />
-                    )}
+                    {isUnread && <span className="bg-accent h-2 w-2 rounded-full" />}
                   </div>
                   <span className="text-grey text-xs">
                     {new Date(thread.created_at).toLocaleDateString()}
@@ -138,6 +129,18 @@ const Messages = () => {
           })
         )}
       </div>
+
+      <PaginationControls
+        page={page}
+        limit={limit}
+        onPageChange={setPage}
+        onLimitChange={(e) => {
+          setLimit(Number(e.target.value));
+          setPage(1);
+        }}
+        loading={threadsLoading}
+        isNextDisabled={threads.length < limit}
+      />
     </MiddenCard>
   );
 };

@@ -1,19 +1,18 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import RecipeForm from "../RecipeForm";
-import useData from "@shared/core/context/data/useData";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@shared/core/context/data/useData");
+import * as canteenApi from "@shared/core/services/canteenApi";
+
+import RecipeForm from "../RecipeForm";
+
+vi.mock("@shared/core/services/canteenApi");
 vi.mock("../DurationInput", () => ({
   default: ({ label, onChange, value }) => (
     <div>
       <label htmlFor={label}>{label}</label>
-      <input
-        id={label}
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      <input id={label} value={value || ""} onChange={(e) => onChange(e.target.value)} />
     </div>
   ),
 }));
@@ -34,36 +33,35 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 describe("RecipeForm", () => {
-  const mockCreateTag = vi.fn();
-  const mockCreateIngredient = vi.fn();
-  const mockGetTags = vi.fn();
-  const mockGetIngredients = vi.fn();
   const mockOnSubmit = vi.fn();
 
   const defaultTags = [{ id: "t1", name: "Vegan" }];
   const defaultIngredients = [{ id: "i1", name: "Salt" }];
 
-  const baseData = {
-    tags: defaultTags,
-    getTags: mockGetTags,
-    ingredients: defaultIngredients,
-    getIngredients: mockGetIngredients,
-    createTag: mockCreateTag,
-    createIngredient: mockCreateIngredient,
-  };
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    useData.mockReturnValue(baseData);
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    canteenApi.fetchTags.mockResolvedValue(defaultTags);
+    canteenApi.fetchIngredients.mockResolvedValue(defaultIngredients);
   });
 
-  it("opens create tag modal and creates tag", async () => {
-    mockCreateTag.mockResolvedValue({ id: "t2", name: "New Tag" });
+  const renderComponent = (ui) =>
+    render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 
-    render(
+  it("opens create tag modal and creates tag", async () => {
+    canteenApi.createTag.mockResolvedValue({ id: "t2", name: "New Tag" });
+
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const tagsButton = screen.getByText(/Select tags.../);
@@ -81,22 +79,22 @@ describe("RecipeForm", () => {
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-      expect(mockCreateTag).toHaveBeenCalledWith("New Tag");
+      expect(canteenApi.createTag).toHaveBeenCalledWith("New Tag");
     });
   });
 
   it("opens create ingredient modal and creates ingredient", async () => {
-    useData.mockReturnValue({
-      ...baseData,
-      ingredients: [],
+    canteenApi.fetchIngredients.mockResolvedValue([]);
+
+    canteenApi.createIngredient.mockResolvedValue({
+      id: "i2",
+      name: "New Ing",
     });
 
-    mockCreateIngredient.mockResolvedValue({ id: "i2", name: "New Ing" });
-
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const input = screen.getByPlaceholderText("Name");
@@ -114,37 +112,50 @@ describe("RecipeForm", () => {
     fireEvent.click(confirmBtn);
 
     await waitFor(() => {
-      expect(mockCreateIngredient).toHaveBeenCalledWith("New Ing");
-      expect(mockGetIngredients).toHaveBeenCalled();
+      expect(canteenApi.createIngredient).toHaveBeenCalledWith("New Ing");
     });
   });
 
   it("submits form with all fields including wait time", async () => {
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} submitLabel="Save Custom Recipe" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: "My Recipe" } });
-    fireEvent.change(screen.getByLabelText("Prep Time"), { target: { value: "10" } });
-    fireEvent.change(screen.getByLabelText("Cook Time"), { target: { value: "20" } });
-    fireEvent.change(screen.getByLabelText("Wait Time"), { target: { value: "30" } });
-    fireEvent.change(screen.getByLabelText(/Servings/i), { target: { value: "4" } });
-    fireEvent.change(screen.getByLabelText(/Instructions/i), { target: { value: "Mix it all together" } });
+    fireEvent.change(screen.getByLabelText(/Title/i), {
+      target: { value: "My Recipe" },
+    });
+    fireEvent.change(screen.getByLabelText("Prep Time"), {
+      target: { value: "10" },
+    });
+    fireEvent.change(screen.getByLabelText("Cook Time"), {
+      target: { value: "20" },
+    });
+    fireEvent.change(screen.getByLabelText("Wait Time"), {
+      target: { value: "30" },
+    });
+    fireEvent.change(screen.getByLabelText(/Servings/i), {
+      target: { value: "4" },
+    });
+    fireEvent.change(screen.getByLabelText(/Instructions/i), {
+      target: { value: "Mix it all together" },
+    });
 
     const submitBtn = screen.getByText("Save Custom Recipe");
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith(expect.objectContaining({
-        title: "My Recipe",
-        prep_time_minutes: 10,
-        cook_time_minutes: 20,
-        wait_time_minutes: 30,
-        servings: 4,
-        instructions: "Mix it all together",
-      }));
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "My Recipe",
+          prep_time_minutes: 10,
+          cook_time_minutes: 20,
+          wait_time_minutes: 30,
+          servings: 4,
+          instructions: "Mix it all together",
+        }),
+      );
     });
   });
 
@@ -163,10 +174,10 @@ describe("RecipeForm", () => {
       selectedTags: ["t1"],
     };
 
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm initialData={initialData} onSubmit={mockOnSubmit} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByLabelText(/Title/i)).toHaveValue("Existing Recipe");
@@ -190,36 +201,48 @@ describe("RecipeForm", () => {
       selectedTags: [],
     };
 
-    render(
+    renderComponent(
       <MemoryRouter>
-        <RecipeForm initialData={initialData} onSubmit={mockOnSubmit} submitLabel="Save Custom Recipe 2" />
-      </MemoryRouter>
+        <RecipeForm
+          initialData={initialData}
+          onSubmit={mockOnSubmit}
+          submitLabel="Save Custom Recipe 2"
+        />
+      </MemoryRouter>,
     );
 
     const submitBtn = screen.getByText("Save Custom Recipe 2");
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith(expect.objectContaining({
-        prep_time_minutes: null,
-        cook_time_minutes: null,
-        wait_time_minutes: null,
-        servings: 4,
-        ingredients: [{ id: "i1", name: "Salt", quantity: null, unit: "tsp", notes: "" }]
-      }));
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          prep_time_minutes: null,
+          cook_time_minutes: null,
+          wait_time_minutes: null,
+          servings: 4,
+          ingredients: [{ id: "i1", name: "Salt", quantity: null, unit: "tsp", notes: "" }],
+        }),
+      );
     });
   });
 
   it("prevents submission if there are unresolved ingredients", async () => {
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} submitLabel="Save Recipe with Unresolved" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: "My Recipe" } });
-    fireEvent.change(screen.getByLabelText(/Servings/i), { target: { value: "2" } });
-    fireEvent.change(screen.getByLabelText(/Instructions/i), { target: { value: "Step 1" } });
+    fireEvent.change(screen.getByLabelText(/Title/i), {
+      target: { value: "My Recipe" },
+    });
+    fireEvent.change(screen.getByLabelText(/Servings/i), {
+      target: { value: "2" },
+    });
+    fireEvent.change(screen.getByLabelText(/Instructions/i), {
+      target: { value: "Step 1" },
+    });
 
     const nameInput = screen.getByPlaceholderText("Name");
     fireEvent.change(nameInput, { target: { value: "New Fake Ingredient" } });
@@ -227,16 +250,18 @@ describe("RecipeForm", () => {
     const submitBtn = screen.getByText("Save Recipe with Unresolved");
     fireEvent.click(submitBtn);
 
-    expect(await screen.findByText(/Please create or select an existing ingredient/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Please create or select an existing ingredient/),
+    ).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
     expect(nameInput).toHaveClass("border-red-500");
   });
 
   it("prevents submission if required fields are missing", async () => {
-    render(
+    renderComponent(
       <MemoryRouter>
         <RecipeForm onSubmit={mockOnSubmit} submitLabel="Save Invalid Recipe" />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const submitBtn = screen.getByText("Save Invalid Recipe");

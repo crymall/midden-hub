@@ -1,15 +1,16 @@
-import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, vi } from "vitest";
-import Explorer from "../Explorer";
 import { explorerLinkList } from "@shared/core/utils/constants";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
+import Explorer from "../Explorer";
 
 vi.mock("@shared/core/utils/constants", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
     explorerLinkList: actual.explorerLinkList.map((item) =>
-      item.label === "Canteen" ? { ...item, to: "http://mock-canteen.url" } : item
+      item.label === "Canteen" ? { ...item, to: "http://mock-canteen.url" } : item,
     ),
   };
 });
@@ -19,7 +20,7 @@ describe("Explorer Component", () => {
     render(
       <MemoryRouter>
         <Explorer />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     explorerLinkList.forEach((item) => {
       const link = screen.getByRole("link", { name: item.label });

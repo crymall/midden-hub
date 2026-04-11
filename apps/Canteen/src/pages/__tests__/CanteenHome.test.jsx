@@ -1,8 +1,10 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+
 import CanteenHome from "../CanteenHome";
-import useAuth from "@shared/core/context/auth/useAuth";
 
 const mockNavigate = vi.fn();
 const mockLocation = { pathname: "" };
@@ -16,7 +18,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("@shared/core/context/auth/useAuth");
+vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
   default: ({ children }) => <div data-testid="midden-card">{children}</div>,
@@ -33,7 +35,7 @@ describe("CanteenHome", () => {
     render(
       <MemoryRouter>
         <CanteenHome />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText(/Find and Share/i)).toBeInTheDocument();
@@ -47,7 +49,7 @@ describe("CanteenHome", () => {
     render(
       <MemoryRouter>
         <CanteenHome />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByRole("button", { name: "Login or Register" })).toBeInTheDocument();
@@ -58,7 +60,7 @@ describe("CanteenHome", () => {
     render(
       <MemoryRouter>
         <CanteenHome />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.queryByRole("button", { name: "Login or Register" })).not.toBeInTheDocument();
@@ -69,10 +71,12 @@ describe("CanteenHome", () => {
     render(
       <MemoryRouter>
         <CanteenHome />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
-    const loginButton = screen.getByRole("button", { name: "Login or Register" });
+    const loginButton = screen.getByRole("button", {
+      name: "Login or Register",
+    });
     fireEvent.click(loginButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("/login", {

@@ -1,62 +1,51 @@
-import { useEffect, useState, useEffectEvent, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@shared/core/hooks/useAuth";
+import { createList, deleteList, fetchUserLists } from "@shared/core/services/canteenApi";
+
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import MiddenModal from "@shared/ui/components/MiddenModal";
+import CreateListModal from "../components/CreateListModal";
 import ListList from "../components/ListList";
 import PaginationControls from "../components/PaginationControls";
-import CreateListModal from "../components/CreateListModal";
 
 const MyLists = () => {
   const { user } = useAuth();
-  const { userLists, getUserLists, canteenApi } = useData();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const hasHistory = location.key !== "default" && !location.state?.hideBack;
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [creatingList, setCreatingList] = useState(false);
-  const [fetchingLists, setFetchingLists] = useState(userLists.length === 0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [listToDelete, setListToDelete] = useState(null);
+  const offset = limit ? (page - 1) * limit : 0;
 
-  const setFetchingListsTrueEvent = useEffectEvent(() => {
-    setFetchingLists(true);
+  const { data: userLists = [], isLoading: fetchingLists } = useQuery({
+    queryKey: ["userLists", user?.canteenId, { limit: limit, offset: offset }],
+    queryFn: () => fetchUserLists(user.canteenId, limit, offset, "", "created_at", "DESC"),
+    enabled: !!user,
   });
 
-  const setFetchingListsFalseEvent = useEffectEvent(() => {
-    setFetchingLists(false);
-  });
-
-  const initialFetchRef = useRef(false);
-
-  useEffect(() => {
-    if (user) {
-      if (!initialFetchRef.current && userLists.length > 0 && page === 1) {
-        setFetchingListsFalseEvent();
-      } else {
-        setFetchingListsTrueEvent();
-        getUserLists(user.canteenId, limit, (page - 1) * limit).finally(() =>
-          setFetchingListsFalseEvent(),
-        );
-      }
-      initialFetchRef.current = true;
-    }
-  }, [user, getUserLists, page, limit, userLists.length]);
-
-  const handleCreateList = async (name) => {
-    setCreatingList(true);
-    try {
-      await canteenApi.createList(name);
-      await getUserLists(user.canteenId, limit, (page - 1) * limit);
+  const createListMutation = useMutation({
+    mutationFn: (name) => createList(name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["userLists", user?.canteenId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["comboboxLists"] });
       setIsCreateModalOpen(false);
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Failed to create list", error);
-    } finally {
-      setCreatingList(false);
-    }
+    },
+  });
+
+  const handleCreateList = (name) => {
+    createListMutation.mutate(name);
   };
 
   const handleDeleteList = (e, listId) => {
@@ -65,14 +54,22 @@ const MyLists = () => {
     setListToDelete(listId);
   };
 
-  const confirmDeleteList = async () => {
-    try {
-      await canteenApi.deleteList(listToDelete);
-      await getUserLists(user.canteenId, limit, (page - 1) * limit);
+  const deleteListMutation = useMutation({
+    mutationFn: (id) => deleteList(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["userLists", user?.canteenId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["comboboxLists"] });
       setListToDelete(null);
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Failed to delete list", error);
-    }
+    },
+  });
+
+  const confirmDeleteList = () => {
+    deleteListMutation.mutate(listToDelete);
   };
 
   const handlePageChange = (newPage) => {
@@ -127,7 +124,7 @@ const MyLists = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onCreate={handleCreateList}
-        loading={creatingList}
+        loading={createListMutation.isPending}
       />
 
       <MiddenModal
@@ -136,8 +133,7 @@ const MyLists = () => {
         title="Delete List"
       >
         <p className="text-lightestGrey mb-6 font-mono">
-          Are you sure you want to delete this list? This action cannot be
-          undone.
+          Are you sure you want to delete this list? This action cannot be undone.
         </p>
         <div className="flex justify-end gap-2">
           <Button
@@ -148,9 +144,10 @@ const MyLists = () => {
           </Button>
           <Button
             onClick={confirmDeleteList}
-            className="bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600"
+            disabled={deleteListMutation.isPending}
+            className="bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600 disabled:opacity-50"
           >
-            Delete
+            {deleteListMutation.isPending ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </MiddenModal>

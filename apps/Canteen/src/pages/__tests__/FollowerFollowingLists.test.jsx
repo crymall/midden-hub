@@ -1,12 +1,15 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
-import FollowerFollowingLists from "../FollowerFollowingLists";
-import useData from "@shared/core/context/data/useData";
-import useAuth from "@shared/core/context/auth/useAuth";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@shared/core/context/data/useData");
-vi.mock("@shared/core/context/auth/useAuth");
+import { useAuth } from "@shared/core/hooks/useAuth";
+import * as canteenApi from "@shared/core/services/canteenApi";
+
+import FollowerFollowingLists from "../FollowerFollowingLists";
+
+vi.mock("@shared/core/services/canteenApi");
+vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/ui/components/MiddenCard", () => ({
   default: ({ children }) => <div data-testid="midden-card">{children}</div>,
@@ -25,41 +28,41 @@ vi.mock("../../components/CanteenUserList", () => ({
 }));
 
 describe("FollowerFollowingLists", () => {
-  const mockGetFollowers = vi.fn().mockResolvedValue([]);
-  const mockGetFollowing = vi.fn().mockResolvedValue([]);
-  const mockFollowUser = vi.fn().mockResolvedValue({});
-  const mockUnfollowUser = vi.fn().mockResolvedValue({});
-  const mockGetRelationshipCounts = vi.fn().mockResolvedValue({});
-
   const defaultUser = { id: "iam1", canteenId: "1", username: "testuser" };
+  let queryClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
 
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
     useAuth.mockReturnValue({ user: defaultUser });
-    useData.mockReturnValue({
-      followers: [{ id: "f1" }, { id: "f2" }],
-      following: [{ id: "f3" }],
-      relationshipCounts: { followers: 2, following: 1 },
-      getRelationshipCounts: mockGetRelationshipCounts,
-      getFollowers: mockGetFollowers,
-      getFollowing: mockGetFollowing,
-      followUser: mockFollowUser,
-      unfollowUser: mockUnfollowUser,
+
+    canteenApi.fetchFollowers.mockResolvedValue([{ id: "f1" }, { id: "f2" }]);
+    canteenApi.fetchFollowing.mockResolvedValue([{ id: "f3" }]);
+    canteenApi.fetchRelationshipCounts.mockResolvedValue({
+      followers: 2,
+      following: 1,
     });
   });
 
   const renderComponent = (initialRoute = "/network/1") => {
     return render(
-      <MemoryRouter initialEntries={[initialRoute]}>
-        <Routes>
-          <Route path="/network/:id" element={<FollowerFollowingLists />} />
-          <Route
-            path="/user/:id"
-            element={<div data-testid="profile-redirect">Redirected to Profile</div>}
-          />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={[initialRoute]}>
+          <Routes>
+            <Route path="/network/:id" element={<FollowerFollowingLists />} />
+            <Route
+              path="/user/:id"
+              element={<div data-testid="profile-redirect">Redirected to Profile</div>}
+            />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
   };
 
@@ -84,9 +87,11 @@ describe("FollowerFollowingLists", () => {
     await act(async () => {
       renderComponent();
     });
-    expect(mockGetFollowers).toHaveBeenCalledWith("1", 20, 0);
-    expect(mockGetFollowing).toHaveBeenCalledWith("1", 50, 0);
-    expect(mockGetRelationshipCounts).toHaveBeenCalledWith("1");
+    await waitFor(() => {
+      expect(canteenApi.fetchFollowers).toHaveBeenCalledWith("1", 20, 0);
+      expect(canteenApi.fetchFollowing).toHaveBeenCalledWith("1", 50, 0);
+      expect(canteenApi.fetchRelationshipCounts).toHaveBeenCalledWith("1");
+    });
   });
 
   it("renders a back link to the user's profile", async () => {
@@ -101,53 +106,73 @@ describe("FollowerFollowingLists", () => {
     await act(async () => {
       renderComponent();
     });
-    expect(screen.getByText("Followers (2)")).toBeInTheDocument();
-    expect(screen.getByText("Following (1)")).toBeInTheDocument();
-    expect(screen.getByText("Users Count: 2")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Followers (2)")).toBeInTheDocument();
+      expect(screen.getByText("Following (1)")).toBeInTheDocument();
+      expect(screen.getByText("Users Count: 2")).toBeInTheDocument();
+    });
   });
 
   it("switches to the following tab when clicked", async () => {
     await act(async () => {
       renderComponent();
     });
-    const followingTab = screen.getByText("Following (1)");
+    const followingTab = await screen.findByText("Following (1)");
     await act(async () => {
       fireEvent.click(followingTab);
     });
-    expect(screen.getByText("Users Count: 1")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Users Count: 1")).toBeInTheDocument();
+    });
   });
 
   it("loads the following tab initially if search params specify it", async () => {
     await act(async () => {
       renderComponent("/network/1?tab=following");
     });
-    expect(screen.getByText("Users Count: 1")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Users Count: 1")).toBeInTheDocument();
+    });
   });
 
   it("calls followUser and refreshes both lists on follow toggle", async () => {
+    canteenApi.fetchRelationshipCounts
+      .mockResolvedValueOnce({ followers: 2, following: 1 })
+      .mockResolvedValueOnce({ followers: 2, following: 2 });
+
     await act(async () => {
       renderComponent();
     });
     await act(async () => {
       fireEvent.click(screen.getByText("Mock Follow"));
     });
-    expect(mockFollowUser).toHaveBeenCalledWith("targetId");
-    expect(mockGetFollowing).toHaveBeenCalledWith("1", 20, 0);
-    expect(mockGetFollowers).toHaveBeenCalledWith("1", 20, 0);
-    expect(mockGetRelationshipCounts).toHaveBeenCalledWith("1");
+    await waitFor(() => {
+      expect(canteenApi.followUser).toHaveBeenCalledWith("targetId");
+      expect(canteenApi.fetchFollowing).toHaveBeenCalled();
+      expect(canteenApi.fetchFollowers).toHaveBeenCalled();
+      expect(canteenApi.fetchRelationshipCounts).toHaveBeenCalled();
+      expect(screen.getByText("Following (2)")).toBeInTheDocument();
+    });
   });
 
   it("calls unfollowUser and refreshes both lists on unfollow toggle", async () => {
+    canteenApi.fetchRelationshipCounts
+      .mockResolvedValueOnce({ followers: 2, following: 1 })
+      .mockResolvedValueOnce({ followers: 2, following: 0 });
+
     await act(async () => {
       renderComponent();
     });
     await act(async () => {
       fireEvent.click(screen.getByText("Mock Unfollow"));
     });
-    expect(mockUnfollowUser).toHaveBeenCalledWith("targetId");
-    expect(mockGetFollowing).toHaveBeenCalledWith("1", 20, 0);
-    expect(mockGetFollowers).toHaveBeenCalledWith("1", 20, 0);
-    expect(mockGetRelationshipCounts).toHaveBeenCalledWith("1");
+    await waitFor(() => {
+      expect(canteenApi.unfollowUser).toHaveBeenCalledWith("targetId");
+      expect(canteenApi.fetchFollowing).toHaveBeenCalled();
+      expect(canteenApi.fetchFollowers).toHaveBeenCalled();
+      expect(canteenApi.fetchRelationshipCounts).toHaveBeenCalled();
+      expect(screen.getByText("Following (0)")).toBeInTheDocument();
+    });
   });
 
   it("handles pagination controls", async () => {
@@ -159,12 +184,16 @@ describe("FollowerFollowingLists", () => {
       fireEvent.click(screen.getByText("Next Page"));
     });
 
-    expect(mockGetFollowers).toHaveBeenCalledWith("1", 20, 20);
+    await waitFor(() => {
+      expect(canteenApi.fetchFollowers).toHaveBeenCalledWith("1", 20, 20);
+    });
 
     await act(async () => {
       fireEvent.click(screen.getByText("Change Limit"));
     });
 
-    expect(mockGetFollowers).toHaveBeenCalledWith("1", 50, 0);
+    await waitFor(() => {
+      expect(canteenApi.fetchFollowers).toHaveBeenCalledWith("1", 50, 0);
+    });
   });
 });

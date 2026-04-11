@@ -1,17 +1,17 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import CanteenUserList from "../CanteenUserList";
 
 vi.mock("@shared/ui/components/MiddenModal", () => ({
-  default: ({ isOpen, children, title }) => (
+  default: ({ isOpen, children, title }) =>
     isOpen ? (
       <div data-testid="midden-modal">
         <h2>{title}</h2>
         {children}
       </div>
-    ) : null
-  ),
+    ) : null,
 }));
 
 vi.mock("../PaginationControls", () => ({
@@ -49,7 +49,7 @@ describe("CanteenUserList", () => {
           emptyMessage="No users found."
           {...props}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   };
 
@@ -65,7 +65,7 @@ describe("CanteenUserList", () => {
 
   it("renders list of users with correct links", () => {
     renderComponent();
-    
+
     expect(screen.getByText("NotFollowedUser")).toBeInTheDocument();
     expect(screen.getByText("JustFollowingUser")).toBeInTheDocument();
     expect(screen.getByText("MutualFriendUser")).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe("CanteenUserList", () => {
     renderComponent();
     const followButtons = screen.getAllByText("Follow");
     expect(followButtons).toHaveLength(1);
-    
+
     fireEvent.click(followButtons[0]);
     expect(mockOnToggleFollow).toHaveBeenCalledWith("1", false);
   });
@@ -89,7 +89,7 @@ describe("CanteenUserList", () => {
     renderComponent();
     const unfollowButton = screen.getByText("Unfollow");
     expect(unfollowButton).toBeInTheDocument();
-    
+
     fireEvent.click(unfollowButton);
     expect(mockOnToggleFollow).toHaveBeenCalledWith("2", true);
   });
@@ -109,11 +109,13 @@ describe("CanteenUserList", () => {
 
   it("calls onToggleFollow with true when Unfriend is confirmed in the modal", () => {
     renderComponent();
-    
+
     fireEvent.click(screen.getByText("Friends"));
     expect(screen.getByTestId("midden-modal")).toBeInTheDocument();
 
-    const unfriendConfirmBtn = screen.getAllByText("Unfriend").find(btn => btn.tagName === "BUTTON");
+    const unfriendConfirmBtn = screen
+      .getAllByText("Unfriend")
+      .find((btn) => btn.tagName === "BUTTON");
     fireEvent.click(unfriendConfirmBtn);
 
     expect(mockOnToggleFollow).toHaveBeenCalledWith("3", true);

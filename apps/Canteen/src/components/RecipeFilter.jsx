@@ -1,24 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Button,
-  Input,
+  Checkbox,
   Field,
+  Input,
   Label,
   Popover,
   PopoverButton,
   PopoverPanel,
-  Checkbox,
 } from "@headlessui/react";
-import useData from "@shared/core/context/data/useData";
+import { useQuery } from "@tanstack/react-query";
+
+import { fetchTags } from "@shared/core/services/canteenApi";
 
 const RecipeFilter = ({ onFilter }) => {
-  const { tags = [], getTags } = useData();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
 
-  useEffect(() => {
-    getTags();
-  }, [getTags]);
+  const { data: tags = [] } = useQuery({
+    queryKey: ["filterTags"],
+    queryFn: () => fetchTags(500, 0),
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,9 +32,7 @@ const RecipeFilter = ({ onFilter }) => {
 
   const toggleTag = (tagId) => {
     setSelectedTags((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId],
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
     );
   };
 
@@ -43,15 +43,10 @@ const RecipeFilter = ({ onFilter }) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="border-grey mb-6 flex flex-col gap-4 border-b-2 pb-6"
-    >
+    <form onSubmit={handleSubmit} className="border-grey mb-6 flex flex-col gap-4 border-b-2 pb-6">
       <div className="flex flex-col gap-4 md:flex-row">
         <Field className="flex-1">
-          <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-            Search Recipes
-          </Label>
+          <Label className="text-lightestGrey mb-1 block text-sm font-bold">Search Recipes</Label>
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -62,9 +57,7 @@ const RecipeFilter = ({ onFilter }) => {
 
         {tags && tags.length > 0 && (
           <Field className="w-full md:w-64">
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">
-              Filter by Tags
-            </Label>
+            <Label className="text-lightestGrey mb-1 block text-sm font-bold">Filter by Tags</Label>
             <Popover className="relative z-30">
               <PopoverButton className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey flex w-full items-center justify-between border p-2 text-left focus:outline-none">
                 <span className="truncate">

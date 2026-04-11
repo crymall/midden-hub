@@ -1,7 +1,8 @@
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@headlessui/react";
-import { useNavigate, Link, useLocation } from "react-router-dom";
-import MobileBurgerMenu from "./MobileBurgerMenu";
+
 import Can from "../../core/gateways/Can";
+import MobileBurgerMenu from "./MobileBurgerMenu";
 
 const Header = ({ user, logout, title, titleLink, navLinks }) => {
   const navigate = useNavigate();
@@ -9,10 +10,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
 
   const processedNavLinks = navLinks.map((link) => ({
     ...link,
-    to:
-      user && link.to.includes(":userId")
-        ? link.to.replace(":userId", user.id)
-        : link.to,
+    to: user && link.to.includes(":userId") ? link.to.replace(":userId", user.id) : link.to,
   }));
 
   const desktopNavLinks = processedNavLinks.map((link) =>
@@ -70,9 +68,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
     <header className="bg-primary border-accent flex items-center justify-between border-b-4 border-dashed p-4">
       <div className="flex items-center gap-4">
         <div className="xl:hidden">
-          {processedNavLinks.length && (
-            <MobileBurgerMenu navLinks={processedNavLinks} />
-          )}
+          {processedNavLinks.length && <MobileBurgerMenu navLinks={processedNavLinks} />}
         </div>
 
         <h1
@@ -83,9 +79,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
         </h1>
 
         {processedNavLinks.length && (
-          <nav className="ml-24 hidden items-center gap-16 xl:flex">
-            {desktopNavLinks}
-          </nav>
+          <nav className="ml-24 hidden items-center gap-16 xl:flex">{desktopNavLinks}</nav>
         )}
       </div>
       <div className="flex items-center gap-4 font-mono">

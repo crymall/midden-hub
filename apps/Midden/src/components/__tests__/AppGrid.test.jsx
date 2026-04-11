@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
 import AppGrid from "../AppGrid";
 
 describe("AppGrid Component", () => {
@@ -13,9 +14,9 @@ describe("AppGrid Component", () => {
     render(
       <MemoryRouter>
         <AppGrid items={items} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
-    
+
     expect(screen.getByRole("link", { name: "App 1" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "App 2" })).toBeInTheDocument();
   });

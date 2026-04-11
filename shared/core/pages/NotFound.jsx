@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+
 import MiddenCard from "../../ui/components/MiddenCard";
 
 const NotFound = () => {
@@ -9,10 +10,7 @@ const NotFound = () => {
         <p className="text-center text-xl">
           The page you are looking for does not exist in this pile.
         </p>
-        <Link
-          to="/"
-          className="text-lightestGrey text-lg underline hover:text-white"
-        >
+        <Link to="/" className="text-lightestGrey text-lg underline hover:text-white">
           Return Home
         </Link>
       </div>
