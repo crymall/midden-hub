@@ -58,9 +58,12 @@ export default function DurationInput({ label, onChange, value }) {
 
   return (
     <div className="w-full">
-      <label className="text-lightestGrey mb-1 block text-sm font-bold">{label}</label>
+      <label htmlFor={label} className="text-lightestGrey mb-1 block text-sm font-bold">
+        {label}
+      </label>
       <div className="relative flex">
         <input
+          id={label}
           type="number"
           min="0"
           value={amount}
@@ -80,7 +83,9 @@ export default function DurationInput({ label, onChange, value }) {
                 <ListboxOption
                   key={unit.id}
                   className={({ active }) =>
-                    `relative cursor-default select-none py-2 px-4 ${active ? "bg-accent text-white" : "text-lightestGrey"}`
+                    `relative cursor-default select-none py-2 px-4 ${
+                      active ? "bg-accent text-white" : "text-lightestGrey"
+                    }`
                   }
                   value={unit}
                 >

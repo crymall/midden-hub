@@ -299,9 +299,17 @@ const RecipeForm = ({
             required: true,
           })}
           <Field>
-            <Label className="text-lightestGrey mb-1 block text-sm font-bold">Tags</Label>
+            <Label
+              htmlFor="tags-popover-button"
+              className="text-lightestGrey mb-1 block text-sm font-bold"
+            >
+              Tags
+            </Label>
             <Popover className="relative">
-              <PopoverButton className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey flex w-full items-center justify-between border p-2 text-left focus:outline-none">
+              <PopoverButton
+                id="tags-popover-button"
+                className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey flex w-full items-center justify-between border p-2 text-left focus:outline-none"
+              >
                 <span className="truncate">
                   {selectedTags.length === 0
                     ? "Select tags..."
@@ -408,7 +416,11 @@ const RecipeForm = ({
                       by={(a, b) => a?.id === b?.id}
                     >
                       <ComboboxInput
-                        className={`${baseInputClass} w-full ${unresolvedIngredients.includes(index) ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500" : ""}`}
+                        className={`${baseInputClass} w-full ${
+                          unresolvedIngredients.includes(index)
+                            ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500"
+                            : ""
+                        }`}
                         placeholder="Name"
                         displayValue={(item) => item?.name || ""}
                         onChange={(e) => {
