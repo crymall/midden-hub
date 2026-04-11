@@ -45,9 +45,7 @@ describe("Login Component", () => {
       </MemoryRouter>,
     );
 
-    const createAccountBtn = screen.getByRole("button", {
-      name: /create account/i,
-    });
+    const createAccountBtn = screen.getByRole("button", { name: /create account/i });
     await user.click(createAccountBtn);
 
     expect(screen.getByRole("heading", { name: /create account/i })).toBeInTheDocument();
@@ -69,15 +67,12 @@ describe("Login Component", () => {
     await user.type(screen.getByLabelText(/password/i), "password123");
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
-    expect(mockLogin).toHaveBeenCalledWith({
-      username: "testuser",
-      password: "password123",
-    });
+    expect(mockLogin).toHaveBeenCalledWith({ username: "testuser", password: "password123" });
   });
 
   it("transitions to 2FA mode when login requires it", async () => {
     const user = userEvent.setup();
-    mockLogin.mockResolvedValue({ userId: "123", message: "Enter code" });
+    mockLogin.mockResolvedValue({ temp_token: "fake-temp-token", message: "Enter code" });
 
     render(
       <MemoryRouter>
@@ -98,7 +93,7 @@ describe("Login Component", () => {
 
   it("submits 2FA code with rememberMe checked", async () => {
     const user = userEvent.setup();
-    mockLogin.mockResolvedValue({ userId: "123", message: "Enter code" });
+    mockLogin.mockResolvedValue({ temp_token: "fake-temp-token", message: "Enter code" });
 
     render(
       <MemoryRouter>
@@ -119,7 +114,7 @@ describe("Login Component", () => {
     await user.click(screen.getByRole("button", { name: /^verify$/i }));
 
     expect(mockVerifyLogin).toHaveBeenCalledWith({
-      userId: "123",
+      tempToken: "fake-temp-token",
       code: "123456",
       rememberMe: true,
     });
@@ -127,7 +122,7 @@ describe("Login Component", () => {
 
   it("submits 2FA code with rememberMe unchecked by default", async () => {
     const user = userEvent.setup();
-    mockLogin.mockResolvedValue({ userId: "123", message: "Enter code" });
+    mockLogin.mockResolvedValue({ temp_token: "fake-temp-token", message: "Enter code" });
 
     render(
       <MemoryRouter>
@@ -147,7 +142,7 @@ describe("Login Component", () => {
     await user.click(screen.getByRole("button", { name: /^verify$/i }));
 
     expect(mockVerifyLogin).toHaveBeenCalledWith({
-      userId: "123",
+      tempToken: "fake-temp-token",
       code: "123456",
       rememberMe: false,
     });

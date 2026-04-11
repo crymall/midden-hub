@@ -98,13 +98,13 @@ describe("useAuth hook", () => {
 
     await act(async () => {
       await result.current.verifyLogin({
-        userId: 1,
+        tempToken: "fake-temp-token",
         code: "123456",
         rememberMe: true,
       });
     });
 
-    expect(iamApi.verify2FA).toHaveBeenCalledWith(1, "123456", true);
+    expect(iamApi.verify2FA).toHaveBeenCalledWith("fake-temp-token", "123456", true);
     expect(canteenApi.fetchMe).toHaveBeenCalled();
 
     // Now the cache should be set!
@@ -131,13 +131,13 @@ describe("useAuth hook", () => {
 
     await act(async () => {
       await result.current.verifyLogin({
-        userId: 1,
+        tempToken: "fake-temp-token",
         code: "123456",
         rememberMe: false,
       });
     });
 
-    expect(iamApi.verify2FA).toHaveBeenCalledWith(1, "123456", false);
+    expect(iamApi.verify2FA).toHaveBeenCalledWith("fake-temp-token", "123456", false);
     expect(consoleSpy).toHaveBeenCalledWith("Failed to fetch Canteen user", expect.any(Error));
 
     const cachedUser = queryClient.getQueryData(["currentUser"]);

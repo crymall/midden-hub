@@ -42,10 +42,10 @@ describe("iamApi", () => {
       });
     });
 
-    it("verify2FA calls post with code and rememberMe", async () => {
-      await api.verify2FA("u1", "123456", true);
+    it("verify2FA calls post with tempToken, code and rememberMe", async () => {
+      await api.verify2FA("fake-temp-token", "123456", true);
       expect(mockPost).toHaveBeenCalledWith("/verify-2fa", {
-        userId: "u1",
+        tempToken: "fake-temp-token",
         code: "123456",
         rememberMe: true,
       });

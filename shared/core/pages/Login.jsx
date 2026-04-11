@@ -5,7 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const [mode, setMode] = useState("login");
-  const [userId, setUserId] = useState(null);
+  const [tempToken, setTempToken] = useState(null);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -27,14 +27,14 @@ export default function Login() {
         case "login":
           {
             const data = await login({ username, password });
-            if (data.token) return;
-            setUserId(data.userId);
+            if (!data?.temp_token) return;
+            setTempToken(data.temp_token);
             setInfo(data.message || "Enter the code sent to your email.");
             setMode("2fa");
           }
           break;
         case "2fa":
-          await verifyLogin({ userId, code, rememberMe });
+          await verifyLogin({ tempToken, code, rememberMe });
           break;
         case "register":
           await register({ username, email, password });
