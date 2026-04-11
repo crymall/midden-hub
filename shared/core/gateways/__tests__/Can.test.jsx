@@ -8,12 +8,12 @@ import Can from "../Can";
 vi.mock("../../hooks/useAuth");
 
 describe("Can Gateway", () => {
-  it("renders loading component when isLoading is true", () => {
+  it("returns null when isLoading is true", () => {
     useAuth.mockReturnValue({ isLoading: true, user: null });
 
-    render(<Can perform={PERMISSIONS.writeUsers}>Content</Can>);
+    const { container } = render(<Can perform={PERMISSIONS.writeUsers}>Content</Can>);
 
-    expect(screen.getByText("Verifying permissions...")).toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it("renders children if user has permission", () => {
