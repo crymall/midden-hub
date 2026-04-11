@@ -10,9 +10,9 @@ export const login = async (username, password) => {
   return response.data;
 };
 
-export const verify2FA = async (userId, code, rememberMe = false) => {
+export const verify2FA = async (tempToken, code, rememberMe = false) => {
   const response = await iamApi.post("/verify-2fa", {
-    userId,
+    tempToken,
     code,
     rememberMe,
   });

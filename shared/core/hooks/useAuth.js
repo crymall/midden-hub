@@ -35,8 +35,8 @@ export const useAuth = () => {
   });
 
   const verifyLoginMutation = useMutation({
-    mutationFn: async ({ userId, code, rememberMe }) => {
-      const data = await iamApi.verify2FA(userId, code, rememberMe);
+    mutationFn: async ({ tempToken, code, rememberMe }) => {
+      const data = await iamApi.verify2FA(tempToken, code, rememberMe);
       let canteenId = null;
       try {
         const canteenUser = await canteenApi.fetchMe();
