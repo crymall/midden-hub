@@ -4,6 +4,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import App from "../App";
 
+vi.mock("@grafana/faro-react", () => ({
+  initializeFaro: vi.fn(),
+  ReactIntegration: vi.fn(),
+  getWebInstrumentations: vi.fn(() => []),
+  createReactRouterV7Options: vi.fn(),
+}));
+
+vi.mock("@grafana/faro-web-tracing", () => ({
+  TracingInstrumentation: vi.fn(),
+}));
+
 const renderMock = vi.fn();
 const createRootMock = vi.fn(() => ({ render: renderMock }));
 

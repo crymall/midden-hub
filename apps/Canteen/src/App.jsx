@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route } from "react-router-dom";
+import { FaroRoutes } from "@grafana/faro-react";
 import { navMeta } from "@shared/core/utils/constants";
 
 import RequireNotGuest from "@shared/core/gateways/RequireNotGuest";
@@ -26,7 +27,7 @@ function App() {
   return (
     <BrowserRouter>
       <Suspense fallback={<Loading />}>
-        <Routes>
+        <FaroRoutes>
           <Route path="/login" element={<Login />} />
 
           <Route path="/" element={<Dashboard navMeta={navMeta.canteen} />}>
@@ -47,7 +48,7 @@ function App() {
 
             <Route path="*" element={<NotFound />} />
           </Route>
-        </Routes>
+        </FaroRoutes>
       </Suspense>
     </BrowserRouter>
   );
