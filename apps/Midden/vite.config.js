@@ -12,7 +12,7 @@ export default defineConfig({
       appId: "1381",
       stackId: "1595848",
       verbose: true,
-      apiKey: process.env.FARO_API_KEY,
+      apiKey: process.env.VITE_FARO_API_KEY,
       gzipContents: true,
     }),
   ],
