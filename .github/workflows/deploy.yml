@@ -42,7 +42,7 @@ jobs:
         platforms: linux/amd64
         build-args: |
           VITE_CANTEEN_URL=${{ vars.PROD_CANTEEN_URL }}
-          FARO_API_KEY=${{ secrets.FARO_API_KEY }}
+          VITE_FARO_API_KEY=${{ vars.VITE_FARO_API_KEY }}
 
     - name: Build and push Canteen
       uses: docker/build-push-action@v4

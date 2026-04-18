@@ -8,8 +8,8 @@ COPY shared ./shared
 COPY apps/Canteen ./apps/Canteen
 ARG VITE_MIDDEN_URL
 ENV VITE_MIDDEN_URL=$VITE_MIDDEN_URL
-ARG FARO_API_KEY
-ENV FARO_API_KEY=$FARO_API_KEY
+ARG VITE_FARO_API_KEY
+ENV VITE_FARO_API_KEY=$VITE_FARO_API_KEY
 RUN npm run build -w apps/Canteen
 
 # Stage 2: Serve
