@@ -5,6 +5,13 @@ import { useAuth } from "@shared/core/hooks/useAuth";
 
 import App from "../App";
 
+vi.mock("@grafana/faro-react", () => {
+  const { Routes } = require("react-router-dom");
+  return {
+    FaroRoutes: Routes,
+  };
+});
+
 vi.mock("@shared/core/hooks/useAuth");
 
 vi.mock("@shared/core/pages/Login", () => ({
