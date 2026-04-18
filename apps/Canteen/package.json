@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@grafana/faro-react": "^2.3.1",
     "@grafana/faro-web-sdk": "^2.3.1",
     "@grafana/faro-web-tracing": "^2.3.1",
     "@headlessui/react": "^2.2.0",
