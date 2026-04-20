@@ -21,7 +21,7 @@ If you're interested in the technology behind/architecture of the app, please cl
 
 There's a lively ongoing discussion within the programming community about the use of AI in software development. I won't wade too deep into this beyond communicating a deep skepticism of AI as a companion, therapist, doctor, artist, or writer, and a grudging acknowledgement of its utility, judiciously-applied, in designing and implementing projects involving code.
 
-Regardless of my opinion on the matter, however, two things are true: LLMs are being used, to some extent, in nearly every enterprise software project imaginable, and I'm trying to follow enterprise-standard practices in my work on Midden. Therefore, I've been playing around with Gemini's 3.1 Pro model. During the design phase, I used it as a sounding board, proposing architectures and stacks and asking it to generate architectures and suggest industry-standard technologies based on my applications' needs and use cases. During developement, I would ask it to generate unit tests and other repetitive patterns, review code that I'd written, and help debug any bugs or implementation issues I encountered.
+Regardless of my opinion on the matter, however, two things are true: LLMs are being used, to some extent, in nearly every enterprise software project imaginable, and I'm trying to follow enterprise-standard practices in my work on Midden. Therefore, I've been playing around with Gemini's 3.1 Pro model on this project. During the design phase, I used it as a sounding board, proposing stacks and asking it to generate architectures, design database schemas, and suggest industry-standard technologies based on my applications' needs and use cases. During developement, I would ask it to generate unit tests and other repetitive patterns, review code that I'd written, and help debug any bugs or implementation issues I encountered.
 
 I reviewed, added, and committed my code manually, line-by-line. I chose not to adopt a fully-agentic approach, which I define as autonomous AI agents reviewing code, generating it, committing it, and making PRs in the codebase. Although this isn't necessarily the industry-standard approach, I think it's important, for a few reasons:
 
@@ -31,9 +31,7 @@ I reviewed, added, and committed my code manually, line-by-line. I chose not to 
 
 As a side note to that last point, I've pasted a note that I've added to "Instructions for Gemini" below, which it uses as global context for every conversation. I find it to be very useful on the mental health front.
 
-```
-Don't complement me for "good questions" I might ask or refer to me at all unless explicitly necessary. Please attempt to respond as matter-of-factly as possible, and remove as much tone from your voice as you can, unless I explicitly ask you to speak in a particular register. 
-```
+`Don't complement me for "good questions" I might ask or refer to me at all unless explicitly necessary. Please attempt to respond as matter-of-factly as possible, and remove as much tone from your voice as you can, unless I explicitly ask you to speak in a particular register.`
 
 ## License
 
