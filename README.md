@@ -11,7 +11,7 @@
 
 ## About
 
-Midden is a showcase of my capability as a technologist. This is for recruiters (*look! I'm a full-stack web developer!*), for friends (*hey! Here are some cool tools you can use!*), and for my own education. Working on Midden, and all its sub-apps, keeps me sharp and up-to-date.
+Midden is a showcase of my capability as a technologist. This is for recruiters (*look! I'm a full-stack web developer!*), for friends (*hey! Here are some cool tools you can use!*), and for my own education. My operating principles in building Midden are threefold: I'd like it to be usable, striking to look at, and enterprise-grade, following all the best practices that the 2026 web dev landscape has to offer.
 
 Inside this repo, you'll find the frontends for two applications: [**Midden**](https://midden.reedgaines.com/), which is a personal mono-app/hub of links to my work, and [**Canteen**](https://canteen.reedgaines.com/), which is a minimalist (yet technologically-sophisticated) recipe storage/sharing app. These apps, and all apps I'll make in the future for this project, have a shared UI sensibility and shared role-based authentication. Currently, everything is offered for free and open-source, but should anything become particularly popular or valuable, I'm not above setting up a Patreon or a Ko-fi in the future.
 
