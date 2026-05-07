@@ -29,8 +29,7 @@ const About = () => {
             don&apos;t make a big deal out of it. Midden is my attempt to reframe my programming
             a/vocation as an archaeological trashheap—something that, at the time, doesn&apos;t
             really matter, but in the future, could be worth something. I write code to please
-            myself, to make useful things, and as a showcase for potential employment, in that
-            order.
+            myself, to make useful things, and as a showcase for potential employment.
           </p>
           <p>
             The site is broken down into two main groups: full-fledged apps and experiments, which
