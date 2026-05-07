@@ -15,7 +15,7 @@ Midden is a showcase of my capability as a technologist. This is for recruiters 
 
 Inside this repo, you'll find two separate applications: [**Midden**](https://midden.reedgaines.com/), which is a personal mono-app/hub of links to my work, and [**Canteen**](https://canteen.reedgaines.com/), which is a minimalist (yet technologically-sophisticated) recipe storage/sharing app. These apps, and all apps I'll make in the future for this project, have a shared UI sensibility and shared role-based authentication. Currently, everything is offered for free and open-source, but should anything become particularly popular or valuable, I'm not above setting up a Patreon or a Ko-fi in the future.
 
-If you're interested in the technology behind/architecture of the app, please click [here](./docs/architecture.md) for a detailed breakdown. If you're interested in who I am, or would like to connect with me about my work, head on over to my [website](https://reedgaines.com/).
+If you're interested in the technology behind/architecture of the app, please click [here](./docs/architecture.md) for a detailed breakdown. To learn about the upcoming features on my roadmap for these apps, click [here](./docs/roadmap.md). If you're interested in who I am, or would like to connect with me about my work, head on over to my [website](https://reedgaines.com/).
 
 ## License
 
