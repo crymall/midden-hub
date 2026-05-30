@@ -248,12 +248,14 @@ const RecipeDetail = () => {
               Ingredients
             </h3>
             {currentRecipe.ingredient_groups?.map((group, index) => (
-              <div 
-                key={group.id} 
+              <div
+                key={group.id}
                 className={
-                  group.name !== "Main" 
-                    ? "mt-6 border border-dashed border-grey/50 p-4 bg-white/5" 
-                    : index > 0 ? "mt-6" : ""
+                  group.name !== "Main"
+                    ? "mt-6 border border-dashed border-grey/50 p-4 bg-white/5"
+                    : index > 0
+                      ? "mt-6"
+                      : ""
                 }
               >
                 {group.name !== "Main" && (

@@ -39,7 +39,7 @@ import DurationInput from "./DurationInput";
 import SortableGroup from "./SortableGroup";
 import SortableIngredient from "./SortableIngredient";
 
-const generateId = () => Math.random().toString(36).substring(2, 9);
+const generateId = () => crypto.randomUUID();
 
 const RecipeForm = ({
   initialData,
@@ -95,7 +95,7 @@ const RecipeForm = ({
     }
 
     const filteredContainers = args.droppableContainers.filter(
-      (container) => container.data.current?.type === activeType
+      (container) => container.data.current?.type === activeType,
     );
 
     return closestCorners({
@@ -103,8 +103,6 @@ const RecipeForm = ({
       droppableContainers: filteredContainers,
     });
   };
-
-
 
   const { data: tags = [] } = useQuery({
     queryKey: ["tags"],
@@ -153,8 +151,12 @@ const RecipeForm = ({
       if (activeGroupIdx === overGroupIdx && active.id !== over.id) {
         setIngredientGroups((groups) => {
           const newGroups = [...groups];
-          const oldIndex = newGroups[activeGroupIdx].ingredients.findIndex((i) => i.uiId === active.id);
-          const newIndex = newGroups[activeGroupIdx].ingredients.findIndex((i) => i.uiId === over.id);
+          const oldIndex = newGroups[activeGroupIdx].ingredients.findIndex(
+            (i) => i.uiId === active.id,
+          );
+          const newIndex = newGroups[activeGroupIdx].ingredients.findIndex(
+            (i) => i.uiId === over.id,
+          );
 
           newGroups[activeGroupIdx] = {
             ...newGroups[activeGroupIdx],
