@@ -12,7 +12,7 @@ const ListView = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const hasHistory = location.key !== "default";
+  const hasHistory = location.key !== "default" && !location.state?.loginRedirect;
 
   const { data: userLists = [], isLoading: listsLoading } = useQuery({
     queryKey: ["userLists", user?.canteenId],
@@ -44,7 +44,7 @@ const ListView = () => {
           <p className="text-lightGrey font-mono">The requested list could not be found.</p>
           <Link
             to="/my-lists"
-            state={!hasHistory ? { hideBack: true } : null}
+            state={!hasHistory ? { loginRedirect: true } : null}
             className="text-accent font-bold hover:underline"
           >
             <span className={"font-icons icon"}>D</span> Back to My Lists
@@ -69,7 +69,7 @@ const ListView = () => {
           ) : (
             <Link
               to="/my-lists"
-              state={{ hideBack: true }}
+              state={{ loginRedirect: true }}
               className="text-white hover:text-accent text-3xl font-icons icon leading-none transition-colors focus:outline-none"
               aria-label="Go back to My Lists"
             >

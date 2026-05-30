@@ -189,7 +189,7 @@ describe("RecipeForm", () => {
           ingredients: [
             {
               uiId: "i1",
-              ingredient_id: "i1",
+              id: "i1",
               name: "Salt",
               quantity: "1",
               unit: "tsp",
@@ -229,7 +229,7 @@ describe("RecipeForm", () => {
           id: "g1",
           name: "Main",
           ingredients: [
-            { uiId: "i1", ingredient_id: "i1", name: "Salt", quantity: "", unit: "tsp", notes: "" },
+            { uiId: "i1", id: "i1", name: "Salt", quantity: "", unit: "tsp", notes: "" },
           ],
         },
       ],
@@ -262,7 +262,7 @@ describe("RecipeForm", () => {
               name: "Main",
               ingredients: [
                 expect.objectContaining({
-                  ingredient_id: "i1",
+                  id: "i1",
                   name: "Salt",
                   quantity: null,
                   unit: "tsp",
@@ -346,7 +346,7 @@ describe("RecipeForm", () => {
           ingredients: [
             {
               uiId: "i1",
-              ingredient_id: "ing1",
+              id: "ing1",
               name: "Apple",
               quantity: "1",
               unit: "whole",
@@ -354,7 +354,7 @@ describe("RecipeForm", () => {
             },
             {
               uiId: "i2",
-              ingredient_id: "ing2",
+              id: "ing2",
               name: "Banana",
               quantity: "2",
               unit: "whole",
@@ -395,8 +395,8 @@ describe("RecipeForm", () => {
           ingredient_groups: [
             expect.objectContaining({
               ingredients: [
-                expect.objectContaining({ ingredient_id: "ing2" }),
-                expect.objectContaining({ ingredient_id: "ing1" }),
+                expect.objectContaining({ id: "ing2" }),
+                expect.objectContaining({ id: "ing1" }),
               ],
             }),
           ],

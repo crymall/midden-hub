@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   closestCorners,
   DndContext,
@@ -47,9 +47,12 @@ const RecipeForm = ({
   isSubmitting,
   error,
   submitLabel = "Save Recipe",
+  onCancel,
 }) => {
+  const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const hasHistory = location.key !== "default" && !location.state?.loginRedirect;
 
   const [formData, setFormData] = useState(
     initialData?.formData || {
@@ -69,7 +72,7 @@ const RecipeForm = ({
         id: generateId(),
         name: "Main",
         ingredients: [
-          { uiId: generateId(), ingredient_id: null, name: "", quantity: "", unit: "", notes: "" },
+          { uiId: generateId(), id: null, name: "", quantity: "", unit: "", notes: "" },
         ],
       },
     ],
@@ -176,7 +179,7 @@ const RecipeForm = ({
         id: generateId(),
         name: `Group ${ingredientGroups.length + 1}`,
         ingredients: [
-          { uiId: generateId(), ingredient_id: null, name: "", quantity: "", unit: "", notes: "" },
+          { uiId: generateId(), id: null, name: "", quantity: "", unit: "", notes: "" },
         ],
       },
     ]);
@@ -202,7 +205,7 @@ const RecipeForm = ({
     const newGroups = [...ingredientGroups];
     newGroups[gIndex].ingredients.push({
       uiId: generateId(),
-      ingredient_id: null,
+      id: null,
       name: "",
       quantity: "",
       unit: "",
@@ -259,7 +262,7 @@ const RecipeForm = ({
         const newGroups = [...ingredientGroups];
         newGroups[gIndex].ingredients[iIndex] = {
           ...newGroups[gIndex].ingredients[iIndex],
-          ingredient_id: newIng.id,
+          id: newIng.id,
           name: newIng.name,
         };
         setIngredientGroups(newGroups);
@@ -310,7 +313,7 @@ const RecipeForm = ({
     const unresolvedIndices = [];
     activeGroups.forEach((group, gIdx) => {
       group.ingredients.forEach((ing, iIdx) => {
-        if (!ing.ingredient_id) {
+        if (!ing.id) {
           unresolvedIndices.push(`${gIdx}-${iIdx}`);
         }
       });
@@ -549,7 +552,15 @@ const RecipeForm = ({
         <div className="flex justify-end gap-4 pt-4">
           <Button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              if (onCancel) {
+                onCancel();
+              } else if (hasHistory) {
+                navigate(-1);
+              } else {
+                navigate("/recipes");
+              }
+            }}
             className="text-lightGrey px-4 py-2 font-bold transition-colors hover:text-white disabled:opacity-50"
           >
             Cancel

@@ -17,7 +17,7 @@ const MyLists = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const hasHistory = location.key !== "default" && !location.state?.hideBack;
+  const hasHistory = location.key !== "default" && !location.state?.loginRedirect;
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);

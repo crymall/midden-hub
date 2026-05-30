@@ -49,7 +49,7 @@ export const useAuth = () => {
     onSuccess: (user) => {
       queryClient.setQueryData(["currentUser"], user);
       const origin = location.state?.from?.pathname || "/";
-      navigate(origin);
+      navigate(origin, { state: { loginRedirect: true, ...location.state?.from?.state } });
     },
   });
 
