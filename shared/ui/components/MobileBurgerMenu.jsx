@@ -20,9 +20,10 @@ const MobileBurgerMenu = ({ navLinks }) => {
     <>
       <Button
         onClick={() => setMobileMenuOpen(true)}
-        className="hover:text-lightestGrey text-shadow-hard-grey font-mono text-2xl font-bold text-white transition-colors"
+        className="hover:text-lightestGrey text-shadow-hard-grey font-icons icon text-2xl font-bold text-white transition-colors"
+        aria-label="Navigation menu"
       >
-        ≡
+        {"["}
       </Button>
       <Dialog
         open={mobileMenuOpen}

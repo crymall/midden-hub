@@ -113,7 +113,7 @@ const Messages = () => {
                     <span className="group-hover:text-accent font-mono text-lg font-bold text-white transition-colors">
                       {thread.other_username}
                     </span>
-                    {isUnread && <span className="bg-accent h-2 w-2 rounded-full" />}
+                    {isUnread && <span className="bg-accent h-2 w-2" />}
                   </div>
                   <span className="text-grey text-xs">
                     {new Date(thread.created_at).toLocaleDateString()}

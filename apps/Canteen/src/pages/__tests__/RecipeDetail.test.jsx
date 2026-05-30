@@ -75,7 +75,14 @@ describe("RecipeDetail", () => {
     wait_time_minutes: 30,
     total_time_minutes: 60,
     servings: 4,
-    ingredients: [{ quantity: "1", unit: "cup", name: "Flour", notes: "sifted" }],
+    ingredient_groups: [
+      {
+        id: "g1",
+        name: "Main",
+        position: 0,
+        ingredients: [{ id: "ri1", quantity: "1", unit: "cup", name: "Flour", notes: "sifted" }],
+      },
+    ],
     instructions: "Mix and bake.",
     likes: [],
     tags: [{ id: "1", name: "TestTag" }],

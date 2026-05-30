@@ -1,6 +1,6 @@
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as canteenApi from "@shared/core/services/canteenApi";
@@ -23,6 +23,18 @@ vi.mock("react-router-dom", async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+  };
+});
+
+export let mockOnDragEnd = null;
+vi.mock("@dnd-kit/core", async () => {
+  const actual = await vi.importActual("@dnd-kit/core");
+  return {
+    ...actual,
+    DndContext: ({ children, onDragEnd }) => {
+      mockOnDragEnd = onDragEnd;
+      return <div data-testid="dnd-context">{children}</div>;
+    },
   };
 });
 
@@ -97,12 +109,12 @@ describe("RecipeForm", () => {
       </MemoryRouter>,
     );
 
-    const input = screen.getByPlaceholderText("Name");
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "New Ing" } });
+    const inputs = screen.getAllByPlaceholderText("Name");
+    fireEvent.focus(inputs[0]);
+    fireEvent.change(inputs[0], { target: { value: "New Ing" } });
 
     await screen.findByText('Create "New Ing"');
-    fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
+    fireEvent.keyDown(inputs[0], { key: "Enter", code: "Enter" });
 
     expect(screen.getByText("Create Ingredient")).toBeInTheDocument();
     expect(screen.getByText(/Are you sure you want to create the ingredient/)).toBeInTheDocument();
@@ -170,7 +182,22 @@ describe("RecipeForm", () => {
         servings: 2,
         instructions: "Do it",
       },
-      ingredients: [{ id: "i1", name: "Salt", quantity: "1", unit: "tsp", notes: "" }],
+      ingredientGroups: [
+        {
+          id: "g1",
+          name: "Main",
+          ingredients: [
+            {
+              uiId: "i1",
+              ingredient_id: "i1",
+              name: "Salt",
+              quantity: "1",
+              unit: "tsp",
+              notes: "",
+            },
+          ],
+        },
+      ],
       selectedTags: ["t1"],
     };
 
@@ -197,7 +224,15 @@ describe("RecipeForm", () => {
         description: "",
         instructions: "Bake",
       },
-      ingredients: [{ id: "i1", name: "Salt", quantity: "", unit: "tsp", notes: "" }],
+      ingredientGroups: [
+        {
+          id: "g1",
+          name: "Main",
+          ingredients: [
+            { uiId: "i1", ingredient_id: "i1", name: "Salt", quantity: "", unit: "tsp", notes: "" },
+          ],
+        },
+      ],
       selectedTags: [],
     };
 
@@ -221,7 +256,21 @@ describe("RecipeForm", () => {
           cook_time_minutes: null,
           wait_time_minutes: null,
           servings: 4,
-          ingredients: [{ id: "i1", name: "Salt", quantity: null, unit: "tsp", notes: "" }],
+          ingredient_groups: [
+            {
+              id: expect.any(String),
+              name: "Main",
+              ingredients: [
+                expect.objectContaining({
+                  ingredient_id: "i1",
+                  name: "Salt",
+                  quantity: null,
+                  unit: "tsp",
+                  notes: "",
+                }),
+              ],
+            },
+          ],
         }),
       );
     });
@@ -244,7 +293,7 @@ describe("RecipeForm", () => {
       target: { value: "Step 1" },
     });
 
-    const nameInput = screen.getByPlaceholderText("Name");
+    const nameInput = screen.getAllByPlaceholderText("Name")[0];
     fireEvent.change(nameInput, { target: { value: "New Fake Ingredient" } });
 
     const submitBtn = screen.getByText("Save Recipe with Unresolved");
@@ -278,4 +327,64 @@ describe("RecipeForm", () => {
     expect(servingsInput).toHaveClass("border-red-500");
     expect(instructionsInput).toHaveClass("border-red-500");
   });
+
+  it("reorders ingredients on drag end", async () => {
+    const initialData = {
+      formData: {
+        title: "Test Recipe",
+        prep_time_minutes: "",
+        cook_time_minutes: "",
+        wait_time_minutes: "",
+        servings: "2",
+        description: "",
+        instructions: "Mix",
+      },
+      ingredientGroups: [
+        {
+          id: "g1",
+          name: "Main",
+          ingredients: [
+            { uiId: "i1", ingredient_id: "ing1", name: "Apple", quantity: "1", unit: "whole", notes: "" },
+            { uiId: "i2", ingredient_id: "ing2", name: "Banana", quantity: "2", unit: "whole", notes: "" },
+          ],
+        },
+      ],
+      selectedTags: [],
+    };
+
+    renderComponent(
+      <MemoryRouter>
+        <RecipeForm initialData={initialData} onSubmit={mockOnSubmit} submitLabel="Save Reordered" />
+      </MemoryRouter>
+    );
+
+    // Call the mock drag end function to simulate dragging i2 above i1
+    if (mockOnDragEnd) {
+      act(() => {
+        mockOnDragEnd({
+          active: { id: "i2", data: { current: { type: "ingredient", groupIndex: 0, index: 1 } } },
+          over: { id: "i1", data: { current: { type: "ingredient", groupIndex: 0, index: 0 } } },
+        });
+      });
+    }
+
+    const submitBtn = screen.getByText("Save Reordered");
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ingredient_groups: [
+            expect.objectContaining({
+              ingredients: [
+                expect.objectContaining({ ingredient_id: "ing2" }),
+                expect.objectContaining({ ingredient_id: "ing1" }),
+              ],
+            }),
+          ],
+        })
+      );
+    });
+  });
+
 });

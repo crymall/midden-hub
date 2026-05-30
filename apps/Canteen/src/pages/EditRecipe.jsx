@@ -6,43 +6,89 @@ import {
   addRecipeIngredient,
   addRecipeTag,
   fetchRecipe,
+  removeRecipeGroup,
   removeRecipeIngredient,
   removeRecipeTag,
+  reorderRecipeGroups,
+  reorderRecipeIngredients,
   updateRecipe,
+  updateRecipeGroup,
 } from "@shared/core/services/canteenApi";
 
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import RecipeForm from "../components/RecipeForm";
 
-const addRemoveAndUpdateIngredients = async (id, originalIngredients, updatedIngredients) => {
-  for (const ingredient of originalIngredients) {
-    const match = updatedIngredients.find((ci) => String(ci.id) === String(ingredient.id));
-    if (
-      !match ||
-      String(match.quantity) !== String(ingredient.quantity) ||
-      String(match.unit) !== String(ingredient.unit) ||
-      String(match.notes) !== String(ingredient.notes)
-    ) {
-      await removeRecipeIngredient(id, ingredient.id);
+const syncIngredientGroups = async (id, originalGroups, updatedGroups) => {
+  let finalRecipeIngredientIds = [];
+
+  const updatedGroupIds = updatedGroups.map((g) => String(g.id));
+  for (const og of originalGroups) {
+    if (!updatedGroupIds.includes(String(og.id)) && og.name !== "Main") {
+      await removeRecipeGroup(id, og.id);
+    } else {
+      const ug = updatedGroups.find((g) => String(g.id) === String(og.id));
+      if (ug && ug.name !== og.name && og.name !== "Main") {
+        await updateRecipeGroup(id, og.id, ug.name);
+      }
     }
   }
 
-  for (const ingredient of updatedIngredients) {
-    const match = originalIngredients.find((oi) => String(oi.id) === String(ingredient.id));
+  const originalIngs = [];
+  originalGroups.forEach((g) => {
+    g.ingredients.forEach((i) => originalIngs.push({ ...i, groupName: g.name }));
+  });
+
+  const updatedIngs = [];
+  updatedGroups.forEach((g) => {
+    g.ingredients.forEach((i) => updatedIngs.push({ ...i, groupName: g.name }));
+  });
+
+  for (const oi of originalIngs) {
+    const match = updatedIngs.find((ui) => String(ui.recipe_ingredient_id) === String(oi.id));
     if (
       !match ||
-      String(match.quantity) !== String(ingredient.quantity) ||
-      String(match.unit) !== String(ingredient.unit) ||
-      String(match.notes) !== String(ingredient.notes)
+      match.groupName !== oi.groupName ||
+      String(match.quantity) !== String(oi.quantity) ||
+      String(match.unit) !== String(oi.unit) ||
+      String(match.notes) !== String(oi.notes)
     ) {
-      await addRecipeIngredient(id, {
-        ingredient_id: ingredient.id,
-        quantity: ingredient.quantity,
-        unit: ingredient.unit,
-        notes: ingredient.notes,
-      });
+      await removeRecipeIngredient(id, oi.ingredient_id, oi.groupName);
     }
   }
+
+  for (const ui of updatedIngs) {
+    const match = originalIngs.find((oi) => String(oi.id) === String(ui.recipe_ingredient_id));
+    if (
+      !match ||
+      ui.groupName !== match.groupName ||
+      String(match.quantity) !== String(ui.quantity) ||
+      String(match.unit) !== String(ui.unit) ||
+      String(match.notes) !== String(ui.notes)
+    ) {
+      const added = await addRecipeIngredient(id, {
+        ingredient_id: ui.ingredient_id,
+        quantity: ui.quantity,
+        unit: ui.unit,
+        notes: ui.notes,
+        group_name: ui.groupName,
+      });
+      ui.recipe_ingredient_id = added.id;
+    }
+    if (ui.recipe_ingredient_id) {
+      finalRecipeIngredientIds.push(ui.recipe_ingredient_id);
+    }
+  }
+
+  const currentRecipe = await fetchRecipe(id);
+
+  const orderedGroupIds = [];
+  for (const ug of updatedGroups) {
+    const cg = currentRecipe.ingredient_groups.find((g) => g.name === ug.name);
+    if (cg) orderedGroupIds.push(cg.id);
+  }
+  await reorderRecipeGroups(id, orderedGroupIds);
+
+  await reorderRecipeIngredients(id, finalRecipeIngredientIds);
 };
 
 const addAndRemoveRecipeTags = async (id, tagsToAdd, tagsToRemove) => {
@@ -85,10 +131,10 @@ const EditRecipe = () => {
 
       await addAndRemoveRecipeTags(id, tagsToAdd, tagsToRemove);
 
-      const originalIngredients = recipe.ingredients || [];
-      const updatedIngredients = updatedRecipe.ingredients;
+      const originalGroups = recipe.ingredient_groups || [];
+      const updatedGroups = updatedRecipe.ingredient_groups;
 
-      await addRemoveAndUpdateIngredients(id, originalIngredients, updatedIngredients);
+      await syncIngredientGroups(id, originalGroups, updatedGroups);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recipe", id] });
@@ -141,16 +187,37 @@ const EditRecipe = () => {
       servings: recipe.servings || "",
       instructions: recipe.instructions || "",
     },
-    ingredients:
-      recipe.ingredients?.length > 0
-        ? recipe.ingredients.map((i) => ({
-            id: i.id,
-            name: i.name || "",
-            quantity: i.quantity || "",
-            unit: i.unit || "",
-            notes: i.notes || "",
+    ingredientGroups:
+      recipe.ingredient_groups?.length > 0
+        ? recipe.ingredient_groups.map((g) => ({
+            id: g.id,
+            name: g.name,
+            ingredients: g.ingredients.map((i) => ({
+              uiId: Math.random().toString(36).substring(2, 9),
+              recipe_ingredient_id: i.id,
+              ingredient_id: i.ingredient_id,
+              name: i.name || "",
+              quantity: i.quantity || "",
+              unit: i.unit || "",
+              notes: i.notes || "",
+            })),
           }))
-        : [{ id: null, name: "", quantity: "", unit: "", notes: "" }],
+        : [
+            {
+              id: Math.random().toString(36).substring(2, 9),
+              name: "Main",
+              ingredients: [
+                {
+                  uiId: Math.random().toString(36).substring(2, 9),
+                  ingredient_id: null,
+                  name: "",
+                  quantity: "",
+                  unit: "",
+                  notes: "",
+                },
+              ],
+            },
+          ],
     selectedTags: recipe.tags?.map((t) => t.id) || [],
   };
 
