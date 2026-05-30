@@ -153,11 +153,11 @@ describe("MyLists", () => {
     expect(screen.queryByRole("button", { name: "Go back" })).not.toBeInTheDocument();
   });
 
-  it("does not render back button if navigated with hideBack state", async () => {
+  it("does not render back button if navigated with loginRedirect state", async () => {
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter
-          initialEntries={["/lists/1", { pathname: "/my-lists", state: { hideBack: true } }]}
+          initialEntries={["/lists/1", { pathname: "/my-lists", state: { loginRedirect: true } }]}
           initialIndex={1}
         >
           <MyLists />

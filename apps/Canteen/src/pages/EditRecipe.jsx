@@ -66,7 +66,7 @@ const syncIngredientGroups = async (id, originalGroups, updatedGroups) => {
       String(match.notes) !== String(ui.notes)
     ) {
       const added = await addRecipeIngredient(id, {
-        ingredient_id: ui.ingredient_id,
+        ingredient_id: ui.id,
         quantity: ui.quantity,
         unit: ui.unit,
         notes: ui.notes,
@@ -140,7 +140,7 @@ const EditRecipe = () => {
       queryClient.invalidateQueries({ queryKey: ["recipe", id] });
       queryClient.invalidateQueries({ queryKey: ["searchedRecipes"] });
 
-      if (location.state?.fromDetail) {
+      if (location.state?.fromDetail && !location.state?.loginRedirect) {
         navigate(-1);
       } else {
         navigate(`/recipes/${id}`, { replace: true });
@@ -195,7 +195,7 @@ const EditRecipe = () => {
             ingredients: g.ingredients.map((i) => ({
               uiId: crypto.randomUUID(),
               recipe_ingredient_id: i.id,
-              ingredient_id: i.ingredient_id,
+              id: i.ingredient_id,
               name: i.name || "",
               quantity: i.quantity || "",
               unit: i.unit || "",
@@ -209,7 +209,7 @@ const EditRecipe = () => {
               ingredients: [
                 {
                   uiId: crypto.randomUUID(),
-                  ingredient_id: null,
+                  id: null,
                   name: "",
                   quantity: "",
                   unit: "",
@@ -230,6 +230,13 @@ const EditRecipe = () => {
         isSubmitting={updateRecipeMutation.isPending}
         error={error}
         submitLabel="Save Changes"
+        onCancel={() => {
+          if (location.state?.fromDetail && !location.state?.loginRedirect) {
+            navigate(-1);
+          } else {
+            navigate(`/recipes/${id}`);
+          }
+        }}
       />
     </MiddenCard>
   );

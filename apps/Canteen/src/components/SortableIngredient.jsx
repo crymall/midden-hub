@@ -90,12 +90,12 @@ const SortableIngredient = ({
               if (typeof val === "object" && val?.action === "create") {
                 handleOpenIngredientModal(val.name, groupIndex, ingIndex);
               } else if (val) {
-                handleIngredientChange(groupIndex, ingIndex, "ingredient_id", val.id);
+                handleIngredientChange(groupIndex, ingIndex, "id", val.id);
                 handleIngredientChange(groupIndex, ingIndex, "name", val.name);
               }
             }}
             immediate
-            by={(a, b) => a?.ingredient_id === b?.ingredient_id}
+            by={(a, b) => a?.id === b?.id}
           >
             <ComboboxInput
               className={`${baseInputClass} w-full ${
@@ -106,7 +106,7 @@ const SortableIngredient = ({
               onChange={(e) => {
                 const val = e.target.value;
                 handleIngredientChange(groupIndex, ingIndex, "name", val);
-                handleIngredientChange(groupIndex, ingIndex, "ingredient_id", null);
+                handleIngredientChange(groupIndex, ingIndex, "id", null);
                 setIngredientSearchQuery(val);
               }}
               onFocus={() => setIngredientSearchQuery(ing.name)}

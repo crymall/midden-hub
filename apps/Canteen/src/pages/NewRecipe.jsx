@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { createRecipe } from "@shared/core/services/canteenApi";
@@ -9,6 +9,7 @@ import RecipeForm from "../components/RecipeForm";
 
 const NewRecipe = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [error, setError] = useState("");
 
@@ -39,6 +40,13 @@ const NewRecipe = () => {
         isSubmitting={createRecipeMutation.isPending}
         error={error}
         submitLabel="Create Recipe"
+        onCancel={() => {
+          if (location.key !== "default" && !location.state?.loginRedirect) {
+            navigate(-1);
+          } else {
+            navigate("/recipes");
+          }
+        }}
       />
     </MiddenCard>
   );

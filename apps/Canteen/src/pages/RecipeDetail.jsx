@@ -25,7 +25,7 @@ const RecipeDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const hasHistory = location.key !== "default";
+  const hasHistory = location.key !== "default" && !location.state?.loginRedirect;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const {
