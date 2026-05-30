@@ -1,6 +1,6 @@
-import { useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Button, Input } from "@headlessui/react";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Button, Input } from "@headlessui/react";
 
 const SortableGroup = ({
   group,
@@ -25,11 +25,7 @@ const SortableGroup = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="mb-4 bg-white/5 p-4 border border-grey/30"
-    >
+    <div ref={setNodeRef} style={style} className="mb-4 bg-white/5 p-4 border border-grey/30">
       <div className="flex items-center justify-between mb-4 gap-2">
         <div className="flex items-center gap-2 pr-8 md:pr-0">
           <div

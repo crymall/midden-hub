@@ -344,8 +344,22 @@ describe("RecipeForm", () => {
           id: "g1",
           name: "Main",
           ingredients: [
-            { uiId: "i1", ingredient_id: "ing1", name: "Apple", quantity: "1", unit: "whole", notes: "" },
-            { uiId: "i2", ingredient_id: "ing2", name: "Banana", quantity: "2", unit: "whole", notes: "" },
+            {
+              uiId: "i1",
+              ingredient_id: "ing1",
+              name: "Apple",
+              quantity: "1",
+              unit: "whole",
+              notes: "",
+            },
+            {
+              uiId: "i2",
+              ingredient_id: "ing2",
+              name: "Banana",
+              quantity: "2",
+              unit: "whole",
+              notes: "",
+            },
           ],
         },
       ],
@@ -354,8 +368,12 @@ describe("RecipeForm", () => {
 
     renderComponent(
       <MemoryRouter>
-        <RecipeForm initialData={initialData} onSubmit={mockOnSubmit} submitLabel="Save Reordered" />
-      </MemoryRouter>
+        <RecipeForm
+          initialData={initialData}
+          onSubmit={mockOnSubmit}
+          submitLabel="Save Reordered"
+        />
+      </MemoryRouter>,
     );
 
     // Call the mock drag end function to simulate dragging i2 above i1
@@ -382,9 +400,8 @@ describe("RecipeForm", () => {
               ],
             }),
           ],
-        })
+        }),
       );
     });
   });
-
 });

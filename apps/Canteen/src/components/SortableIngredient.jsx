@@ -1,6 +1,13 @@
-import { Button, Input, Combobox, ComboboxOptions, ComboboxOption, ComboboxInput } from "@headlessui/react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import {
+  Button,
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+  Input,
+} from "@headlessui/react";
 
 const SortableIngredient = ({
   ing,
@@ -12,7 +19,6 @@ const SortableIngredient = ({
   searchResults,
   setIngredientSearchQuery,
   handleOpenIngredientModal,
-  ingredientsLength,
   baseInputClass,
 }) => {
   const isUnresolved = unresolvedIngredients.includes(`${groupIndex}-${ingIndex}`);
@@ -92,8 +98,9 @@ const SortableIngredient = ({
             by={(a, b) => a?.ingredient_id === b?.ingredient_id}
           >
             <ComboboxInput
-              className={`${baseInputClass} w-full ${isUnresolved ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500" : ""
-                }`}
+              className={`${baseInputClass} w-full ${
+                isUnresolved ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500" : ""
+              }`}
               placeholder="Name"
               displayValue={(item) => item?.name || ""}
               onChange={(e) => {
@@ -109,29 +116,29 @@ const SortableIngredient = ({
                 !searchResults.some(
                   (r) => r.name.toLowerCase() === (ing.name || "").toLowerCase(),
                 ))) && (
-                <ComboboxOptions className="bg-dark border-grey absolute z-50 mt-1 max-h-60 w-full overflow-auto border p-1 shadow-xl">
-                  {searchResults.map((suggestion) => (
+              <ComboboxOptions className="bg-dark border-grey absolute z-50 mt-1 max-h-60 w-full overflow-auto border p-1 shadow-xl">
+                {searchResults.map((suggestion) => (
+                  <ComboboxOption
+                    key={suggestion.id}
+                    value={suggestion}
+                    className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 select-none data-focus:text-white"
+                  >
+                    {suggestion.name}
+                  </ComboboxOption>
+                ))}
+                {(ing.name || "").trim() !== "" &&
+                  !searchResults.some(
+                    (r) => r.name.toLowerCase() === (ing.name || "").toLowerCase(),
+                  ) && (
                     <ComboboxOption
-                      key={suggestion.id}
-                      value={suggestion}
-                      className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 select-none data-focus:text-white"
+                      value={{ action: "create", name: ing.name }}
+                      className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-focus:text-white"
                     >
-                      {suggestion.name}
+                      {`Create "${ing.name}"`}
                     </ComboboxOption>
-                  ))}
-                  {(ing.name || "").trim() !== "" &&
-                    !searchResults.some(
-                      (r) => r.name.toLowerCase() === (ing.name || "").toLowerCase(),
-                    ) && (
-                      <ComboboxOption
-                        value={{ action: "create", name: ing.name }}
-                        className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-focus:text-white"
-                      >
-                        {`Create "${ing.name}"`}
-                      </ComboboxOption>
-                    )}
-                </ComboboxOptions>
-              )}
+                  )}
+              </ComboboxOptions>
+            )}
           </Combobox>
         </div>
         <Input

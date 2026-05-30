@@ -193,7 +193,7 @@ const EditRecipe = () => {
             id: g.id,
             name: g.name,
             ingredients: g.ingredients.map((i) => ({
-              uiId: Math.random().toString(36).substring(2, 9),
+              uiId: crypto.randomUUID(),
               recipe_ingredient_id: i.id,
               ingredient_id: i.ingredient_id,
               name: i.name || "",
@@ -204,11 +204,11 @@ const EditRecipe = () => {
           }))
         : [
             {
-              id: Math.random().toString(36).substring(2, 9),
+              id: crypto.randomUUID(),
               name: "Main",
               ingredients: [
                 {
-                  uiId: Math.random().toString(36).substring(2, 9),
+                  uiId: crypto.randomUUID(),
                   ingredient_id: null,
                   name: "",
                   quantity: "",
