@@ -31,7 +31,7 @@ describe("MobileBurgerMenu Component", () => {
         <MobileBurgerMenu {...defaultProps} />
       </MemoryRouter>,
     );
-    expect(screen.getByText("≡")).toBeInTheDocument();
+    expect(screen.getByText("[")).toBeInTheDocument();
     expect(screen.queryByText("X")).not.toBeInTheDocument();
   });
 
@@ -43,7 +43,7 @@ describe("MobileBurgerMenu Component", () => {
       </MemoryRouter>,
     );
 
-    await user.click(screen.getByText("≡"));
+    await user.click(screen.getByText("["));
     expect(await screen.findByText("X")).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe("MobileBurgerMenu Component", () => {
       </MemoryRouter>,
     );
 
-    await user.click(screen.getByText("≡"));
+    await user.click(screen.getByText("["));
     const closeBtn = await screen.findByText("X");
     await user.click(closeBtn);
 
@@ -73,7 +73,7 @@ describe("MobileBurgerMenu Component", () => {
       </MemoryRouter>,
     );
 
-    await user.click(screen.getByText("≡"));
+    await user.click(screen.getByText("["));
     expect(await screen.findByText("Test Link")).toBeInTheDocument();
   });
 
@@ -92,7 +92,7 @@ describe("MobileBurgerMenu Component", () => {
       </MemoryRouter>,
     );
 
-    await user.click(screen.getByText("≡"));
+    await user.click(screen.getByText("["));
     expect(await screen.findByText("Restricted Link")).toBeInTheDocument();
   });
 
@@ -111,7 +111,7 @@ describe("MobileBurgerMenu Component", () => {
       </MemoryRouter>,
     );
 
-    await user.click(screen.getByText("≡"));
+    await user.click(screen.getByText("["));
     expect(await screen.findByText("X")).toBeInTheDocument();
     expect(screen.queryByText("Restricted Link")).not.toBeInTheDocument();
   });
@@ -125,7 +125,7 @@ describe("MobileBurgerMenu Component", () => {
       </MemoryRouter>,
     );
 
-    await user.click(screen.getByText("≡"));
+    await user.click(screen.getByText("["));
     expect(await screen.findByText("X")).toBeInTheDocument();
 
     await user.click(screen.getByText("Go There"));

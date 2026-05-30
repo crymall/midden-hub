@@ -73,8 +73,34 @@ export const removeRecipeTag = async (recipeId, tagId) => {
   return response.data;
 };
 
-export const removeRecipeIngredient = async (recipeId, ingredientId) => {
-  const response = await canteenApi.delete(`/recipes/${recipeId}/ingredients/${ingredientId}`);
+export const removeRecipeIngredient = async (recipeId, ingredientId, groupName = "Main") => {
+  const response = await canteenApi.delete(`/recipes/${recipeId}/ingredients/${ingredientId}`, {
+    params: { group: groupName },
+  });
+  return response.data;
+};
+
+export const removeRecipeGroup = async (recipeId, groupId) => {
+  const response = await canteenApi.delete(`/recipes/${recipeId}/groups/${groupId}`);
+  return response.data;
+};
+
+export const updateRecipeGroup = async (recipeId, groupId, name) => {
+  const response = await canteenApi.put(`/recipes/${recipeId}/groups/${groupId}`, { name });
+  return response.data;
+};
+
+export const reorderRecipeGroups = async (recipeId, orderedGroupIds) => {
+  const response = await canteenApi.put(`/recipes/${recipeId}/groups/reorder`, {
+    ordered_group_ids: orderedGroupIds,
+  });
+  return response.data;
+};
+
+export const reorderRecipeIngredients = async (recipeId, orderedIngredientIds) => {
+  const response = await canteenApi.put(`/recipes/${recipeId}/ingredients/reorder`, {
+    ordered_ingredient_ids: orderedIngredientIds,
+  });
   return response.data;
 };
 

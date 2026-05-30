@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  closestCorners,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import {
   Button,
   Checkbox,
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
   Field,
   Input,
   Label,
@@ -26,6 +36,10 @@ import {
 
 import MiddenModal from "@shared/ui/components/MiddenModal";
 import DurationInput from "./DurationInput";
+import SortableGroup from "./SortableGroup";
+import SortableIngredient from "./SortableIngredient";
+
+const generateId = () => Math.random().toString(36).substring(2, 9);
 
 const RecipeForm = ({
   initialData,
@@ -49,8 +63,16 @@ const RecipeForm = ({
     },
   );
 
-  const [ingredients, setIngredients] = useState(
-    initialData?.ingredients || [{ id: null, name: "", quantity: "", unit: "", notes: "" }],
+  const [ingredientGroups, setIngredientGroups] = useState(
+    initialData?.ingredientGroups || [
+      {
+        id: generateId(),
+        name: "Main",
+        ingredients: [
+          { uiId: generateId(), ingredient_id: null, name: "", quantity: "", unit: "", notes: "" },
+        ],
+      },
+    ],
   );
 
   const [selectedTags, setSelectedTags] = useState(initialData?.selectedTags || []);
@@ -59,11 +81,30 @@ const RecipeForm = ({
   const [newTagName, setNewTagName] = useState("");
   const [isIngredientModalOpen, setIsIngredientModalOpen] = useState(false);
   const [pendingIngredientName, setPendingIngredientName] = useState("");
-  const [pendingIngredientIndex, setPendingIngredientIndex] = useState(null);
+  const [pendingIngredientIndex, setPendingIngredientIndex] = useState(null); // { gIndex, iIndex }
   const [validationError, setValidationError] = useState("");
   const [unresolvedIngredients, setUnresolvedIngredients] = useState([]);
   const [invalidFields, setInvalidFields] = useState([]);
   const [ingredientSearchQuery, setIngredientSearchQuery] = useState("");
+
+  const customCollisionDetection = (args) => {
+    const activeType = args.active.data.current?.type;
+
+    if (!activeType) {
+      return closestCorners(args);
+    }
+
+    const filteredContainers = args.droppableContainers.filter(
+      (container) => container.data.current?.type === activeType
+    );
+
+    return closestCorners({
+      ...args,
+      droppableContainers: filteredContainers,
+    });
+  };
+
+
 
   const { data: tags = [] } = useQuery({
     queryKey: ["tags"],
@@ -75,6 +116,13 @@ const RecipeForm = ({
     queryFn: () => fetchIngredients(50, 0, ingredientSearchQuery),
   });
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     if (type === "number" && value < 0) {
@@ -83,21 +131,88 @@ const RecipeForm = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleIngredientChange = (index, field, value) => {
-    const newIngredients = [...ingredients];
-    newIngredients[index][field] = value;
-    setIngredients(newIngredients);
-  };
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) return;
 
-  const addIngredient = () => {
-    setIngredients([...ingredients, { id: null, name: "", quantity: "", unit: "", notes: "" }]);
-  };
+    const activeType = active.data.current?.type;
+    const overType = over.data.current?.type;
 
-  const removeIngredient = (index) => {
-    if (ingredients.length > 1) {
-      const newIngredients = ingredients.filter((_, i) => i !== index);
-      setIngredients(newIngredients);
+    if (activeType === "group" && overType === "group") {
+      if (active.id !== over.id) {
+        setIngredientGroups((groups) => {
+          const oldIndex = groups.findIndex((g) => g.id === active.id);
+          const newIndex = groups.findIndex((g) => g.id === over.id);
+          return arrayMove(groups, oldIndex, newIndex);
+        });
+      }
+    } else if (activeType === "ingredient" && overType === "ingredient") {
+      const activeGroupIdx = active.data.current.groupIndex;
+      const overGroupIdx = over.data.current.groupIndex;
+
+      if (activeGroupIdx === overGroupIdx && active.id !== over.id) {
+        setIngredientGroups((groups) => {
+          const newGroups = [...groups];
+          const oldIndex = newGroups[activeGroupIdx].ingredients.findIndex((i) => i.uiId === active.id);
+          const newIndex = newGroups[activeGroupIdx].ingredients.findIndex((i) => i.uiId === over.id);
+
+          newGroups[activeGroupIdx] = {
+            ...newGroups[activeGroupIdx],
+            ingredients: arrayMove(newGroups[activeGroupIdx].ingredients, oldIndex, newIndex),
+          };
+
+          return newGroups;
+        });
+      }
     }
+  };
+
+  const addGroup = () => {
+    setIngredientGroups([
+      ...ingredientGroups,
+      {
+        id: generateId(),
+        name: `Group ${ingredientGroups.length + 1}`,
+        ingredients: [
+          { uiId: generateId(), ingredient_id: null, name: "", quantity: "", unit: "", notes: "" },
+        ],
+      },
+    ]);
+  };
+
+  const removeGroup = (index) => {
+    setIngredientGroups(ingredientGroups.filter((_, i) => i !== index));
+  };
+
+  const handleGroupNameChange = (index, val) => {
+    const newGroups = [...ingredientGroups];
+    newGroups[index].name = val;
+    setIngredientGroups(newGroups);
+  };
+
+  const handleIngredientChange = (gIndex, iIndex, field, value) => {
+    const newGroups = [...ingredientGroups];
+    newGroups[gIndex].ingredients[iIndex][field] = value;
+    setIngredientGroups(newGroups);
+  };
+
+  const addIngredient = (gIndex) => {
+    const newGroups = [...ingredientGroups];
+    newGroups[gIndex].ingredients.push({
+      uiId: generateId(),
+      ingredient_id: null,
+      name: "",
+      quantity: "",
+      unit: "",
+      notes: "",
+    });
+    setIngredientGroups(newGroups);
+  };
+
+  const removeIngredient = (gIndex, iIndex) => {
+    const newGroups = [...ingredientGroups];
+    newGroups[gIndex].ingredients = newGroups[gIndex].ingredients.filter((_, i) => i !== iIndex);
+    setIngredientGroups(newGroups);
   };
 
   const toggleTag = (tagId) => {
@@ -127,9 +242,9 @@ const RecipeForm = ({
     createTagMutation.mutate(newTagName);
   };
 
-  const handleOpenIngredientModal = (name, index) => {
+  const handleOpenIngredientModal = (name, gIndex, iIndex) => {
     setPendingIngredientName(name);
-    setPendingIngredientIndex(index);
+    setPendingIngredientIndex({ gIndex, iIndex });
     setIsIngredientModalOpen(true);
   };
 
@@ -138,13 +253,14 @@ const RecipeForm = ({
     onSuccess: (newIng) => {
       queryClient.invalidateQueries({ queryKey: ["ingredients"] });
       if (pendingIngredientIndex !== null) {
-        const newIngredients = [...ingredients];
-        newIngredients[pendingIngredientIndex] = {
-          ...newIngredients[pendingIngredientIndex],
-          id: newIng.id,
+        const { gIndex, iIndex } = pendingIngredientIndex;
+        const newGroups = [...ingredientGroups];
+        newGroups[gIndex].ingredients[iIndex] = {
+          ...newGroups[gIndex].ingredients[iIndex],
+          ingredient_id: newIng.id,
           name: newIng.name,
         };
-        setIngredients(newIngredients);
+        setIngredientGroups(newGroups);
       }
       setIsIngredientModalOpen(false);
       setPendingIngredientName("");
@@ -182,13 +298,20 @@ const RecipeForm = ({
       return;
     }
 
-    const activeIngredients = ingredients.filter((i) => i.name.trim() !== "");
+    const activeGroups = ingredientGroups
+      .map((group) => ({
+        ...group,
+        ingredients: group.ingredients.filter((i) => i.name.trim() !== ""),
+      }))
+      .filter((group) => group.ingredients.length > 0 || group.name === "Main");
 
     const unresolvedIndices = [];
-    activeIngredients.forEach((ing) => {
-      if (!ing.id) {
-        unresolvedIndices.push(ingredients.indexOf(ing));
-      }
+    activeGroups.forEach((group, gIdx) => {
+      group.ingredients.forEach((ing, iIdx) => {
+        if (!ing.ingredient_id) {
+          unresolvedIndices.push(`${gIdx}-${iIdx}`);
+        }
+      });
     });
 
     if (unresolvedIndices.length > 0) {
@@ -205,9 +328,13 @@ const RecipeForm = ({
       cook_time_minutes: sanitizeNumber(formData.cook_time_minutes),
       wait_time_minutes: sanitizeNumber(formData.wait_time_minutes),
       servings: sanitizeNumber(formData.servings),
-      ingredients: activeIngredients.map((i) => ({
-        ...i,
-        quantity: sanitizeNumber(i.quantity),
+      ingredient_groups: activeGroups.map((g) => ({
+        id: g.id,
+        name: g.name,
+        ingredients: g.ingredients.map((i) => ({
+          ...i,
+          quantity: sanitizeNumber(i.quantity),
+        })),
       })),
       tags: selectedTags,
     };
@@ -229,7 +356,8 @@ const RecipeForm = ({
         type={type}
         value={formData[name]}
         onChange={handleChange}
-        className={`${baseInputClass} w-full ${invalidFields.includes(name) ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500" : ""}`}
+        disabled={props.disabled}
+        className={`${baseInputClass} w-full ${invalidFields.includes(name) ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500" : ""} disabled:opacity-50`}
         {...props}
       />
     </Field>
@@ -253,7 +381,7 @@ const RecipeForm = ({
         value={formData[name]}
         onChange={handleChange}
         rows={rows}
-        className={`${baseInputClass} w-full ${invalidFields.includes(name) ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500" : ""}`}
+        className={`${baseInputClass} w-full ${invalidFields.includes(name) ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500" : ""} disabled:opacity-50`}
         placeholder={placeholder}
       />
     </Field>
@@ -308,7 +436,7 @@ const RecipeForm = ({
             <Popover className="relative">
               <PopoverButton
                 id="tags-popover-button"
-                className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey flex w-full items-center justify-between border p-2 text-left focus:outline-none"
+                className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey flex w-full items-center justify-between border p-2 text-left focus:outline-none disabled:opacity-50"
               >
                 <span className="truncate">
                   {selectedTags.length === 0
@@ -362,128 +490,56 @@ const RecipeForm = ({
         <div>
           <div className="mb-2 flex items-center justify-between">
             <span className="text-lightestGrey block text-sm font-bold">Ingredients</span>
-            <Button
-              type="button"
-              onClick={addIngredient}
-              className="text-accent text-sm font-bold hover:text-white"
-            >
-              + Add Ingredient
-            </Button>
-          </div>
-          <div className="flex flex-col md:gap-2">
-            {ingredients.map((ing, index) => (
-              <div
-                key={index}
-                className="border-grey/30 flex items-stretch gap-2 border-b py-4 last:border-0 md:border-0 md:py-0"
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                onClick={addGroup}
+                className="text-accent text-sm font-bold hover:text-white"
               >
-                <div className="flex flex-1 flex-wrap gap-2 md:flex-nowrap">
-                  <Input
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="Qty"
-                    value={ing.quantity}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val < 0) return;
-                      handleIngredientChange(index, "quantity", val === "0" ? "" : val);
-                    }}
-                    className={`${baseInputClass} w-20 flex-none`}
-                  />
-                  <Input
-                    placeholder="Unit"
-                    value={ing.unit}
-                    onChange={(e) => handleIngredientChange(index, "unit", e.target.value)}
-                    className={`${baseInputClass} w-24 flex-none`}
-                  />
-                  <div className="relative min-w-25 flex-1">
-                    <Combobox
-                      value={ing}
-                      onChange={async (val) => {
-                        if (typeof val === "object" && val?.action === "create") {
-                          handleOpenIngredientModal(val.name, index);
-                        } else if (val) {
-                          const newIngredients = [...ingredients];
-                          newIngredients[index] = {
-                            ...newIngredients[index],
-                            id: val.id,
-                            name: val.name,
-                          };
-                          setIngredients(newIngredients);
-                        }
-                      }}
-                      immediate
-                      by={(a, b) => a?.id === b?.id}
-                    >
-                      <ComboboxInput
-                        className={`${baseInputClass} w-full ${
-                          unresolvedIngredients.includes(index)
-                            ? "border-red-500 bg-red-900/20 text-red-200 focus:border-red-500"
-                            : ""
-                        }`}
-                        placeholder="Name"
-                        displayValue={(item) => item?.name || ""}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          const newIngredients = [...ingredients];
-                          newIngredients[index] = {
-                            ...newIngredients[index],
-                            name: val,
-                            id: null,
-                          };
-                          setIngredients(newIngredients);
-                          setIngredientSearchQuery(val);
-                        }}
-                        onFocus={() => setIngredientSearchQuery(ing.name)}
-                      />
-                      {(searchResults.length > 0 ||
-                        ((ing.name || "").trim() !== "" &&
-                          !searchResults.some(
-                            (r) => r.name.toLowerCase() === (ing.name || "").toLowerCase(),
-                          ))) && (
-                        <ComboboxOptions className="bg-dark border-grey absolute z-50 mt-1 max-h-60 w-full overflow-auto border p-1 shadow-xl">
-                          {searchResults.map((suggestion) => (
-                            <ComboboxOption
-                              key={suggestion.id}
-                              value={suggestion}
-                              className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 select-none data-focus:text-white"
-                            >
-                              {suggestion.name}
-                            </ComboboxOption>
-                          ))}
-                          {(ing.name || "").trim() !== "" &&
-                            !searchResults.some(
-                              (r) => r.name.toLowerCase() === (ing.name || "").toLowerCase(),
-                            ) && (
-                              <ComboboxOption
-                                value={{ action: "create", name: ing.name }}
-                                className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-focus:text-white"
-                              >
-                                {`Create "${ing.name}"`}
-                              </ComboboxOption>
-                            )}
-                        </ComboboxOptions>
-                      )}
-                    </Combobox>
-                  </div>
-                  <Input
-                    placeholder="Notes"
-                    value={ing.notes}
-                    onChange={(e) => handleIngredientChange(index, "notes", e.target.value)}
-                    className={`${baseInputClass} w-full flex-none md:w-1/2`}
-                  />
-                </div>
-                <Button
-                  type="button"
-                  onClick={() => removeIngredient(index)}
-                  className="flex items-center justify-center px-2 font-bold text-red-400 hover:text-red-200"
-                  disabled={ingredients.length === 1}
-                >
-                  ✕
-                </Button>
-              </div>
-            ))}
+                + Add Group
+              </Button>
+            </div>
           </div>
+          <DndContext
+            id="recipe-groups-context"
+            sensors={sensors}
+            collisionDetection={customCollisionDetection}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              id="groups-context"
+              items={ingredientGroups.map((g) => g.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {ingredientGroups.map((group, groupIndex) => (
+                <SortableGroup
+                  key={group.id}
+                  group={group}
+                  groupIndex={groupIndex}
+                  handleGroupNameChange={handleGroupNameChange}
+                  removeGroup={removeGroup}
+                  addIngredient={addIngredient}
+                >
+                  {group.ingredients.map((ing, ingIndex) => (
+                    <SortableIngredient
+                      key={ing.uiId}
+                      ing={ing}
+                      ingIndex={ingIndex}
+                      groupIndex={groupIndex}
+                      unresolvedIngredients={unresolvedIngredients}
+                      handleIngredientChange={handleIngredientChange}
+                      removeIngredient={removeIngredient}
+                      searchResults={searchResults}
+                      setIngredientSearchQuery={setIngredientSearchQuery}
+                      handleOpenIngredientModal={handleOpenIngredientModal}
+                      ingredientsLength={group.ingredients.length}
+                      baseInputClass={baseInputClass}
+                    />
+                  ))}
+                </SortableGroup>
+              ))}
+            </SortableContext>
+          </DndContext>
         </div>
 
         {renderTextarea("Instructions", "instructions", 10, "", "Step 1: ...", true)}
@@ -492,7 +548,7 @@ const RecipeForm = ({
           <Button
             type="button"
             onClick={() => navigate(-1)}
-            className="text-lightGrey px-4 py-2 font-bold transition-colors hover:text-white"
+            className="text-lightGrey px-4 py-2 font-bold transition-colors hover:text-white disabled:opacity-50"
           >
             Cancel
           </Button>

@@ -51,7 +51,24 @@ describe("EditRecipe", () => {
     servings: 4,
     instructions: "Mix and match",
     tags: [{ id: "t1", name: "Vegan" }],
-    ingredients: [{ id: "i1", name: "Salt", quantity: "1", unit: "tsp", notes: "" }],
+    ingredient_groups: [
+      {
+        id: "g1",
+        name: "Main",
+        position: 0,
+        ingredients: [
+          {
+            id: "ri1",
+            ingredient_id: "i1",
+            name: "Salt",
+            quantity: "1",
+            unit: "tsp",
+            notes: "",
+            position: 0,
+          },
+        ],
+      },
+    ],
   };
 
   let queryClient;
@@ -69,6 +86,10 @@ describe("EditRecipe", () => {
     canteenApi.updateRecipe.mockResolvedValue({});
     canteenApi.fetchTags.mockResolvedValue([]);
     canteenApi.fetchIngredients.mockResolvedValue([]);
+    canteenApi.removeRecipeGroup.mockResolvedValue({});
+    canteenApi.updateRecipeGroup.mockResolvedValue({});
+    canteenApi.reorderRecipeGroups.mockResolvedValue({});
+    canteenApi.reorderRecipeIngredients.mockResolvedValue({});
   });
 
   const renderComponent = () =>

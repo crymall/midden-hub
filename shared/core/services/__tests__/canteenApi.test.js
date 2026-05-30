@@ -115,8 +115,34 @@ describe("canteenApi", () => {
     });
 
     it("removeRecipeIngredient calls delete", async () => {
-      await api.removeRecipeIngredient("123", "ing1");
-      expect(mockDelete).toHaveBeenCalledWith("/recipes/123/ingredients/ing1");
+      await api.removeRecipeIngredient("123", "ing1", "Side");
+      expect(mockDelete).toHaveBeenCalledWith("/recipes/123/ingredients/ing1", {
+        params: { group: "Side" },
+      });
+    });
+
+    it("removeRecipeGroup calls delete", async () => {
+      await api.removeRecipeGroup("123", "g1");
+      expect(mockDelete).toHaveBeenCalledWith("/recipes/123/groups/g1");
+    });
+
+    it("updateRecipeGroup calls put", async () => {
+      await api.updateRecipeGroup("123", "g1", "Garnish");
+      expect(mockPut).toHaveBeenCalledWith("/recipes/123/groups/g1", { name: "Garnish" });
+    });
+
+    it("reorderRecipeGroups calls put", async () => {
+      await api.reorderRecipeGroups("123", ["g2", "g1"]);
+      expect(mockPut).toHaveBeenCalledWith("/recipes/123/groups/reorder", {
+        ordered_group_ids: ["g2", "g1"],
+      });
+    });
+
+    it("reorderRecipeIngredients calls put", async () => {
+      await api.reorderRecipeIngredients("123", ["i2", "i1"]);
+      expect(mockPut).toHaveBeenCalledWith("/recipes/123/ingredients/reorder", {
+        ordered_ingredient_ids: ["i2", "i1"],
+      });
     });
   });
 

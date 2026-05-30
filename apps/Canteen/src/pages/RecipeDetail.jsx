@@ -221,7 +221,7 @@ const RecipeDetail = () => {
           </p>
         </div>
 
-        <div className="text-lightestGrey grid grid-cols-2 gap-4 rounded-lg bg-white/5 p-4 text-center font-mono md:grid-cols-4">
+        <div className="text-lightestGrey grid grid-cols-2 gap-4 bg-white/5 p-4 text-center font-mono md:grid-cols-4">
           <div>
             <span className="text-grey block text-xs tracking-wider uppercase">Prep Time</span>
             <span className="text-xl font-bold">{formatTime(currentRecipe.prep_time_minutes)}</span>
@@ -247,17 +247,35 @@ const RecipeDetail = () => {
             <h3 className="font-gothic border-grey mb-4 border-b pb-2 text-3xl text-white">
               Ingredients
             </h3>
-            <ul className="text-lightestGrey space-y-2 font-mono">
-              {currentRecipe.ingredients?.map((ing, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="text-accent">•</span>
-                  <span>
-                    {ing.quantity} {ing.unit} <strong>{ing.name}</strong>
-                    {ing.notes && <span className="text-grey text-sm italic"> ({ing.notes})</span>}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {currentRecipe.ingredient_groups?.map((group, index) => (
+              <div 
+                key={group.id} 
+                className={
+                  group.name !== "Main" 
+                    ? "mt-6 border border-dashed border-grey/50 p-4 bg-white/5" 
+                    : index > 0 ? "mt-6" : ""
+                }
+              >
+                {group.name !== "Main" && (
+                  <h4 className="text-white font-bold mb-2 font-mono uppercase tracking-wider text-sm">
+                    {group.name}
+                  </h4>
+                )}
+                <ul className="text-lightestGrey space-y-2 font-mono">
+                  {group.ingredients?.map((ing) => (
+                    <li key={ing.id} className="flex items-start gap-2">
+                      <span className="text-accent">•</span>
+                      <span>
+                        {ing.quantity} {ing.unit} <strong>{ing.name}</strong>
+                        {ing.notes && (
+                          <span className="text-grey text-sm italic"> ({ing.notes})</span>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
 
           <div className="md:col-span-2">
