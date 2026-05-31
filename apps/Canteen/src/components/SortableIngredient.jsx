@@ -23,7 +23,7 @@ const SortableIngredient = ({
 }) => {
   const isUnresolved = unresolvedIngredients.includes(`${groupIndex}-${ingIndex}`);
 
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: ing.uiId,
     data: {
       type: "ingredient",
@@ -36,7 +36,7 @@ const SortableIngredient = ({
     transform: CSS.Translate.toString(transform),
     transition,
     position: "relative",
-    zIndex: transform ? 50 : 1,
+    zIndex: isDragging ? 50 : "auto",
   };
 
   return (

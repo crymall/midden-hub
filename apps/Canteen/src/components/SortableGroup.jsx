@@ -10,7 +10,7 @@ const SortableGroup = ({
   addIngredient,
   children,
 }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.id,
     data: {
       type: "group",
@@ -21,7 +21,7 @@ const SortableGroup = ({
     transform: CSS.Translate.toString(transform),
     transition,
     position: "relative",
-    zIndex: transform ? 50 : 1,
+    zIndex: isDragging ? 50 : "auto",
   };
 
   return (
