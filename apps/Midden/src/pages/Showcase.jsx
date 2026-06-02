@@ -7,10 +7,10 @@ const Showcase = () => {
     <MiddenCard>
       <div className="space-y-12">
         <section className="pb-4">
-          <h2 className="mb-6 font-gothic text-4xl font-bold text-white md:text-6xl text-shadow-hard-grey">
+          <h2 className="mb-6 font-gothic text-4xl font-bold text-white md:text-5xl text-shadow-hard-grey">
             Professional Showcase
           </h2>
-          <p className="font-mono text-lg text-lightestGrey leading-relaxed">
+          <p className="font-mono md:text-lg text-lightestGrey leading-relaxed">
             I&apos;ve been a professional developer since 2017. Since then, I&apos;ve worked on
             projects big and small, from enterprise data migrations to accessible and responsive
             redesigns to small-scale apps built to help students learn the fundamentals of

@@ -4,8 +4,11 @@ const About = () => {
   return (
     <MiddenCard>
       <div className="space-y-8">
-        <section className="pb-8 mb-6 border-b-2 border-dashed border-white/10">
-          <h2 className="mb-1 font-gothic text-4xl font-bold text-white">Midden</h2>
+        <section className="pb-8 mb-6 border-b-2 md:text-lg border-dashed border-white/10">
+          <h2 className="mb-6 font-gothic text-4xl font-bold text-white md:text-5xl text-shadow-hard-grey">
+            About
+          </h2>
+          <h3 className="mb-4 text-xl md:text-2xl text-white">Midden</h3>
           <p className="mb-4 text-sm text-gray-400">(noun) /ˈmɪdən/</p>
 
           <p>
@@ -19,7 +22,7 @@ const About = () => {
           </p>
         </section>
 
-        <section className="space-y-4 leading-relaxed">
+        <section className="space-y-4 md:text-lg leading-relaxed">
           <p>
             In my life so far, one thing has become clear: If you intend to accomplish something,
             don&apos;t make a big deal out of it. Midden is my attempt to reframe my programming

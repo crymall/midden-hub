@@ -7,11 +7,11 @@ import AppGrid from "../components/AppGrid";
 const Explorer = () => {
   return (
     <MiddenCard>
-      <h2 className="font-gothic text-shadow-hard-grey mb-4 text-4xl leading-tight text-white md:text-7xl md:mb-6">
-        Check out my work.
+      <h2 className="font-gothic text-shadow-hard-grey mb-4 text-5xl leading-tight text-white md:text-7xl md:mb-6">
+        Welcome to my portfolio.
       </h2>
 
-      <p className="mb-4 font-mono text-lg text-lightestGrey md:text-xl">
+      <p className="mb-4 font-mono md:text-lg text-lightestGrey md:text-xl">
         My name is{" "}
         <a
           href="https://www.reedgaines.com"
@@ -25,7 +25,7 @@ const Explorer = () => {
         others to show my skills as a web developer.
       </p>
 
-      <p className="mb-12 font-mono text-lg text-lightestGrey md:text-xl">
+      <p className="mb-12 font-mono md:text-lg text-lightestGrey md:text-xl">
         If you&apos;d like to read about my professional development work, you can find a few choice
         projects{" "}
         <Link
