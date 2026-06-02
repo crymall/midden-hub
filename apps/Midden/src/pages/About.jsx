@@ -51,8 +51,9 @@ const About = () => {
               rel="noopener noreferrer"
               className="text-lightestGrey underline hover:text-white transition-colors"
             >
-              here.
+              here
             </a>
+            .
           </p>
 
           <p>
