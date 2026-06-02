@@ -8,8 +8,8 @@ const About = () => {
           <h2 className="mb-6 font-gothic text-4xl font-bold text-white md:text-5xl text-shadow-hard-grey">
             About
           </h2>
-          <h3 className="mb-4 text-xl md:text-2xl text-white">Midden</h3>
-          <p className="mb-4 text-sm text-gray-400">(noun) /ˈmɪdən/</p>
+          <h3 className="mb-1 text-xl md:text-2xl text-white">Midden</h3>
+          <p className="mb-2 text-sm text-gray-400">(noun) /ˈmɪdən/</p>
 
           <p>
             An accumulation, deposit, or soil derived from occupation debris, rubbish, or other
