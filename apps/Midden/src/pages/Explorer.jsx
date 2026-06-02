@@ -26,7 +26,8 @@ const Explorer = () => {
       </p>
 
       <p className="mb-12 font-mono text-lg text-lightestGrey md:text-xl">
-        If you&apos;d like to read about my professional development work, you can find it{" "}
+        If you&apos;d like to read about my professional development work, you can find a few choice
+        projects{" "}
         <Link
           to="/professional-showcase"
           className="text-white underline hover:text-accent transition-colors"
