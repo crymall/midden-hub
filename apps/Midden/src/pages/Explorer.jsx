@@ -12,7 +12,16 @@ const Explorer = () => {
       </h2>
 
       <p className="mb-4 font-mono text-lg text-lightestGrey md:text-xl">
-        Below is a collection of projects I&apos;ve been working on. Some of them are for fun,
+        My name is{" "}
+        <a
+          href="https://www.reedgaines.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-white underline hover:text-accent transition-colors"
+        >
+          Reed Gaines
+        </a>
+        . Below is a collection of projects I&apos;ve been working on. Some of them are for fun,
         others to show my skills as a web developer.
       </p>
 
