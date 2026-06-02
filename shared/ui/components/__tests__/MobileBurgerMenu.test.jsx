@@ -64,6 +64,34 @@ describe("MobileBurgerMenu Component", () => {
     });
   });
 
+  it("renders a Home link defaulting to /", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <MobileBurgerMenu {...defaultProps} />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByText("["));
+    const homeLink = await screen.findByText("Home");
+    expect(homeLink).toBeInTheDocument();
+    expect(homeLink).toHaveAttribute("href", "/");
+  });
+
+  it("renders a Home link using the provided titleLink", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <MobileBurgerMenu {...defaultProps} titleLink="/custom-home" />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByText("["));
+    const homeLink = await screen.findByText("Home");
+    expect(homeLink).toBeInTheDocument();
+    expect(homeLink).toHaveAttribute("href", "/custom-home");
+  });
+
   it("renders navigation links", async () => {
     const navLinks = [{ to: "/test", label: "Test Link", ariaLabel: "Test" }];
     const user = userEvent.setup();

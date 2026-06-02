@@ -68,7 +68,9 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
     <header className="bg-primary border-accent flex items-center justify-between border-b-4 border-dashed p-4">
       <div className="flex items-center gap-4">
         <div className="xl:hidden">
-          {processedNavLinks.length && <MobileBurgerMenu navLinks={processedNavLinks} />}
+          {processedNavLinks.length && (
+            <MobileBurgerMenu navLinks={processedNavLinks} titleLink={titleLink} />
+          )}
         </div>
 
         <h1

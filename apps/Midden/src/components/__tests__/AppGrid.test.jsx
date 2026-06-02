@@ -17,7 +17,8 @@ describe("AppGrid Component", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole("link", { name: "App 1" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "App 2" })).toBeInTheDocument();
+    expect(screen.getByText("App 1")).toBeInTheDocument();
+    expect(screen.getByText("App 2")).toBeInTheDocument();
+    expect(screen.getAllByRole("link").length).toBe(2);
   });
 });

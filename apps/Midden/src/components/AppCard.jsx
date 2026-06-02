@@ -1,100 +1,87 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 
 const AppCard = ({ to, symbol, label, description }) => {
-  const [alignRight, setAlignRight] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const cardRef = useRef(null);
 
-  const handleMouseEnter = () => {
-    if (cardRef.current) {
-      const rect = cardRef.current.getBoundingClientRect();
-      setAlignRight(rect.left > window.innerWidth / 2);
-    }
-  };
-
-  const isExternal = to.startsWith("http");
-
-  const wrapperClass = clsx(
-    "relative group text-white hover:text-lightestGrey transition-all",
-    "w-full flex flex-col bg-white/5 sm:bg-transparent",
-    "sm:aspect-square sm:flex-col sm:items-center sm:justify-center sm:hover:bg-opacity-90 sm:hover:z-50",
-    "sm:w-30 md:w-46",
-  );
-
-  const contentClass = clsx(
-    "flex flex-1 items-center p-4",
-    "sm:flex-col sm:justify-center sm:p-0 sm:w-full sm:h-full",
-  );
-
-  const symbolClass = clsx(
-    "text-3xl font-icons icon mr-6 text-shadow-hard-grey",
-    "sm:mr-0 sm:text-4xl sm:mb-2",
-    "md:text-5xl",
-  );
-
-  const labelClass = clsx(
-    "text-sm font-bold tracking-wide",
-    "md:text-base sm:font-normal sm:text-center sm:leading-tight",
-  );
-
-  const content = (
-    <div className={contentClass}>
-      <div className={symbolClass}>{symbol}</div>
-      <div className={labelClass}>{label}</div>
-    </div>
-  );
-
-  const desktopTooltip = description && (
-    <div
-      className={clsx(
-        "bg-lightGrey border-accent pointer-events-none absolute top-full z-50 hidden w-[170%] border-4 border-dashed p-4 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 sm:block md:-mt-4",
-        alignRight ? "right-0 translate-x-4" : "left-0 -translate-x-4",
-      )}
-    >
-      <p className="md:text-base text-dark text-left font-mono text-sm">{description}</p>
-    </div>
-  );
-
-  const mobileDescription = description && isExpanded && (
-    <div className="bg-black/20 p-4 text-sm text-lightestGrey border-t border-white/10 sm:hidden font-mono">
-      {description}
-    </div>
-  );
-
+  const isExternal = to?.startsWith("http");
   const LinkComponent = isExternal ? "a" : Link;
   const linkProps = isExternal
     ? { href: to, target: "_blank", rel: "noopener noreferrer" }
-    : { to };
+    : { to: to || "/" };
 
   return (
-    <div ref={cardRef} className={wrapperClass} onMouseEnter={handleMouseEnter}>
-      <div className="flex w-full">
-        <LinkComponent
-          {...linkProps}
-          className="grow hover:bg-white/10 sm:hover:bg-transparent transition-colors"
-          aria-label={label}
-        >
-          {content}
-        </LinkComponent>
+    <div className="group border-accent flex w-full flex-col border-2 border-dashed transition-colors hover:bg-primary/20 bg-white/5 md:bg-transparent">
+      <LinkComponent
+        {...linkProps}
+        className={clsx(
+          "w-full items-center justify-between p-4 md:p-6",
+          description ? "hidden md:flex" : "flex",
+        )}
+      >
+        <div className="flex items-center gap-6">
+          <span className="text-shadow-hard-grey font-icons text-3xl text-white md:text-5xl inline-block w-12 md:w-16 text-center shrink-0">
+            {symbol}
+          </span>
+          <div className="flex flex-col gap-1 md:gap-2 text-left">
+            <span className="text-xl font-bold tracking-wide text-white md:text-3xl">{label}</span>
+            {description && (
+              <span className="text-sm text-lightestGrey md:text-base group-hover:text-white transition-colors">
+                {description}
+              </span>
+            )}
+          </div>
+        </div>
 
-        {description && (
+        {label !== "Back" && (
+          <span className="text-accent group-hover:text-white font-icons icon text-2xl transition-colors md:text-4xl shrink-0 ml-4">
+            B
+          </span>
+        )}
+      </LinkComponent>
+
+      {description && (
+        <div className="md:hidden flex w-full items-stretch justify-between">
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              setIsExpanded(!isExpanded);
-            }}
-            className="flex items-center justify-center px-6 text-lightestGrey hover:text-white hover:bg-white/10 sm:hidden transition-colors"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex grow items-center gap-6 p-4 text-left"
+            aria-expanded={isExpanded}
             aria-label={isExpanded ? "Collapse description" : "Expand description"}
           >
-            <span className="text-xl font-icons icon">{isExpanded ? "A" : "C"}</span>
+            <span className="text-shadow-hard-grey font-icons text-3xl text-white inline-block w-12 text-center shrink-0">
+              {symbol}
+            </span>
+            <div className="flex flex-col gap-1 text-left">
+              <span className="text-xl font-bold tracking-wide text-white">{label}</span>
+            </div>
           </button>
-        )}
-      </div>
 
-      {mobileDescription}
-      {desktopTooltip}
+          <LinkComponent
+            {...linkProps}
+            className={clsx(
+              "flex shrink-0 items-center justify-center px-6 transition-colors border-l border-dashed border-white/10",
+              isExpanded ? "bg-white/10" : "hover:bg-white/10",
+            )}
+            aria-label={`Navigate to ${label}`}
+          >
+            <span
+              className={clsx(
+                "font-icons icon text-2xl transition-colors",
+                isExpanded ? "text-white" : "text-accent group-hover:text-white",
+              )}
+            >
+              B
+            </span>
+          </LinkComponent>
+        </div>
+      )}
+
+      {isExpanded && description && (
+        <div className="md:hidden border-t border-dashed border-white/10 p-4 font-mono text-sm text-lightestGrey bg-black/20">
+          {description}
+        </div>
+      )}
     </div>
   );
 };
