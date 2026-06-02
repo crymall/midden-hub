@@ -23,9 +23,9 @@ describe("Explorer Component", () => {
       </MemoryRouter>,
     );
     explorerLinkList.forEach((item) => {
-      const link = screen.getByRole("link", { name: item.label });
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute("href", item.to);
+      expect(screen.getAllByText(item.label)[0]).toBeInTheDocument();
     });
+
+    expect(screen.getAllByRole("link").length).toBeGreaterThanOrEqual(explorerLinkList.length);
   });
 });

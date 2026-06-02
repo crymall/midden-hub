@@ -4,7 +4,7 @@ import { Button, Dialog, DialogPanel } from "@headlessui/react";
 
 import Can from "../../core/gateways/Can";
 
-const MobileBurgerMenu = ({ navLinks }) => {
+const MobileBurgerMenu = ({ navLinks, titleLink = "/" }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -38,6 +38,13 @@ const MobileBurgerMenu = ({ navLinks }) => {
             X
           </button>
           <div className="flex flex-col items-center gap-8">
+            <Link
+              to={titleLink}
+              onClick={() => setMobileMenuOpen(false)}
+              className="font-gothic text-4xl text-white hover:text-lightestGrey transition-colors"
+            >
+              Home
+            </Link>
             {navLinks.map((link) =>
               link.requiredPermission ? (
                 <Can key={link.to} perform={link.requiredPermission}>

@@ -12,7 +12,10 @@ export const navMeta = {
   midden: {
     title: "Midden",
     titleLink: "/",
-    navLinks: [{ to: "/about", label: "About", ariaLabel: "about" }],
+    navLinks: [
+      { to: "/about", label: "About", ariaLabel: "about" },
+      { to: "/professional-showcase", label: "Showcase", ariaLabel: "showcase" },
+    ],
   },
   canteen: {
     title: "Canteen",
@@ -44,11 +47,14 @@ export const explorerLinkList = [
     label: "Canteen",
     symbol: "f",
     to: import.meta.env.VITE_CANTEEN_URL,
+    description:
+      "A full-featured app for storing and sharing recipes. Focusing on a minimal, yet high-performance, experience for home cooks.",
   },
   {
     label: "Experiments",
     symbol: "t",
     to: "/experiments",
+    description: "A collection of smaller miscellaneous projects.",
   },
 ];
 

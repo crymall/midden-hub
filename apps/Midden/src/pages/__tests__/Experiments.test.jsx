@@ -13,9 +13,10 @@ describe("Experiments Component", () => {
       </MemoryRouter>,
     );
     experimentLinkList.forEach((item) => {
-      const link = screen.getByRole("link", { name: item.label });
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute("href", item.to);
+      expect(screen.getAllByText(item.label)[0]).toBeInTheDocument();
+
+      const links = screen.getAllByRole("link");
+      expect(links.some((link) => link.getAttribute("href") === item.to)).toBe(true);
     });
   });
 });

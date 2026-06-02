@@ -9,8 +9,6 @@ describe("About Component", () => {
 
     expect(screen.getByRole("heading", { name: "Midden" })).toBeInTheDocument();
     expect(screen.getByText("(noun) /ˈmɪdən/")).toBeInTheDocument();
-    expect(screen.getByText("A dung heap.")).toBeInTheDocument();
-    expect(screen.getByText("A refuse heap usually near a dwelling.")).toBeInTheDocument();
     expect(
       screen.getByText(/An accumulation, deposit, or soil derived from occupation/i),
     ).toBeInTheDocument();
@@ -21,7 +19,7 @@ describe("About Component", () => {
     render(<About />);
 
     expect(screen.getByText(/In my life so far, one thing has become clear:/i)).toBeInTheDocument();
-    expect(screen.getByText(/The site is broken down into two main groups/i)).toBeInTheDocument();
+    expect(screen.getByText(/In other words: Midden is the hub/i)).toBeInTheDocument();
     expect(screen.getByText(/Please don't hesitate to/i)).toBeInTheDocument();
   });
 });
