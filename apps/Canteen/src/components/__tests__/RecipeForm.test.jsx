@@ -328,6 +328,63 @@ describe("RecipeForm", () => {
     expect(instructionsInput).toHaveClass("border-red-500");
   });
 
+  it("sanitizes fraction quantities to decimals", async () => {
+    const initialData = {
+      formData: {
+        title: "Fraction Recipe",
+        prep_time_minutes: "",
+        cook_time_minutes: "",
+        wait_time_minutes: "",
+        servings: "2",
+        description: "",
+        instructions: "Mix",
+      },
+      ingredientGroups: [
+        {
+          id: "g1",
+          name: "Main",
+          ingredients: [
+            { uiId: "i1", id: "i1", name: "Flour", quantity: "1 1/2", unit: "cup", notes: "" },
+            { uiId: "i2", id: "i2", name: "Sugar", quantity: "3/4", unit: "cup", notes: "" },
+            { uiId: "i3", id: "i3", name: "Salt", quantity: "1-1/2", unit: "tsp", notes: "" },
+            { uiId: "i4", id: "i4", name: "Water", quantity: " 1 / 3 ", unit: "cup", notes: "" },
+          ],
+        },
+      ],
+      selectedTags: [],
+    };
+
+    renderComponent(
+      <MemoryRouter>
+        <RecipeForm
+          initialData={initialData}
+          onSubmit={mockOnSubmit}
+          submitLabel="Save Fractions"
+        />
+      </MemoryRouter>,
+    );
+
+    const submitBtn = screen.getByText("Save Fractions");
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ingredient_groups: [
+            expect.objectContaining({
+              ingredients: [
+                expect.objectContaining({ name: "Flour", quantity: 1.5 }),
+                expect.objectContaining({ name: "Sugar", quantity: 0.75 }),
+                expect.objectContaining({ name: "Salt", quantity: 1.5 }),
+                expect.objectContaining({ name: "Water", quantity: 1 / 3 }),
+              ],
+            }),
+          ],
+        }),
+      );
+    });
+  });
+
   it("reorders ingredients on drag end", async () => {
     const initialData = {
       formData: {
