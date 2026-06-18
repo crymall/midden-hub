@@ -12,7 +12,7 @@ export const navMeta = {
   midden: {
     title: "Midden",
     titleLink: "/",
-    navLinks: [
+    navLinks: () => [
       { to: "/about", label: "About", ariaLabel: "about" },
       { to: "/professional-showcase", label: "Showcase", ariaLabel: "showcase" },
     ],
@@ -20,18 +20,22 @@ export const navMeta = {
   canteen: {
     title: "Canteen",
     titleLink: "/",
-    navLinks: [
+    navLinks: (user) => [
       {
         to: "/recipes",
         label: "Recipe Search",
         ariaLabel: "recipe-search",
       },
-      {
-        to: "/user/:userId",
-        label: "My Profile",
-        ariaLabel: "my-profile",
-        requiredPermission: PERMISSIONS.writeData,
-      },
+      ...(user
+        ? [
+            {
+              to: `/user/${user.canteenId}`,
+              label: "My Profile",
+              ariaLabel: "my-profile",
+              requiredPermission: PERMISSIONS.writeData,
+            },
+          ]
+        : []),
       {
         to: "/messages",
         label: "Messages",
