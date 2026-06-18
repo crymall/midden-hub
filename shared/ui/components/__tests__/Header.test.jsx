@@ -29,7 +29,7 @@ describe("Header Component", () => {
     logout: mockLogout,
     title: "Midden",
     titleLink: "/",
-    navLinks: [],
+    navLinks: () => [],
   };
 
   it("renders user information", () => {
@@ -80,7 +80,7 @@ describe("Header Component", () => {
   });
 
   it("renders navigation links when provided", () => {
-    const navLinks = [{ to: "/test", label: "Test Link", ariaLabel: "Test" }];
+    const navLinks = () => [{ to: "/test", label: "Test Link", ariaLabel: "Test" }];
     render(
       <MemoryRouter>
         <Header {...defaultProps} navLinks={navLinks} />
@@ -90,7 +90,7 @@ describe("Header Component", () => {
   });
 
   it("renders restricted link when permission is allowed", () => {
-    const navLinks = [
+    const navLinks = () => [
       {
         to: "/restricted",
         label: "Restricted Link",
@@ -106,7 +106,7 @@ describe("Header Component", () => {
   });
 
   it("does not render restricted link when permission is denied", () => {
-    const navLinks = [
+    const navLinks = () => [
       {
         to: "/restricted",
         label: "Restricted Link",
@@ -136,28 +136,31 @@ describe("Header Component", () => {
     });
   });
 
-  it("replaces :userId in navigation links with actual user id", () => {
-    const userWithId = { ...user, id: 123 };
-    const navLinks = [{ to: "/user/:userId/profile", label: "Profile" }];
+  it("evaluates functional navLinks when provided", () => {
+    const userWithId = { ...user, canteenId: 456 };
+    const navLinksFn = (u) => [{ to: `/user/${u.canteenId}`, label: "Profile" }];
     render(
       <MemoryRouter>
-        <Header {...defaultProps} user={userWithId} navLinks={navLinks} />
+        <Header {...defaultProps} user={userWithId} navLinks={navLinksFn} />
       </MemoryRouter>,
     );
 
     const link = screen.getByText("Profile");
-    expect(link).toHaveAttribute("href", "/user/123/profile");
+    expect(link).toHaveAttribute("href", "/user/456");
   });
 
-  it("does not replace :userId if user is not present", () => {
-    const navLinks = [{ to: "/user/:userId/profile", label: "Profile" }];
+  it("handles missing user when evaluating functional navLinks", () => {
+    const navLinksFn = (u) =>
+      u
+        ? [{ to: `/user/${u.canteenId}`, label: "Profile" }]
+        : [{ to: "/login", label: "Login Instead" }];
     render(
       <MemoryRouter>
-        <Header {...defaultProps} user={null} navLinks={navLinks} />
+        <Header {...defaultProps} user={null} navLinks={navLinksFn} />
       </MemoryRouter>,
     );
 
-    const link = screen.getByText("Profile");
-    expect(link).toHaveAttribute("href", "/user/:userId/profile");
+    const link = screen.getByText("Login Instead");
+    expect(link).toHaveAttribute("href", "/login");
   });
 });

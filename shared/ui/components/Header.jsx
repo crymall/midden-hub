@@ -8,10 +8,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const processedNavLinks = navLinks.map((link) => ({
-    ...link,
-    to: user && link.to.includes(":userId") ? link.to.replace(":userId", user.id) : link.to,
-  }));
+  const processedNavLinks = navLinks(user);
 
   const desktopNavLinks = processedNavLinks.map((link) =>
     link.requiredPermission ? (
