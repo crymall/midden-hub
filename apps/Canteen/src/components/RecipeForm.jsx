@@ -280,8 +280,26 @@ const RecipeForm = ({
 
   const sanitizeNumber = (val) => {
     if (val === "" || val === null || val === undefined) return null;
-    const num = Number(val);
-    return isNaN(num) ? null : num;
+    const str = String(val).trim();
+
+    const num = Number(str);
+    if (!isNaN(num)) return num < 0 ? null : num;
+
+    // Try parsing fractions (e.g., "1/2", "1 1/2", "1-1/2", "3 / 4")
+    const fractionMatch = str.match(/^(\d+[\s-]+)?(\d+)\s*\/\s*(\d+)$/);
+    if (fractionMatch) {
+      let whole = 0;
+      if (fractionMatch[1]) {
+        whole = parseInt(fractionMatch[1].replace(/[\s-]/g, ""), 10);
+      }
+      const numerator = parseInt(fractionMatch[2], 10);
+      const denominator = parseInt(fractionMatch[3], 10);
+      if (denominator !== 0) {
+        return whole + numerator / denominator;
+      }
+    }
+
+    return null;
   };
 
   const handleSubmit = (e) => {
