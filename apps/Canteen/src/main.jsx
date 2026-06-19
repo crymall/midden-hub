@@ -50,6 +50,10 @@ initializeFaro({
   ],
 });
 
+window.addEventListener("vite:preloadError", () => {
+  window.location.reload();
+});
+
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(
