@@ -44,6 +44,18 @@ export const navMeta = {
       },
     ],
   },
+  netbook: {
+    title: "Netbook",
+    titleLink: "/",
+    navLinks: () => [
+      {
+        to: "/notes/new",
+        label: "New Note",
+        ariaLabel: "new-note",
+        requiredPermission: PERMISSIONS.writeData,
+      },
+    ],
+  },
 };
 
 export const explorerLinkList = [
