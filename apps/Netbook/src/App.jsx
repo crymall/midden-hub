@@ -3,8 +3,6 @@ import { BrowserRouter, Route } from "react-router-dom";
 import { FaroRoutes } from "@grafana/faro-react";
 import { navMeta } from "@shared/core/utils/constants";
 
-import RequireNotGuest from "@shared/core/gateways/RequireNotGuest";
-
 import Dashboard from "@shared/core/pages/Dashboard";
 import Login from "@shared/core/pages/Login";
 import NotFound from "@shared/core/pages/NotFound";
@@ -12,9 +10,7 @@ import NotFound from "@shared/core/pages/NotFound";
 import Loading from "@shared/ui/components/Loading";
 
 const Notes = lazy(() => import("./pages/Notes"));
-const NoteDetail = lazy(() => import("./pages/NoteDetail"));
-const NewNote = lazy(() => import("./pages/NewNote"));
-const EditNote = lazy(() => import("./pages/EditNote"));
+const NetbookSplash = lazy(() => import("./pages/NetbookSplash"));
 
 function App() {
   return (
@@ -24,13 +20,11 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/" element={<Dashboard navMeta={navMeta.netbook} />}>
-            <Route element={<RequireNotGuest />}>
-              <Route index element={<Notes />} />
-              <Route path="notes/new" element={<NewNote />} />
-              <Route path="notes/:id" element={<NoteDetail />} />
-              <Route path="notes/:id/edit" element={<EditNote />} />
-            </Route>
-
+            {/* Notes self-gates: it shows the splash to guests and the full
+                notebook to signed-in users, so no route guard is needed. */}
+            <Route index element={<Notes />} />
+            {/* Preview the full splash directly, even while signed in. */}
+            <Route path="splash-test" element={<NetbookSplash preview />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </FaroRoutes>

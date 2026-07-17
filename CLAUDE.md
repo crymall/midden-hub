@@ -11,7 +11,7 @@ Midden Hub is a frontend-only monorepo (npm workspaces) containing three React 1
 - **`apps/Netbook`** — personal notes app backed by netbook-service.
 - **`shared/`** — code used by all apps, imported via Vite aliases `@shared/core` (hooks, services, gateways, pages, constants) and `@shared/ui` (components, styles, fonts, assets).
 
-The backends are **separate repositories**: [iam-service](https://github.com/crymall/iam-service) (auth/identity), [canteen-service](https://github.com/crymall/canteen-service), and netbook-service (C#/ASP.NET Core notes API, local sibling repo `../netbook-service`). Nothing in this repo defines API endpoints — the clients call them through path-prefixed routes (`/iam/*`, `/canteen/*`, `/netbook/*`).
+The backends are **separate repositories**: [iam-service](https://github.com/crymall/iam-service) (auth/identity), [canteen-service](https://github.com/crymall/canteen-service), and netbook-service (C#/ASP.NET Core notes API, local sibling repo `../midden-services/netbook-service`). Nothing in this repo defines API endpoints — the clients call them through path-prefixed routes (`/iam/*`, `/canteen/*`, `/netbook/*`).
 
 See `docs/architecture.md` for the full stack description (k8s hosting, Grafana observability, CI/CD).
 
@@ -41,7 +41,7 @@ Both `App.jsx` files follow the same shape: `<BrowserRouter>` → app-level `<Su
 
 - **Midden**: public `/` (Explorer), `/about`, `/professional-showcase`, `/experiments`; guarded: `/settings`.
 - **Canteen**: public `/` (CanteenHome), `/recipes`, `/recipes/:id`, `/user/:id`; guarded: `/recipes/new`, `/recipes/:id/edit`, `/my-lists`, `/my-lists/:id`, `/messages`, `/messages/:id`, `/user/:id/network`.
-- **Netbook**: everything is guarded (notes are private): `/` (Notes), `/notes/new`, `/notes/:id`, `/notes/:id/edit`.
+- **Netbook**: a single public route `/` (Notes). It self-gates via `useAuth` — guests and logged-out visitors get `NetbookSplash`; signed-in users get the whole notebook on that one page: an inline "+ New note" form, a paginated list (numbered Prev/Next, page size 10) whose expandable cards read a note in place and edit it in place (the shared `NoteForm`), and a delete-confirm modal. There is no `RequireNotGuest` guard and no `/notes/*` sub-routes — the old new/detail/edit pages were removed.
 
 All pages are `lazy()` imports. Both `main.jsx` files register a `vite:preloadError` listener that reloads the page — this is the fix for stale lazy chunks after a redeploy; keep it when touching main.jsx.
 

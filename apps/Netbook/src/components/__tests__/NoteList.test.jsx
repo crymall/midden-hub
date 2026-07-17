@@ -1,5 +1,4 @@
-import { MemoryRouter } from "react-router-dom";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import NoteList from "../NoteList";
@@ -12,9 +11,14 @@ describe("NoteList", () => {
 
   const renderComponent = (props = {}) =>
     render(
-      <MemoryRouter>
-        <NoteList fetchingNotes={false} notes={notes} emptyMessage="No notes." {...props} />
-      </MemoryRouter>,
+      <NoteList
+        fetchingNotes={false}
+        notes={notes}
+        emptyMessage="No notes."
+        onUpdateNote={vi.fn().mockResolvedValue({})}
+        updating={false}
+        {...props}
+      />,
     );
 
   it("shows a loading state", () => {
@@ -27,18 +31,57 @@ describe("NoteList", () => {
     expect(screen.getByText("No notes.")).toBeInTheDocument();
   });
 
-  it("renders notes with links to their detail pages", () => {
+  it("renders note titles", () => {
     renderComponent();
     expect(screen.getByText("Groceries")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "View Groceries" })).toHaveAttribute(
-      "href",
-      "/notes/n1",
-    );
+  });
+
+  it("keeps note content collapsed until the note is expanded", () => {
+    renderComponent();
+    expect(screen.queryByText("Eggs")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Groceries"));
+    expect(screen.getByText("Eggs")).toBeInTheDocument();
+  });
+
+  it("collapses an expanded note when clicked again", () => {
+    renderComponent();
+    fireEvent.click(screen.getByText("Groceries"));
+    fireEvent.click(screen.getByText("Groceries"));
+    expect(screen.queryByText("Eggs")).not.toBeInTheDocument();
   });
 
   it("falls back to Untitled for notes without a title", () => {
     renderComponent();
     expect(screen.getByText("Untitled")).toBeInTheDocument();
+  });
+
+  it("edits a note inline and calls onUpdateNote", async () => {
+    const onUpdateNote = vi.fn().mockResolvedValue({});
+    renderComponent({ onUpdateNote });
+
+    fireEvent.click(screen.getByLabelText("Edit Groceries"));
+    // The shared form appears, pre-filled with the note.
+    const titleInput = screen.getByDisplayValue("Groceries");
+    fireEvent.change(titleInput, { target: { value: "Groceries updated" } });
+    fireEvent.click(screen.getByText("Save Note"));
+
+    await waitFor(() =>
+      expect(onUpdateNote).toHaveBeenCalledWith("n1", {
+        title: "Groceries updated",
+        content: "Eggs",
+      }),
+    );
+  });
+
+  it("cancels an inline edit and returns to the read view", () => {
+    renderComponent();
+    fireEvent.click(screen.getByLabelText("Edit Groceries"));
+    expect(screen.getByText("Save Note")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Cancel editing Groceries"));
+    expect(screen.queryByText("Save Note")).not.toBeInTheDocument();
+    expect(screen.getByText("Eggs")).toBeInTheDocument();
   });
 
   it("calls handleDeleteNote with the note id", () => {
