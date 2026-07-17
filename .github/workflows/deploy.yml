@@ -42,6 +42,7 @@ jobs:
         platforms: linux/amd64
         build-args: |
           VITE_CANTEEN_URL=${{ vars.PROD_CANTEEN_URL }}
+          VITE_NETBOOK_URL=${{ vars.PROD_NETBOOK_URL }}
           VITE_FARO_API_KEY=${{ vars.VITE_FARO_API_KEY }}
 
     - name: Build and push Canteen

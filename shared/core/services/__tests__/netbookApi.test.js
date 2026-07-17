@@ -29,14 +29,14 @@ describe("netbookApi", () => {
     mockDelete.mockResolvedValue({ data: {} });
   });
 
-  it("fetchNotes calls get on /notes", async () => {
+  it("fetchNotes calls get on /notes with pagination params", async () => {
     await api.fetchNotes();
-    expect(mockGet).toHaveBeenCalledWith("/notes");
+    expect(mockGet).toHaveBeenCalledWith("/notes", { params: { page: 1, pageSize: 10 } });
   });
 
-  it("fetchNote calls get with the note id", async () => {
-    await api.fetchNote("n1");
-    expect(mockGet).toHaveBeenCalledWith("/notes/n1");
+  it("fetchNotes forwards the requested page", async () => {
+    await api.fetchNotes(3, 25);
+    expect(mockGet).toHaveBeenCalledWith("/notes", { params: { page: 3, pageSize: 25 } });
   });
 
   it("createNote posts the note data", async () => {
@@ -60,8 +60,8 @@ describe("netbookApi", () => {
   });
 
   it("returns response data", async () => {
-    mockGet.mockResolvedValue({ data: [{ id: "n1" }] });
+    mockGet.mockResolvedValue({ data: { items: [{ id: "n1" }], total: 1 } });
     const result = await api.fetchNotes();
-    expect(result).toEqual([{ id: "n1" }]);
+    expect(result).toEqual({ items: [{ id: "n1" }], total: 1 });
   });
 });

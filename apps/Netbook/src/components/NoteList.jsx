@@ -1,48 +1,141 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import clsx from "clsx";
 
-const NoteList = ({ fetchingNotes, notes, handleDeleteNote, emptyMessage }) => {
+import NoteForm from "./NoteForm";
+
+const NoteList = ({
+  fetchingNotes,
+  notes,
+  handleDeleteNote,
+  onUpdateNote,
+  updating,
+  emptyMessage,
+}) => {
+  const [expandedId, setExpandedId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+
+  const collapse = () => {
+    setExpandedId(null);
+    setEditingId(null);
+  };
+
+  const toggleExpand = (id) => {
+    if (expandedId === id) {
+      collapse();
+    } else {
+      setExpandedId(id);
+      setEditingId(null);
+    }
+  };
+
+  const toggleEdit = (id) => {
+    if (editingId === id) {
+      setEditingId(null); // "Cancel" — back to read view, stays expanded
+    } else {
+      setExpandedId(id);
+      setEditingId(id);
+    }
+  };
+
+  if (fetchingNotes) {
+    return (
+      <div className="flex justify-center p-12">
+        <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading notes...</p>
+      </div>
+    );
+  }
+
+  if (notes.length === 0) {
+    return (
+      <div className="border-grey flex flex-col items-center justify-center border-2 border-dashed p-12 text-center">
+        <p className="text-lightGrey font-mono">{emptyMessage}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {fetchingNotes ? (
-        <div className="col-span-full flex justify-center p-12">
-          <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading notes...</p>
-        </div>
-      ) : notes.length === 0 ? (
-        <div className="border-grey col-span-full flex flex-col items-center justify-center border-2 border-dashed p-12 text-center">
-          <p className="text-lightGrey font-mono">{emptyMessage}</p>
-        </div>
-      ) : (
-        notes.map((note) => (
+    <div className="flex flex-col gap-4">
+      {notes.map((note) => {
+        const isExpanded = expandedId === note.id;
+        const isEditing = editingId === note.id;
+        const title = note.title || "Untitled";
+
+        return (
           <div
             key={note.id}
-            className="group border-grey hover:border-accent relative flex flex-col border-2 border-dashed p-4 transition-colors"
+            className="group border-grey hover:border-accent flex w-full flex-col border-2 border-dashed transition-colors"
           >
-            <Link to={`/notes/${note.id}`} className="absolute inset-0 z-0">
-              <span className="sr-only">View {note.title || "Untitled"}</span>
-            </Link>
-            <div className="pointer-events-none relative z-10 flex items-start justify-between gap-2">
-              <h3 className="text-accent group-hover:text-white font-mono text-xl font-bold transition-colors">
-                {note.title || "Untitled"}
-              </h3>
-              {handleDeleteNote && (
+            <div className="flex items-stretch justify-between">
+              <h3 className="grow">
                 <button
-                  onClick={(e) => handleDeleteNote(e, note.id)}
-                  className="text-grey pointer-events-auto z-20 font-bold transition-colors hover:text-red-400"
-                  aria-label={`Delete ${note.title || "Untitled"}`}
+                  onClick={() => toggleExpand(note.id)}
+                  aria-expanded={isExpanded}
+                  aria-controls={`note-body-${note.id}`}
+                  className="flex w-full items-center gap-3 p-4 text-left"
                 >
-                  ✕
+                  <span
+                    aria-hidden="true"
+                    className={clsx(
+                      "text-accent group-hover:text-white text-lg leading-none transition-transform",
+                      isExpanded && "rotate-90",
+                    )}
+                  >
+                    ▸
+                  </span>
+                  <span className="flex flex-col gap-0.5">
+                    <span className="text-accent group-hover:text-white font-mono text-xl font-bold transition-colors">
+                      {title}
+                    </span>
+                    <span className="text-grey text-sm font-normal">
+                      {new Date(note.createdAt).toLocaleDateString()}
+                    </span>
+                  </span>
                 </button>
-              )}
+              </h3>
+
+              <div className="flex shrink-0 items-center">
+                <button
+                  onClick={() => toggleEdit(note.id)}
+                  className="text-grey hover:text-accent px-3 font-mono text-sm font-bold transition-colors"
+                  aria-label={isEditing ? `Cancel editing ${title}` : `Edit ${title}`}
+                >
+                  {isEditing ? "Cancel" : "Edit"}
+                </button>
+                {handleDeleteNote && (
+                  <button
+                    onClick={(e) => handleDeleteNote(e, note.id)}
+                    className="text-grey px-4 font-bold transition-colors hover:text-red-400"
+                    aria-label={`Delete ${title}`}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
-            <p className="text-grey pointer-events-none relative z-10 mt-1 text-sm">
-              {new Date(note.createdAt).toLocaleDateString()}
-            </p>
-            <p className="text-lightGrey pointer-events-none relative z-10 mt-2 line-clamp-3 whitespace-pre-wrap">
-              {note.content}
-            </p>
+
+            {isExpanded && (
+              <div
+                id={`note-body-${note.id}`}
+                className="border-grey/40 border-t border-dashed p-4"
+              >
+                {isEditing ? (
+                  <NoteForm
+                    initialNote={note}
+                    submitLabel="Save Note"
+                    loading={updating}
+                    onCancel={() => setEditingId(null)}
+                    onSubmit={(noteData) =>
+                      onUpdateNote(note.id, noteData).then(() => setEditingId(null))
+                    }
+                  />
+                ) : (
+                  <p className="text-lightestGrey whitespace-pre-wrap">{note.content}</p>
+                )}
+              </div>
+            )}
           </div>
-        ))
-      )}
+        );
+      })}
     </div>
   );
 };

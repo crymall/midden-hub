@@ -5,13 +5,8 @@ const netbookApi = axios.create({
   withCredentials: true,
 });
 
-export const fetchNotes = async () => {
-  const response = await netbookApi.get("/notes");
-  return response.data;
-};
-
-export const fetchNote = async (id) => {
-  const response = await netbookApi.get(`/notes/${id}`);
+export const fetchNotes = async (page = 1, pageSize = 10) => {
+  const response = await netbookApi.get("/notes", { params: { page, pageSize } });
   return response.data;
 };
 
