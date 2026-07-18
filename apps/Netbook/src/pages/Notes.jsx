@@ -1,69 +1,161 @@
 import { useState } from "react";
 import { Button } from "@headlessui/react";
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { onlineManager, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
-import { createNote, deleteNote, fetchNotes, updateNote } from "@shared/core/services/netbookApi";
+import { createNote, deleteNote, updateNote } from "@shared/core/services/netbookApi";
 
 import MiddenCard from "@shared/ui/components/MiddenCard";
 import MiddenModal from "@shared/ui/components/MiddenModal";
 import NoteForm from "../components/NoteForm";
 import NoteList from "../components/NoteList";
+import { useNotes } from "../hooks/useNotes";
+import { flushPendingNotes } from "../offline/flushPendingNotes";
+import { clearDraft, getDraft, NEW_NOTE_DRAFT_KEY } from "../offline/noteDrafts";
+import { queueNoteCreate, queueNoteDelete, queueNoteUpdate } from "../offline/pendingNotesStore";
 import NetbookSplash from "./NetbookSplash";
+
+// Axios network-level failures carry no response; anything the server actually
+// answered does.
+const isNetworkError = (error) => !error.response;
 
 const Notes = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [showNewForm, setShowNewForm] = useState(false);
+  // A surviving draft means the user was mid-write when the page unloaded
+  // (refresh, redeploy reload) — reopen the form with it.
+  const [showNewForm, setShowNewForm] = useState(() => !!getDraft(NEW_NOTE_DRAFT_KEY));
   const [noteToDelete, setNoteToDelete] = useState(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["notes", page],
-    queryFn: () => fetchNotes(page),
-    placeholderData: keepPreviousData,
-    enabled: !!user && user.username !== "guest",
-  });
+  const enabled = !!user && user.username !== "guest";
+  const { notes, totalPages, isLoading, pendingCount } = useNotes(page, enabled);
 
-  const notes = data?.items ?? [];
-  const totalPages = data?.totalPages ?? 1;
+  const kickFlush = () => {
+    if (onlineManager.isOnline()) {
+      flushPendingNotes(queryClient);
+    }
+  };
+
+  // The note was saved (or queued) — its draft is spent.
+  const closeNewForm = () => {
+    clearDraft(NEW_NOTE_DRAFT_KEY);
+    setShowNewForm(false);
+    setPage(1);
+  };
+
+  const queueCreate = (noteData) => {
+    queueNoteCreate(queryClient, noteData);
+    closeNewForm();
+    kickFlush();
+  };
 
   const createNoteMutation = useMutation({
     mutationFn: (noteData) => createNote(noteData),
+    networkMode: "always",
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-      setShowNewForm(false);
-      setPage(1);
+      closeNewForm();
     },
-    onError: (error) => {
+    onError: (error, noteData) => {
+      if (isNetworkError(error)) {
+        queueCreate(noteData);
+        return;
+      }
       console.error("Failed to create note", error);
     },
   });
 
+  const handleCreateNote = (noteData) => {
+    if (!onlineManager.isOnline()) {
+      queueCreate(noteData);
+      return;
+    }
+    createNoteMutation.mutate(noteData);
+  };
+
   const updateNoteMutation = useMutation({
     mutationFn: ({ id, noteData }) => updateNote(id, noteData),
+    networkMode: "always",
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
 
-  const onUpdateNote = (id, noteData) => updateNoteMutation.mutateAsync({ id, noteData });
+  const queueUpdate = (note, noteData) => {
+    queueNoteUpdate(queryClient, note, noteData);
+    kickFlush();
+  };
+
+  const onUpdateNote = async (id, noteData) => {
+    const note = notes.find((n) => n.id === id);
+    if (!note) {
+      return;
+    }
+    // A note with a pending entry is always edited through the queue, so the
+    // queue stays the single path from local state to the server.
+    if (note.pending || !onlineManager.isOnline()) {
+      queueUpdate(note, noteData);
+      clearDraft(note.id);
+      return;
+    }
+    try {
+      await updateNoteMutation.mutateAsync({ id, noteData });
+      clearDraft(note.id);
+    } catch (error) {
+      if (isNetworkError(error)) {
+        queueUpdate(note, noteData);
+        clearDraft(note.id);
+        return;
+      }
+      throw error;
+    }
+  };
+
+  const stepBackIfPageEmptied = () => {
+    // If we just removed the last note on a non-first page, step back so the
+    // user doesn't land on an empty page.
+    if (notes.length === 1 && page > 1) {
+      setPage((p) => Math.max(1, p - 1));
+    }
+  };
+
+  const queueDelete = (note) => {
+    queueNoteDelete(queryClient, note);
+    stepBackIfPageEmptied();
+    setNoteToDelete(null);
+    kickFlush();
+  };
 
   const deleteNoteMutation = useMutation({
-    mutationFn: (id) => deleteNote(id),
+    mutationFn: (note) => deleteNote(note.id),
+    networkMode: "always",
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-      // If we just removed the last note on a non-first page, step back so the
-      // user doesn't land on an empty page.
-      if (notes.length === 1 && page > 1) {
-        setPage((p) => Math.max(1, p - 1));
-      }
+      stepBackIfPageEmptied();
       setNoteToDelete(null);
     },
-    onError: (error) => {
+    onError: (error, note) => {
+      if (isNetworkError(error)) {
+        queueDelete(note);
+        return;
+      }
       console.error("Failed to delete note", error);
     },
   });
+
+  const confirmDelete = () => {
+    const note = notes.find((n) => n.id === noteToDelete);
+    if (!note) {
+      setNoteToDelete(null);
+      return;
+    }
+    if (note.pending || !onlineManager.isOnline()) {
+      queueDelete(note);
+      return;
+    }
+    deleteNoteMutation.mutate(note);
+  };
 
   const handleDeleteNote = (e, noteId) => {
     e.preventDefault();
@@ -90,11 +182,22 @@ const Notes = () => {
         )}
       </div>
 
+      {pendingCount > 0 && (
+        <p className="text-accent mb-4 font-mono text-sm">
+          {pendingCount} {pendingCount === 1 ? "change" : "changes"} saved offline — will sync when
+          you&apos;re back online.
+        </p>
+      )}
+
       {showNewForm && (
         <div className="border-grey mb-6 border-2 border-dashed p-4">
           <NoteForm
-            onSubmit={(noteData) => createNoteMutation.mutate(noteData)}
-            onCancel={() => setShowNewForm(false)}
+            draftKey={NEW_NOTE_DRAFT_KEY}
+            onSubmit={handleCreateNote}
+            onCancel={() => {
+              clearDraft(NEW_NOTE_DRAFT_KEY);
+              setShowNewForm(false);
+            }}
             loading={createNoteMutation.isPending}
             submitLabel="Create Note"
           />
@@ -148,7 +251,7 @@ const Notes = () => {
             Cancel
           </Button>
           <Button
-            onClick={() => deleteNoteMutation.mutate(noteToDelete)}
+            onClick={confirmDelete}
             disabled={deleteNoteMutation.isPending}
             className="bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600 disabled:opacity-50"
           >

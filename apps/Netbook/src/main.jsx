@@ -14,9 +14,14 @@ import {
   ReactIntegration,
 } from "@grafana/faro-react";
 import { TracingInstrumentation } from "@grafana/faro-web-tracing";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import { onlineManager, QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 
 import App from "./App.jsx";
+import { flushPendingNotes } from "./offline/flushPendingNotes";
+import { pruneStaleDrafts } from "./offline/noteDrafts";
+import { PENDING_NOTES_QUERY_KEY } from "./offline/pendingNotesStore";
 
 import "@shared/ui/styles/index.css";
 
@@ -58,11 +63,47 @@ window.addEventListener("vite:preloadError", () => {
 });
 
 const queryClient = new QueryClient();
+// The pending offline queue is written with setQueryData and often has no
+// observer (e.g. on the splash); without this it would be garbage-collected.
+queryClient.setQueryDefaults(PENDING_NOTES_QUERY_KEY, { gcTime: Infinity });
+
+const persister = createSyncStoragePersister({
+  storage: window.localStorage,
+  key: "netbook-query-cache",
+  // Default is 1s; a shorter throttle narrows the window in which closing the
+  // tab right after an offline write could lose it.
+  throttleTime: 100,
+});
+
+pruneStaleDrafts();
+
+// Flush the offline queue whenever connectivity returns.
+onlineManager.subscribe((isOnline) => {
+  if (isOnline) {
+    flushPendingNotes(queryClient);
+  }
+});
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister,
+        // Default 24h maxAge would discard unsynced offline notes on restore.
+        maxAge: Infinity,
+        buster: "v1",
+        dehydrateOptions: {
+          // Notes and the offline queue only — persisting ["currentUser"]
+          // (staleTime Infinity) would let a reload skip iamApi.verify().
+          shouldDehydrateQuery: (query) =>
+            query.state.status === "success" &&
+            (query.queryKey[0] === "pendingNotes" || query.queryKey[0] === "notes"),
+        },
+      }}
+      onSuccess={() => flushPendingNotes(queryClient)}
+    >
       <App />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   </StrictMode>,
 );

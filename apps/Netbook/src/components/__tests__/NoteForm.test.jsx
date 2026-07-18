@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getDraft, saveDraft } from "../../offline/noteDrafts";
 import NoteForm from "../NoteForm";
 
 describe("NoteForm", () => {
@@ -9,6 +10,7 @@ describe("NoteForm", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    window.localStorage.clear();
   });
 
   const renderComponent = (props = {}) =>
@@ -56,5 +58,37 @@ describe("NoteForm", () => {
     const submitBtn = screen.getByText("Saving...");
     expect(submitBtn).toBeDisabled();
     expect(screen.queryByText("Create Note")).not.toBeInTheDocument();
+  });
+
+  it("persists a draft on every change when draftKey is set", () => {
+    renderComponent({ draftKey: "new" });
+
+    fireEvent.change(screen.getByPlaceholderText("e.g. Reading List"), {
+      target: { value: "Half-written" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Write your note..."), {
+      target: { value: "thought" },
+    });
+
+    expect(getDraft("new")).toMatchObject({ title: "Half-written", content: "thought" });
+  });
+
+  it("restores a saved draft over initialNote", () => {
+    saveDraft("n1", { title: "Draft title", content: "Draft content" });
+
+    renderComponent({ draftKey: "n1", initialNote: { title: "Groceries", content: "Eggs" } });
+
+    expect(screen.getByDisplayValue("Draft title")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Draft content")).toBeInTheDocument();
+  });
+
+  it("does not touch storage without a draftKey", () => {
+    renderComponent();
+
+    fireEvent.change(screen.getByPlaceholderText("e.g. Reading List"), {
+      target: { value: "Ephemeral" },
+    });
+
+    expect(window.localStorage.getItem("netbook-note-drafts")).toBeNull();
   });
 });

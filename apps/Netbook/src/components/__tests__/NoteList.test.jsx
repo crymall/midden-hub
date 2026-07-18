@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getDraft, saveDraft } from "../../offline/noteDrafts";
 import NoteList from "../NoteList";
 
 describe("NoteList", () => {
@@ -95,5 +96,59 @@ describe("NoteList", () => {
   it("hides delete buttons when handleDeleteNote is not provided", () => {
     renderComponent({ handleDeleteNote: undefined });
     expect(screen.queryByLabelText("Delete Groceries")).not.toBeInTheDocument();
+  });
+
+  it("marks pending notes as unsynced", () => {
+    renderComponent({ notes: [{ ...notes[0], pending: true }, notes[1]] });
+    expect(screen.getByText("● unsynced")).toBeInTheDocument();
+  });
+
+  describe("edit drafts", () => {
+    beforeEach(() => {
+      window.localStorage.clear();
+    });
+
+    it("restores an in-progress edit draft when the editor reopens", () => {
+      saveDraft("n1", { title: "Groceries draft", content: "Eggs and milk" });
+      renderComponent();
+
+      fireEvent.click(screen.getByLabelText("Edit Groceries"));
+
+      expect(screen.getByDisplayValue("Groceries draft")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("Eggs and milk")).toBeInTheDocument();
+    });
+
+    it("clears the draft on the header Cancel", () => {
+      saveDraft("n1", { title: "Groceries draft", content: "" });
+      renderComponent();
+
+      fireEvent.click(screen.getByLabelText("Edit Groceries"));
+      fireEvent.click(screen.getByLabelText("Cancel editing Groceries"));
+
+      expect(getDraft("n1")).toBeNull();
+    });
+
+    it("clears the draft on the form Cancel", () => {
+      saveDraft("n1", { title: "Groceries draft", content: "" });
+      renderComponent();
+
+      fireEvent.click(screen.getByLabelText("Edit Groceries"));
+      // The header toggle is labeled "Cancel editing Groceries"; this targets
+      // the form's own Cancel button.
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      expect(getDraft("n1")).toBeNull();
+    });
+
+    it("keeps the draft when the card is collapsed without cancelling", () => {
+      saveDraft("n1", { title: "Groceries draft", content: "" });
+      renderComponent();
+
+      fireEvent.click(screen.getByLabelText("Edit Groceries"));
+      // Clicking the title collapses the card — an implicit exit, not a cancel.
+      fireEvent.click(screen.getByText("Groceries"));
+
+      expect(getDraft("n1")).not.toBeNull();
+    });
   });
 });

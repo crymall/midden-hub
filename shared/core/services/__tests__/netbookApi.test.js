@@ -59,6 +59,13 @@ describe("netbookApi", () => {
     expect(mockDelete).toHaveBeenCalledWith("/notes/n1");
   });
 
+  it("deleteNote sends the optional updatedAt precondition as the request body", async () => {
+    await api.deleteNote("n1", "2026-07-01T00:00:00Z");
+    expect(mockDelete).toHaveBeenCalledWith("/notes/n1", {
+      data: { updatedAt: "2026-07-01T00:00:00Z" },
+    });
+  });
+
   it("returns response data", async () => {
     mockGet.mockResolvedValue({ data: { items: [{ id: "n1" }], total: 1 } });
     const result = await api.fetchNotes();
