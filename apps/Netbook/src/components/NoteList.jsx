@@ -1,6 +1,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 
+import { clearDraft } from "../offline/noteDrafts";
 import NoteForm from "./NoteForm";
 
 const NoteList = ({
@@ -30,7 +31,10 @@ const NoteList = ({
 
   const toggleEdit = (id) => {
     if (editingId === id) {
-      setEditingId(null); // "Cancel" — back to read view, stays expanded
+      // "Cancel" — back to read view, stays expanded. An explicit cancel
+      // discards the draft; an implicit collapse (clicking the title) keeps it.
+      clearDraft(id);
+      setEditingId(null);
     } else {
       setExpandedId(id);
       setEditingId(id);
@@ -88,6 +92,7 @@ const NoteList = ({
                     </span>
                     <span className="text-grey text-sm font-normal">
                       {new Date(note.createdAt).toLocaleDateString()}
+                      {note.pending && <span className="text-accent ml-2">● unsynced</span>}
                     </span>
                   </span>
                 </button>
@@ -121,9 +126,13 @@ const NoteList = ({
                 {isEditing ? (
                   <NoteForm
                     initialNote={note}
+                    draftKey={note.id}
                     submitLabel="Save Note"
                     loading={updating}
-                    onCancel={() => setEditingId(null)}
+                    onCancel={() => {
+                      clearDraft(note.id);
+                      setEditingId(null);
+                    }}
                     onSubmit={(noteData) =>
                       onUpdateNote(note.id, noteData).then(() => setEditingId(null))
                     }

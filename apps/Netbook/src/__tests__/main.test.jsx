@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import App from "../App";
@@ -43,9 +44,13 @@ describe("main.jsx", () => {
     expect(createRootMock).toHaveBeenCalledWith(rootElement);
     expect(renderMock).toHaveBeenCalledWith(
       <StrictMode>
-        <QueryClientProvider client={expect.any(QueryClient)}>
+        <PersistQueryClientProvider
+          client={expect.any(QueryClient)}
+          persistOptions={expect.objectContaining({ maxAge: Infinity })}
+          onSuccess={expect.any(Function)}
+        >
           <App />
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </StrictMode>,
     );
   });

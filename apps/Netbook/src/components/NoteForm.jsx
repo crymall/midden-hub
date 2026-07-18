@@ -1,9 +1,29 @@
 import { useState } from "react";
 import { Button, Field, Input, Label, Textarea } from "@headlessui/react";
 
-const NoteForm = ({ initialNote, onSubmit, onCancel, loading, submitLabel }) => {
-  const [title, setTitle] = useState(initialNote?.title || "");
-  const [content, setContent] = useState(initialNote?.content || "");
+import { getDraft, saveDraft } from "../offline/noteDrafts";
+
+const NoteForm = ({ initialNote, onSubmit, onCancel, loading, submitLabel, draftKey }) => {
+  // A saved draft is newer typing than the note it was based on, so it wins.
+  const [draft] = useState(() => (draftKey ? getDraft(draftKey) : null));
+  const [title, setTitle] = useState(draft?.title ?? initialNote?.title ?? "");
+  const [content, setContent] = useState(draft?.content ?? initialNote?.content ?? "");
+
+  const persistDraft = (nextTitle, nextContent) => {
+    if (draftKey) {
+      saveDraft(draftKey, { title: nextTitle, content: nextContent });
+    }
+  };
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+    persistDraft(e.target.value, content);
+  };
+
+  const handleContentChange = (e) => {
+    setContent(e.target.value);
+    persistDraft(title, e.target.value);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,7 +37,7 @@ const NoteForm = ({ initialNote, onSubmit, onCancel, loading, submitLabel }) => 
         <Input
           required
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={handleTitleChange}
           className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full border p-2 focus:outline-none"
           placeholder="e.g. Reading List"
           autoFocus
@@ -27,7 +47,7 @@ const NoteForm = ({ initialNote, onSubmit, onCancel, loading, submitLabel }) => 
         <Label className="text-lightestGrey mb-1 block text-sm font-bold">Content</Label>
         <Textarea
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={handleContentChange}
           rows={12}
           className="bg-dark border-grey text-lightestGrey focus:border-lightestGrey w-full resize-y border p-2 font-mono focus:outline-none"
           placeholder="Write your note..."
