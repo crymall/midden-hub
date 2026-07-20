@@ -28,27 +28,18 @@ export const queueNoteCreate = (queryClient, { title, content }) => {
 export const queueNoteUpdate = (queryClient, note, { title, content }) => {
   const entries = getPendingNotes(queryClient);
   const now = new Date().toISOString();
+  const existingNoteUpdate = entries.find((entry) => entry.serverId === note.id);
 
-  // A note that only exists locally: fold the edit into its pending create.
-  if (note.localId) {
+  // If the note exists in pending notes. Presence of localId means it was created in the client
+  // this pending session, existingNoteUpdate means we're performing an update on an update from
+  // a note that existed in the server already (i.e. a serverId is present).
+  if (note.localId || existingNoteUpdate) {
     setPendingNotes(
       queryClient,
       entries.map((entry) =>
-        entry.localId === note.localId ? { ...entry, title, content, updatedAt: now } : entry,
-      ),
-    );
-    return;
-  }
-
-  const existing = entries.find((entry) => entry.serverId === note.id);
-  if (existing) {
-    // Repeated offline edits overwrite the queued content but keep the original
-    // baseUpdatedAt — the edit is based on what the user last saw from the server,
-    // not on their own intermediate local states.
-    setPendingNotes(
-      queryClient,
-      entries.map((entry) =>
-        entry === existing ? { ...entry, title, content, updatedAt: now } : entry,
+        entry.localId === note.localId || entry === existingNoteUpdate
+          ? { ...entry, title, content, updatedAt: now }
+          : entry,
       ),
     );
     return;
@@ -62,8 +53,7 @@ export const queueNoteUpdate = (queryClient, note, { title, content }) => {
       serverId: note.id,
       title,
       content,
-      // Opaque server value, echoed byte-for-byte as the write precondition;
-      // never round-trip it through Date.
+      // Echoed back byte-for-byte as the write precondition; never round-trip through Date.
       baseUpdatedAt: note.updatedAt ?? null,
       createdAt: note.createdAt,
       updatedAt: now,
@@ -74,7 +64,6 @@ export const queueNoteUpdate = (queryClient, note, { title, content }) => {
 export const queueNoteDelete = (queryClient, note) => {
   const entries = getPendingNotes(queryClient);
 
-  // A note that only exists locally: drop its pending create, nothing to sync.
   if (note.localId) {
     setPendingNotes(
       queryClient,

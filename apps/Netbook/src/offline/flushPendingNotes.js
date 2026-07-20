@@ -37,14 +37,11 @@ export const flushPendingNotes = async (queryClient) => {
       } catch (error) {
         const status = error.response?.status;
         if (!status || status >= 500 || status === 401 || status === 403) {
-          // Network failure, server error, or expired session: keep the queue
-          // intact and retry on the next trigger.
           break;
         }
         if (status === 409 && entry.op === "update") {
-          // Conflict: the server's version wins the row, and the local content
-          // survives as a visible conflicted copy rather than being resolved
-          // silently. The converted entry is a create, so this run posts it next.
+          // The server's version wins; the local edit survives as a visible
+          // conflicted copy rather than being dropped silently.
           replacePendingNote(queryClient, entry.localId, {
             ...entry,
             op: "create",
@@ -55,8 +52,6 @@ export const flushPendingNotes = async (queryClient) => {
           resolvedAny = true;
           continue;
         }
-        // 409 on delete (the note changed since the user last saw it) or any
-        // other 4xx: retrying can never succeed, so drop the entry.
         console.error("Dropping unsyncable pending note change", entry, error);
         removePendingNote(queryClient, entry.localId);
         resolvedAny = true;

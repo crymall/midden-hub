@@ -4,9 +4,6 @@ import { fetchNotes } from "@shared/core/services/netbookApi";
 
 import { PENDING_NOTES_QUERY_KEY } from "../offline/pendingNotesStore";
 
-// Merges the server page with the pending offline queue for display: pending
-// creates are prepended on page 1, pending updates overlay their content onto
-// the matching server note, and pending deletes filter the note out.
 export const useNotes = (page, enabled) => {
   const { data, isLoading } = useQuery({
     queryKey: ["notes", page],
@@ -57,8 +54,6 @@ export const useNotes = (page, enabled) => {
   return {
     notes,
     totalPages: data?.totalPages ?? 1,
-    // Pending notes are worth showing even while the server page is loading
-    // (or unreachable), so only report loading when there is nothing to render.
     isLoading: isLoading && notes.length === 0,
     pendingCount: pendingEntries.length,
   };

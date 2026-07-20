@@ -150,5 +150,51 @@ describe("NoteList", () => {
 
       expect(getDraft("n1")).not.toBeNull();
     });
+
+    it("marks a note that has a stored draft while not being edited", () => {
+      saveDraft("n1", { title: "Groceries draft", content: "" });
+      renderComponent();
+
+      expect(screen.getByText("● unsaved draft")).toBeInTheDocument();
+    });
+
+    it("does not mark a note that has no draft", () => {
+      renderComponent();
+
+      expect(screen.queryByText("● unsaved draft")).not.toBeInTheDocument();
+    });
+
+    it("hides the marker while the note is actively being edited", () => {
+      saveDraft("n1", { title: "Groceries draft", content: "" });
+      renderComponent();
+
+      fireEvent.click(screen.getByLabelText("Edit Groceries"));
+
+      // The open form already shows the draft, so the marker would be redundant.
+      expect(screen.queryByText("● unsaved draft")).not.toBeInTheDocument();
+    });
+
+    it("surfaces the kept draft after leaving an edit without cancelling", () => {
+      renderComponent();
+
+      fireEvent.click(screen.getByLabelText("Edit Groceries"));
+      fireEvent.change(screen.getByDisplayValue("Groceries"), {
+        target: { value: "Groceries in progress" },
+      });
+      // Collapse by clicking the title — the draft is kept, not cancelled.
+      fireEvent.click(screen.getByText("Groceries"));
+
+      expect(screen.getByText("● unsaved draft")).toBeInTheDocument();
+    });
+
+    it("removes the marker once the draft is cancelled", () => {
+      saveDraft("n1", { title: "Groceries draft", content: "" });
+      renderComponent();
+
+      fireEvent.click(screen.getByLabelText("Edit Groceries"));
+      fireEvent.click(screen.getByLabelText("Cancel editing Groceries"));
+
+      expect(screen.queryByText("● unsaved draft")).not.toBeInTheDocument();
+    });
   });
 });

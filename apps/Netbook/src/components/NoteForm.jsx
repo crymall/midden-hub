@@ -4,7 +4,7 @@ import { Button, Field, Input, Label, Textarea } from "@headlessui/react";
 import { getDraft, saveDraft } from "../offline/noteDrafts";
 
 const NoteForm = ({ initialNote, onSubmit, onCancel, loading, submitLabel, draftKey }) => {
-  // A saved draft is newer typing than the note it was based on, so it wins.
+  // A saved draft is newer than the note it was based on, so it takes precedence.
   const [draft] = useState(() => (draftKey ? getDraft(draftKey) : null));
   const [title, setTitle] = useState(draft?.title ?? initialNote?.title ?? "");
   const [content, setContent] = useState(draft?.content ?? initialNote?.content ?? "");

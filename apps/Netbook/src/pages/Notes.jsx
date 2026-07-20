@@ -15,16 +15,10 @@ import { clearDraft, getDraft, NEW_NOTE_DRAFT_KEY } from "../offline/noteDrafts"
 import { queueNoteCreate, queueNoteDelete, queueNoteUpdate } from "../offline/pendingNotesStore";
 import NetbookSplash from "./NetbookSplash";
 
-// Axios network-level failures carry no response; anything the server actually
-// answered does.
-const isNetworkError = (error) => !error.response;
-
 const Notes = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  // A surviving draft means the user was mid-write when the page unloaded
-  // (refresh, redeploy reload) — reopen the form with it.
   const [showNewForm, setShowNewForm] = useState(() => !!getDraft(NEW_NOTE_DRAFT_KEY));
   const [noteToDelete, setNoteToDelete] = useState(null);
 
@@ -37,7 +31,6 @@ const Notes = () => {
     }
   };
 
-  // The note was saved (or queued) — its draft is spent.
   const closeNewForm = () => {
     clearDraft(NEW_NOTE_DRAFT_KEY);
     setShowNewForm(false);
@@ -58,7 +51,7 @@ const Notes = () => {
       closeNewForm();
     },
     onError: (error, noteData) => {
-      if (isNetworkError(error)) {
+      if (!error.response) {
         queueCreate(noteData);
         return;
       }
@@ -75,36 +68,34 @@ const Notes = () => {
   };
 
   const updateNoteMutation = useMutation({
-    mutationFn: ({ id, noteData }) => updateNote(id, noteData),
+    mutationFn: ({ id, updatedNoteData }) => updateNote(id, updatedNoteData),
     networkMode: "always",
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
 
-  const queueUpdate = (note, noteData) => {
-    queueNoteUpdate(queryClient, note, noteData);
+  const queueUpdate = (note, updatedNoteData) => {
+    queueNoteUpdate(queryClient, note, updatedNoteData);
     kickFlush();
   };
 
-  const onUpdateNote = async (id, noteData) => {
+  const onUpdateNote = async (id, updatedNoteData) => {
     const note = notes.find((n) => n.id === id);
     if (!note) {
       return;
     }
-    // A note with a pending entry is always edited through the queue, so the
-    // queue stays the single path from local state to the server.
     if (note.pending || !onlineManager.isOnline()) {
-      queueUpdate(note, noteData);
+      queueUpdate(note, updatedNoteData);
       clearDraft(note.id);
       return;
     }
     try {
-      await updateNoteMutation.mutateAsync({ id, noteData });
+      await updateNoteMutation.mutateAsync({ id, updatedNoteData });
       clearDraft(note.id);
     } catch (error) {
-      if (isNetworkError(error)) {
-        queueUpdate(note, noteData);
+      if (!error.response) {
+        queueUpdate(note, updatedNoteData);
         clearDraft(note.id);
         return;
       }
@@ -113,8 +104,6 @@ const Notes = () => {
   };
 
   const stepBackIfPageEmptied = () => {
-    // If we just removed the last note on a non-first page, step back so the
-    // user doesn't land on an empty page.
     if (notes.length === 1 && page > 1) {
       setPage((p) => Math.max(1, p - 1));
     }
@@ -136,7 +125,7 @@ const Notes = () => {
       setNoteToDelete(null);
     },
     onError: (error, note) => {
-      if (isNetworkError(error)) {
+      if (!error.response) {
         queueDelete(note);
         return;
       }
@@ -163,7 +152,6 @@ const Notes = () => {
     setNoteToDelete(noteId);
   };
 
-  // Guests and logged-out visitors get the splash, not the notebook.
   if (!user || user.username === "guest") {
     return <NetbookSplash />;
   }

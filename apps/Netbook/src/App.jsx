@@ -20,10 +20,7 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/" element={<Dashboard navMeta={navMeta.netbook} />}>
-            {/* Notes self-gates: it shows the splash to guests and the full
-                notebook to signed-in users, so no route guard is needed. */}
             <Route index element={<Notes />} />
-            {/* Preview the full splash directly, even while signed in. */}
             <Route path="splash-test" element={<NetbookSplash preview />} />
             <Route path="*" element={<NotFound />} />
           </Route>

@@ -21,8 +21,7 @@ export const updateNote = async (id, noteData) => {
 };
 
 export const deleteNote = async (id, updatedAt) => {
-  // updatedAt is an optional opaque precondition: when present the server
-  // rejects the delete with 409 if the stored row is strictly newer.
+  // Optional precondition: when present, the server 409s if its stored row is newer.
   const response = updatedAt
     ? await netbookApi.delete(`/notes/${id}`, { data: { updatedAt } })
     : await netbookApi.delete(`/notes/${id}`);

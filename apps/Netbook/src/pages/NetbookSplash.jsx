@@ -10,9 +10,6 @@ const NetbookSplash = ({ preview = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Guests and logged-out visitors see the call to action (a guest is a truthy
-  // user but not a real sign-in). `preview` forces it on so the /splash-test
-  // route shows the whole page even while you're signed in.
   const showCta = preview || !user || user.username === "guest";
 
   return (
