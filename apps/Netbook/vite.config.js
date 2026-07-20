@@ -1,21 +1,9 @@
-import faroUploader from "@grafana/faro-rollup-plugin";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    faroUploader({
-      appName: "midden",
-      endpoint: "https://faro-api-prod-us-east-2.grafana.net/faro/api/v1",
-      appId: "1381",
-      stackId: "1595848",
-      verbose: true,
-      apiKey: process.env.VITE_FARO_API_KEY,
-      gzipContents: true,
-    }),
-  ],
+  plugins: [react()],
   publicDir: path.resolve(__dirname, "../../shared/ui/assets"),
   resolve: {
     alias: {
@@ -24,7 +12,8 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: 5175,
+    strictPort: true,
     proxy: {
       "^/iam(/|$)": {
         target: "http://localhost:3000",
@@ -37,6 +26,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/canteen/, ""),
+      },
+      "^/netbook(/|$)": {
+        target: "http://localhost:5099",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/netbook/, ""),
       },
     },
   },

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netbook-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: netbook-client
+  template:
+    metadata:
+      labels:
+        app: netbook-client
+    spec:
+      containers:
+      - name: netbook-client
+        image: crymall/netbook-client:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: netbook-client
+spec:
+  type: ClusterIP
+  selector:
+    app: netbook-client
+  ports:
+  - port: 80
+    targetPort: 80

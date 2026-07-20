@@ -4,6 +4,7 @@
 @source "../../core/pages";
 @source "../../../apps/Midden/src";
 @source "../../../apps/Canteen/src";
+@source "../../../apps/Netbook/src";
 
 @font-face {
   font-family: "Jacquard 12";
@@ -58,6 +59,15 @@
     --color-lightestGrey: #f2ebd9;
     --color-primary: #6b3e2e;
     --color-accent: #b2b67f;
+  }
+
+  [data-theme="netbook"] {
+    --color-dark: #131824;
+    --color-grey: #7a8194;
+    --color-lightGrey: #c0c7d6;
+    --color-lightestGrey: #eaeef7;
+    --color-primary: #1e3a5f;
+    --color-accent: #8a6d2f;
   }
 }
 
