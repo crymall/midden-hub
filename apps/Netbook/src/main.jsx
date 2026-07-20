@@ -63,21 +63,20 @@ window.addEventListener("vite:preloadError", () => {
 });
 
 const queryClient = new QueryClient();
-// The pending offline queue is written with setQueryData and often has no
-// observer (e.g. on the splash); without this it would be garbage-collected.
+// The offline queue is written with setQueryData and often has no observer
+// (e.g. on the splash); without this it would be garbage-collected.
 queryClient.setQueryDefaults(PENDING_NOTES_QUERY_KEY, { gcTime: Infinity });
 
 const persister = createSyncStoragePersister({
   storage: window.localStorage,
   key: "netbook-query-cache",
-  // Default is 1s; a shorter throttle narrows the window in which closing the
-  // tab right after an offline write could lose it.
+  // Shorter than the 1s default so closing the tab right after an offline write
+  // is far less likely to lose it.
   throttleTime: 100,
 });
 
 pruneStaleDrafts();
 
-// Flush the offline queue whenever connectivity returns.
 onlineManager.subscribe((isOnline) => {
   if (isOnline) {
     flushPendingNotes(queryClient);
@@ -90,12 +89,12 @@ createRoot(document.getElementById("root")).render(
       client={queryClient}
       persistOptions={{
         persister,
-        // Default 24h maxAge would discard unsynced offline notes on restore.
+        // The 24h default would discard unsynced offline notes on restore.
         maxAge: Infinity,
         buster: "v1",
         dehydrateOptions: {
-          // Notes and the offline queue only — persisting ["currentUser"]
-          // (staleTime Infinity) would let a reload skip iamApi.verify().
+          // Never persist ["currentUser"] — its Infinity staleTime would let a
+          // reload skip iamApi.verify().
           shouldDehydrateQuery: (query) =>
             query.state.status === "success" &&
             (query.queryKey[0] === "pendingNotes" || query.queryKey[0] === "notes"),
