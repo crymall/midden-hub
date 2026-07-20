@@ -42,6 +42,16 @@ describe("Header Component", () => {
     expect(screen.getByText("testuser")).toBeInTheDocument();
   });
 
+  it("renders no stray '0' when there are no nav links", () => {
+    // `{arr.length && <x/>}` would render the literal 0; the guard must be `> 0`.
+    const { container } = render(
+      <MemoryRouter>
+        <Header {...defaultProps} title="Netbook" navLinks={() => []} />
+      </MemoryRouter>,
+    );
+    expect(container.textContent).not.toContain("0");
+  });
+
   it("navigates to settings when settings button is clicked", async () => {
     const user = userEvent.setup();
     render(

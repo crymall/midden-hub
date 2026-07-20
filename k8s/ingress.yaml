@@ -11,6 +11,7 @@ spec:
   - hosts:
     - midden.reedgaines.com
     - canteen.reedgaines.com
+    - netbook.reedgaines.com
     secretName: workspace-tls-secret
   rules:
   - host: midden.reedgaines.com
@@ -31,5 +32,15 @@ spec:
         backend:
           service:
             name: canteen-client
+            port:
+              number: 80
+  - host: netbook.reedgaines.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: netbook-client
             port:
               number: 80

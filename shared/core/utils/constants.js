@@ -44,6 +44,12 @@ export const navMeta = {
       },
     ],
   },
+  netbook: {
+    title: "Netbook",
+    titleLink: "/",
+    // Creating notes now lives inline on the main page, so there is no sub-nav.
+    navLinks: () => [],
+  },
 };
 
 export const explorerLinkList = [
@@ -53,6 +59,13 @@ export const explorerLinkList = [
     to: import.meta.env.VITE_CANTEEN_URL,
     description:
       "A full-featured app for storing and sharing recipes. Focusing on a minimal, yet high-performance, experience for home cooks.",
+  },
+  {
+    label: "Netbook",
+    symbol: "d",
+    to: import.meta.env.VITE_NETBOOK_URL,
+    description:
+      "A minimalist notes app for jotting down and organizing your thoughts, synced to your Midden account.",
   },
   {
     label: "Experiments",
