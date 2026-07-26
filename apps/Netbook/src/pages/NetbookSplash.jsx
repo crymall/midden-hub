@@ -80,7 +80,7 @@ const NetbookSplash = ({ preview = false }) => {
         <div className="mt-16 font-mono">
           <Button
             onClick={() => navigate("/login", { state: { from: location } })}
-            className="bg-grey hover:bg-accent/80 px-6 py-2 text-lg font-bold text-white transition-colors"
+            className="bg-grey hover:bg-accent/80 px-6 py-2 text-lg font-bold text-dark transition-colors"
           >
             Login or Register
           </Button>

@@ -185,7 +185,7 @@ const UserProfile = () => {
               className={`px-3 py-1 text-sm font-bold transition-colors ${
                 isFollowing
                   ? "border-grey text-lightGrey hover:border-lightestGrey hover:text-white border bg-transparent"
-                  : "bg-accent hover:bg-accent/80 text-white disabled:opacity-50"
+                  : "bg-accent hover:bg-accent/80 text-dark disabled:opacity-50"
               }`}
             >
               {isFollowing ? "Unfollow" : "Follow"}
@@ -195,12 +195,12 @@ const UserProfile = () => {
             <>
               <Button
                 onClick={() => setIsCreateListOpen(true)}
-                className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors"
+                className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-dark transition-colors"
               >
                 + List
               </Button>
               <Link to="/recipes/new">
-                <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">
+                <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-dark transition-colors">
                   + Recipe
                 </Button>
               </Link>

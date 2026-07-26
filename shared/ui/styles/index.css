@@ -91,3 +91,23 @@
 @utility text-shadow-hard-lightestGrey {
   text-shadow: 2px 2px 0 #cfd6ea;
 }
+
+/* Guarantee a visible keyboard-focus ring even on controls that clear the
+   outline for mouse focus. Left unlayered so it wins over Tailwind's utilities
+   layer without !important; :focus-visible keeps it keyboard-only. */
+:where(
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary,
+  [tabindex],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  [role="button"]
+):focus-visible {
+  outline: 2px solid var(--color-lightestGrey);
+  outline-offset: 2px;
+}

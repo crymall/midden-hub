@@ -121,7 +121,7 @@ const SortableIngredient = ({
                   <ComboboxOption
                     key={suggestion.id}
                     value={suggestion}
-                    className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 select-none data-focus:text-white"
+                    className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 select-none data-focus:text-dark"
                   >
                     {suggestion.name}
                   </ComboboxOption>
@@ -132,7 +132,7 @@ const SortableIngredient = ({
                   ) && (
                     <ComboboxOption
                       value={{ action: "create", name: ing.name }}
-                      className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-focus:text-white"
+                      className="data-focus:bg-accent text-lightestGrey cursor-pointer px-4 py-2 font-bold italic select-none data-focus:text-dark"
                     >
                       {`Create "${ing.name}"`}
                     </ComboboxOption>

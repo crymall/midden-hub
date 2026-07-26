@@ -98,7 +98,7 @@ const MyLists = () => {
         </div>
         <Button
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors"
+          className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-dark transition-colors"
         >
           + List
         </Button>

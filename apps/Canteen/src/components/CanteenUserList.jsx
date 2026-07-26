@@ -69,10 +69,10 @@ const CanteenUserList = ({
                     }}
                     className={`group/btn w-24 px-3 py-1 text-sm font-bold transition-colors focus:outline-none ${
                       isFriend
-                        ? "border-accent text-accent hover:bg-accent hover:text-white border bg-transparent"
+                        ? "border-accent text-accent hover:bg-accent hover:text-dark border bg-transparent"
                         : isFollowing
                           ? "border-grey text-lightGrey hover:border-lightestGrey hover:text-white border bg-transparent"
-                          : "bg-accent hover:bg-accent/80 text-white"
+                          : "bg-accent hover:bg-accent/80 text-dark"
                     }`}
                   >
                     {isFriend ? (

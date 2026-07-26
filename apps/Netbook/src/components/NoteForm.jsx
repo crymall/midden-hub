@@ -64,7 +64,7 @@ const NoteForm = ({ initialNote, onSubmit, onCancel, loading, submitLabel, draft
         <Button
           type="submit"
           disabled={loading}
-          className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
+          className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-dark disabled:opacity-50"
         >
           {loading ? "Saving..." : submitLabel}
         </Button>
