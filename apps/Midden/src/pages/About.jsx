@@ -17,7 +17,7 @@ const About = () => {
             or a pile or mound of such materials, often prehistoric.
           </p>
 
-          <p className="text-xs italic text-gray-500 mt-2">
+          <p className="text-xs italic text-gray-400 mt-2">
             Excerpt from the Wiktionary entry for “midden”
           </p>
         </section>
