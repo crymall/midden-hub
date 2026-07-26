@@ -120,7 +120,7 @@ const ListAddPopover = ({
                       <ComboboxOption
                         key={list.id}
                         value={list}
-                        className="data-focus:bg-accent text-lightestGrey cursor-pointer px-2 py-1 text-sm select-none data-focus:text-white"
+                        className="data-focus:bg-accent text-lightestGrey cursor-pointer px-2 py-1 text-sm select-none data-focus:text-dark"
                       >
                         {list.name}
                       </ComboboxOption>
@@ -129,7 +129,7 @@ const ListAddPopover = ({
                       !comboboxLists.some((l) => l.name.toLowerCase() === query.toLowerCase()) && (
                         <ComboboxOption
                           value={{ action: "create" }}
-                          className="data-focus:bg-accent text-lightestGrey cursor-pointer px-2 py-1 text-sm font-bold italic select-none data-focus:text-white"
+                          className="data-focus:bg-accent text-lightestGrey cursor-pointer px-2 py-1 text-sm font-bold italic select-none data-focus:text-dark"
                         >
                           {`Create "${query}"`}
                         </ComboboxOption>
@@ -168,7 +168,7 @@ const ListAddPopover = ({
             <Button
               type="submit"
               disabled={createListMutation.isPending || addToListMutation.isPending}
-              className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
+              className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-dark disabled:opacity-50"
             >
               {createListMutation.isPending || addToListMutation.isPending
                 ? "Adding..."

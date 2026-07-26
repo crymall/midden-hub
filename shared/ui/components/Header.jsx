@@ -70,11 +70,14 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
           )}
         </div>
 
-        <h1
-          onClick={() => navigate(titleLink)}
-          className="font-gothic hover:text-lightestGrey text-shadow-hard-grey cursor-pointer text-3xl tracking-wide text-white transition-colors sm:text-5xl"
-        >
-          {title}
+        <h1 className="font-gothic text-shadow-hard-grey text-3xl tracking-wide sm:text-5xl">
+          <Link
+            to={titleLink}
+            aria-label={`${title} home`}
+            className="hover:text-lightestGrey text-white transition-colors"
+          >
+            {title}
+          </Link>
         </h1>
 
         {processedNavLinks.length > 0 && (
@@ -87,7 +90,7 @@ const Header = ({ user, logout, title, titleLink, navLinks }) => {
         ) : (
           <Button
             onClick={() => navigate("/login", { state: { from: location } })}
-            className="bg-grey hover:bg-accent/80 px-3 py-1 font-bold text-white transition-colors"
+            className="bg-grey hover:bg-accent/80 px-3 py-1 font-bold text-dark transition-colors"
           >
             Login
           </Button>
