@@ -177,6 +177,9 @@ Radius is `0` everywhere; corners are cut, not rounded. The recurring silhouette
 ### Signature Component — the Directory Row (`AppCard`)
 The clearest expression of the world: a dashed-accent-bordered row pairing a large `Midden Icons` glyph, a bold label, an optional description, and a trailing `B` chevron glyph in the accent. Hovering washes the row in `primary/20` and brightens text and chevron to white — a point-and-click "hotspot" lighting up under the cursor. On mobile it splits into an expand toggle plus a separate navigate affordance so the whole row need not be one target.
 
+### Signature Component — the Moon-Phase Loader (`Loading`)
+The suite's one authored motion moment, and its loading indicator everywhere. A large `Midden Icons` moon glyph (pale `lightestGrey`, `text-7xl`/`8xl`, with the hard letterpress shadow) cycles the eight lunar phases — glyphs `1 2 3 4 5 6 7 0` in order — advancing one discrete frame every ~160ms (~1.3s per full cycle). Below it, an uppercase, wide-tracked "Loading…" label breathes with the pulse animation. The stepping is deliberately discrete, not a smooth tween — phase illustrations are discrete, and the retro world rejects Web-2.0 easing. The moon is `aria-hidden`; the label carries `role="status"` so the state is announced. **Motion:** the phase cycle is a JS interval, not a CSS animation; under `prefers-reduced-motion: reduce` it holds on a static full moon (phase `5`) and the label stops pulsing — meaning preserved, motion removed.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -187,6 +190,7 @@ The clearest expression of the world: a dashed-accent-bordered row pairing a lar
 - **Do** apply the hard `2px 2px 0` (zero-blur) text-shadow to white display headings as the signature depth.
 - **Do** meet **WCAG 2.2 Level AA**: body/placeholder text ≥4.5:1, large text and non-text UI (borders, glyphs used as controls) ≥3:1, measured against the active theme's `--color-dark`. The accent is now AA-text-safe on the dark ground in all three themes — preserve that when retheming.
 - **Do** tint secondary text from the neutral ramp (Cold Chalk / Bone Grey); never drop below 4.5:1 with a mid-grey.
+- **Do** gate every looping animation behind `motion-safe:` / `prefers-reduced-motion`, with a static fallback that keeps the meaning — the moon loader rests on a full moon, pulses stop, nothing disappears.
 
 ### Don't:
 - **Don't** introduce border-radius, blurred drop shadows, gradients, gradient text, or glassmorphism — each breaks the Excavated Console.

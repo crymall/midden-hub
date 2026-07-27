@@ -26,7 +26,8 @@
       { "name": "letterpress-dark", "value": "2px 2px 0 #060a08", "purpose": "Hard shadow variant used on lighter glyphs/controls against pale fills." }
     ],
     "motion": [
-      { "name": "state-color", "value": "color 0.2s, background-color 0.2s", "purpose": "Default transition for hover/active color and background shifts on links, buttons, and rows." }
+      { "name": "state-color", "value": "color 0.2s, background-color 0.2s", "purpose": "Default transition for hover/active color and background shifts on links, buttons, and rows." },
+      { "name": "moon-cycle", "value": "8 discrete phase frames, ~160ms each (~1.3s loop), JS-driven", "purpose": "The loading indicator: a Midden Icons moon cycling its eight phases; rests on a static full moon under prefers-reduced-motion." }
     ],
     "breakpoints": [
       { "name": "md", "value": "768px" },
@@ -81,6 +82,13 @@
       "description": "Monospace header link, white at rest, brightening to the lightest neutral on hover.",
       "html": "<a class=\"ds-nav-link\" href=\"#\">Recipe Search</a>",
       "css": ".ds-nav-link { font-family: 'Libertinus Mono', monospace; color: #fff; text-decoration: none; transition: color 0.2s; } .ds-nav-link:hover { color: var(--color-lightestGrey, #cfd6ea); } .ds-nav-link:focus-visible { outline: 2px solid var(--color-lightestGrey, #cfd6ea); outline-offset: 4px; }"
+    },
+    {
+      "name": "Moon-Phase Loader",
+      "kind": "custom",
+      "description": "The suite's loading indicator and one authored motion moment: a Midden Icons moon cycling its eight lunar phases (glyphs 1-7,0) above a pulsing label. Production uses the icon font; this snippet approximates the moon with CSS so it renders standalone. Reduced motion holds a full moon and stops the pulse.",
+      "html": "<div class=\"ds-loader\"><div class=\"ds-loader-moon\" aria-hidden=\"true\"></div><p class=\"ds-loader-label\" role=\"status\">Loading…</p></div>",
+      "css": ".ds-loader { display: flex; flex-direction: column; align-items: center; gap: 32px; font-family: 'Libertinus Mono', monospace; } .ds-loader-moon { width: 72px; height: 72px; border-radius: 50%; background: radial-gradient(circle at 36% 34%, #eaeef7 0 54%, #8f97a9 55% 100%); filter: drop-shadow(2px 2px 0 var(--color-grey, #7d7e75)); } .ds-loader-label { color: var(--color-lightestGrey, #cfd6ea); font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; animation: ds-pulse 2s ease-in-out infinite; } @keyframes ds-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } } @media (prefers-reduced-motion: reduce) { .ds-loader-label { animation: none; } }"
     }
   ],
   "narrative": {
@@ -108,7 +116,8 @@
       "Do use Midden Icons glyphs for all iconography; map single letters to symbols as the existing components do.",
       "Do apply the hard 2px 2px 0 (zero-blur) text-shadow to white display headings as the signature depth.",
       "Do meet WCAG 2.2 Level AA: body/placeholder text >=4.5:1, large text and non-text UI (borders, glyphs used as controls) >=3:1, measured against the active theme's --color-dark. The accent is now AA-text-safe on the dark ground in all three themes — preserve that when retheming.",
-      "Do tint secondary text from the neutral ramp (Cold Chalk / Bone Grey); never drop below 4.5:1 with a mid-grey."
+      "Do tint secondary text from the neutral ramp (Cold Chalk / Bone Grey); never drop below 4.5:1 with a mid-grey.",
+      "Do gate every looping animation behind motion-safe / prefers-reduced-motion, with a static fallback that keeps the meaning — the moon loader rests on a full moon, pulses stop, nothing disappears."
     ],
     "donts": [
       "Don't introduce border-radius, blurred drop shadows, gradients, gradient text, or glassmorphism — each breaks the Excavated Console.",

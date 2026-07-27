@@ -71,7 +71,9 @@ const RecipeDetail = () => {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
-          <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading recipe...</p>
+          <p className="text-lightestGrey motion-safe:animate-pulse font-mono text-xl">
+            Loading recipe...
+          </p>
         </div>
       </MiddenCard>
     );

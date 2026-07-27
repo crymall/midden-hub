@@ -23,7 +23,9 @@ const CanteenUserList = ({
   if (loading && (!users || users.length === 0)) {
     return (
       <div className="flex justify-center p-12">
-        <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading users...</p>
+        <p className="text-lightestGrey motion-safe:animate-pulse font-mono text-xl">
+          Loading users...
+        </p>
       </div>
     );
   }

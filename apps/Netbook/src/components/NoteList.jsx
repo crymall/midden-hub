@@ -34,7 +34,9 @@ const NoteList = ({
   if (fetchingNotes) {
     return (
       <div className="flex justify-center p-12">
-        <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading notes...</p>
+        <p className="text-lightestGrey motion-safe:animate-pulse font-mono text-xl">
+          Loading notes...
+        </p>
       </div>
     );
   }
