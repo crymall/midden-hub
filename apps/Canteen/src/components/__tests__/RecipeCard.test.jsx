@@ -26,7 +26,7 @@ describe("RecipeCard", () => {
     id: "123",
     title: "Spicy Tacos",
     description: "Delicious tacos with spicy salsa.",
-    likes: ["user1", "user2", "user3"],
+    like_count: 3,
     tags: [
       { id: "1", name: "Mexican" },
       { id: "2", name: "Spicy" },
@@ -80,7 +80,7 @@ describe("RecipeCard", () => {
   it("formats large like counts compactly", () => {
     const recipeManyLikes = {
       ...mockRecipe,
-      likes: new Array(1200).fill("user"),
+      like_count: 1200,
     };
     render(
       <MemoryRouter>
@@ -91,7 +91,7 @@ describe("RecipeCard", () => {
   });
 
   it("does not render the like count when likes are empty", () => {
-    const recipeNoLikes = { ...mockRecipe, likes: [] };
+    const recipeNoLikes = { ...mockRecipe, like_count: 0 };
     render(
       <MemoryRouter>
         <RecipeCard recipe={recipeNoLikes} />
