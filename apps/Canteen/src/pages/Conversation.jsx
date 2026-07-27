@@ -132,7 +132,9 @@ const Conversation = () => {
         className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-scroll p-4"
       >
         {conversationLoading && (
-          <div className="text-lightGrey animate-pulse text-center text-sm">Loading...</div>
+          <div className="text-lightGrey motion-safe:animate-pulse text-center text-sm">
+            Loading...
+          </div>
         )}
         {displayConversation.map((msg) => {
           const isMe = String(msg.sender_id) === String(user.canteenId);

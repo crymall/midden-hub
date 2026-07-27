@@ -122,7 +122,9 @@ const UserProfile = () => {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
-          <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading profile...</p>
+          <p className="text-lightestGrey motion-safe:animate-pulse font-mono text-xl">
+            Loading profile...
+          </p>
         </div>
       </MiddenCard>
     );
