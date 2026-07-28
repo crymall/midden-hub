@@ -39,7 +39,7 @@ const RecipeDetail = () => {
     retry: false,
   });
 
-  const isLiked = currentRecipe?.likes?.some((like) => like.user_id === user?.canteenId);
+  const isLiked = currentRecipe?.liked_by_current_user;
 
   const toggleLikeMutation = useMutation({
     mutationFn: async () => {

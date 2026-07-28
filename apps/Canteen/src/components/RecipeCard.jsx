@@ -85,9 +85,9 @@ const RecipeCard = ({ recipe, inverse = false }) => {
               ))}
           </div>
           <div className="flex shrink-0 items-center gap-3">
-            {recipe.likes && recipe.likes.length > 0 && (
+            {recipe.like_count > 0 && (
               <span className="text-accent font-mono text-xs font-bold">
-                ♥ {Intl.NumberFormat("en-US", { notation: "compact" }).format(recipe.likes.length)}
+                ♥ {Intl.NumberFormat("en-US", { notation: "compact" }).format(recipe.like_count)}
               </span>
             )}
             <Can perform={PERMISSIONS.writeData}>
