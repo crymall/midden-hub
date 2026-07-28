@@ -84,7 +84,7 @@ describe("RecipeDetail", () => {
       },
     ],
     instructions: "Mix and bake.",
-    likes: [],
+    liked_by_current_user: false,
     tags: [{ id: "1", name: "TestTag" }],
   };
 
@@ -249,7 +249,7 @@ describe("RecipeDetail", () => {
   it("shows liked state correctly", async () => {
     const likedRecipe = {
       ...mockRecipe,
-      likes: [{ user_id: "user1" }],
+      liked_by_current_user: true,
     };
     canteenApi.fetchRecipe.mockResolvedValue(likedRecipe);
 
