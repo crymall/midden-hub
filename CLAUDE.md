@@ -70,3 +70,39 @@ Keep the ones you do write short.
 
 ### CI/CD
 GitHub Actions: `ci.yml` runs lint + tests on every push/PR to main; `deploy.yml` on merge to main runs tests, builds per-app Docker images (build context is the **repo root** so Dockerfiles can copy `shared/`), pushes to Docker Hub, and applies the `k8s/` manifests. Lazy-loaded pages require a reload prompt after redeploys (see recent commit history).
+
+## Claude Code tooling
+
+`.claude/` is **gitignored and not part of the repo**.
+It holds vendored agent tooling and machine-local settings, both of which are environment setup rather than project source.
+A fresh clone will not have it, and nothing in the build, test, lint, or deploy path depends on it.
+
+### The `impeccable` design skill
+
+A user-invocable skill vendored at `.claude/skills/impeccable/` (v4.0.2, Apache 2.0).
+It owns frontend design work: visual language, UX review, accessibility, responsive behaviour, typography, motion, and design-system extraction.
+Invoke it as `/impeccable <command> [target]`; with no argument it presents a menu.
+
+Commands used on this repo so far, and what each is for:
+
+- `critique` — heuristic UX review producing a scored report. Runs two isolated sub-agents (design review, and detector plus browser evidence), then persists a snapshot.
+- `polish`, `harden`, `clarify` — refinement passes for final quality, production edge cases, and UX copy.
+- `extract` — pulls repeated patterns into shared tokens and components.
+
+Because the skill lives outside version control, it must be reinstalled locally before those commands work.
+There is no npm dependency for it, so `npm install` will not restore it.
+
+### Design detector hooks
+
+`.claude/settings.local.json` registers `PostToolUse` and `Stop` hooks that run the skill's detector against changed UI files.
+Both are guarded with `[ ! -f … ] ||`, so they no-op silently when the skill is absent rather than failing the session.
+That file is machine-local and has never been tracked; it also carries the per-project tool permission allowlist.
+
+### Committed design artifacts
+
+These *are* tracked, and are the durable output of the tooling rather than the tooling itself:
+
+- `DESIGN.md` — the design language spec for the whole suite ("The Excavated Console"). The source of truth for colour, type, shape, depth, and component rules across all three apps.
+- `.impeccable/design.json` — a generated sidecar for `DESIGN.md`. Refresh it with `/impeccable document`; do not hand-edit.
+- `.impeccable/critique/` — dated critique snapshots, plus `ignore.md`. `ignore.md` records findings that are deliberate product decisions, so repeat critiques stop re-raising them; add an entry whenever a flagged item is a settled choice.
+- `docs/design-remediation.md` — the phased remediation backlog derived from the 2026-07-29 critique, ordered by where each fix lives rather than by severity.

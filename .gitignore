@@ -25,6 +25,7 @@ issuer.yaml
 *.dump
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 .DS_Store
