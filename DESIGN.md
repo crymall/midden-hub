@@ -12,9 +12,9 @@ colors:
 typography:
   display:
     fontFamily: "Jacquard 12, cursive"
-    fontSize: "clamp(2rem, 6vw, 4.5rem)"
+    fontSize: "1.875rem–6rem, stepped at breakpoints (text-3xl → text-8xl)"
     fontWeight: 400
-    lineHeight: 1.1
+    lineHeight: 1.25
     letterSpacing: "0.02em"
   body:
     fontFamily: "Libertinus Mono, monospace"
@@ -47,7 +47,7 @@ components:
     textColor: "{colors.dark}"
   button-nav:
     backgroundColor: "{colors.grey}"
-    textColor: "{colors.chalk-white}"
+    textColor: "{colors.dark}"
     rounded: "{rounded.none}"
     padding: "4px 12px"
   button-icon:
@@ -79,7 +79,7 @@ One design language serves the whole Midden family — Midden, Canteen, and Netb
 The result is brutalist in spirit but never hostile. Surfaces are near-black grounds; type is a blackletter gothic display (`Jacquard 12`) set against a monospace body (`Libertinus Mono`); everything is squared-off and framed in dashed "excavation tape" in the app's single accent color. Depth is a hard, zero-blur letterpress shadow — an intentional 8-bit/print artifact, not a naturalistic elevation. Information is surfaced, not hidden: density is welcome as long as hierarchy keeps it legible. The one thing this system refuses is the generic SaaS register — the slick, safe, rounded-and-shadowed look it is defined against.
 
 **Key Characteristics:**
-- Near-black grounds, one saturated accent per theme, no light mode.
+- Near-black grounds; one saturated brand hue and one quieter accent per theme; no light mode.
 - Blackletter display + monospace body; no third typeface.
 - Zero border-radius; dashed borders are the form language.
 - Hard 2px/2px zero-blur text-shadows as the only "depth."
@@ -87,24 +87,65 @@ The result is brutalist in spirit but never hostile. Surfaces are near-black gro
 
 ## Colors
 
-A dark, tonal palette: every surface descends from one near-black ground, and each app owns exactly one accent that carries links, active glyphs, and dashed borders. Contrast is earned by lightening text over the dark ground, never by inverting to a light surface. The frontmatter tokens are the **Midden (default) theme**; the two `[data-theme]` blocks below re-tint the same token names.
+A dark, tonal palette. Every surface descends from one near-black ground; each app owns one saturated brand hue that fills its header, and one quieter accent that marks what is actionable. Contrast is earned by lightening text over the dark ground, never by inverting to a light surface. The frontmatter tokens are the **Midden (default) theme**; the two `[data-theme]` blocks below re-tint the same token names.
 
-### Primary
-- **Signal Moss** (`#4a9d5b`): the Midden accent — links, list bullets, active glyphs, and the dashed borders that frame every panel. AA-text-safe on the dark ground (≈5.9:1). Used sparingly; its scarcity is the signal.
+Colors are grouped by **role**, not by hue family.
+Each of the four roles below is re-tinted independently per theme, and each is governed by a different rule.
 
-### Neutral
-- **Excavation Black** (`#060a08`): the ground under everything — page and `<main>` background. A near-black with a faint green undertone.
-- **Deep Regolith Violet** (`#210130`): raised fields — the header bar and the login panel. Reads as a darker slab against the black.
-- **Ash Grey** (`#7d7e75`): the default button/control surface, paired with dark text.
+> **Why this replaced a Primary/Neutral split.** The previous grouping listed `--color-accent` alone under "Primary" and put everything else, including `--color-primary`, under "Neutral."
+> That demoted the brand color to a neutral and promoted the interaction color to the brand slot — backwards in both directions.
+> It was also wrong colorimetrically: `--color-primary` is the *more* saturated of the two in all three themes (96% / 40% / 52% against 36% / 27% / 44%), so it was the least neutral color in the bucket named Neutral.
+
+### Ground — `--color-dark`
+The single surface everything descends from, governed by the Dark-Ground Rule.
+
+- **Excavation Black** (`#060a08`): page and `<main>` background, and the fill of every input. A near-black with a faint green undertone.
+
+### Brand — `--color-primary`
+**The identity color, and the most saturated token in every theme.**
+It is what someone pictures when they picture the app: it fills the header bar on every page, and the login panel.
+Chromatic by design — never treat it as a neutral or a mere "raised surface."
+
+- **Deep Regolith Violet** (`#210130`): the header bar and the login panel.
+
+Contrast against the ground is low by intent (1.05:1 in Midden), so this token cannot delimit a surface on its own — the 4px dashed accent border carries that boundary.
+It also appears at low opacity (`primary/20`, `primary/40`) as the hover wash on interactive rows.
+
+### Text & control ramp — `--color-grey` → `--color-lightGrey` → `--color-lightestGrey`
+Three steps of ascending lightness over the dark ground.
+This is the ramp that earns contrast, and it is the part most likely to be misread when adding a theme: the steps must stay ordered and each must clear its own threshold.
+
+- **Ash Grey** (`#7d7e75`): the default button and control surface, paired with dark text. The darkest step, and the one with the least headroom — 4.85:1 in Midden and 4.56:1 in Netbook against the ground.
 - **Bone Grey** (`#b0b2b8`): button hover surface and secondary text.
-- **Cold Chalk** (`#cfd6ea`): primary body text on the dark ground.
-- **Chalk White** (`#ffffff`): headings and interactive text at rest.
+- **Cold Chalk** (`#cfd6ea`): primary body text on the dark ground, and the keyboard focus ring.
+
+### Accent — `--color-accent`
+**The interaction color, not the brand color.** It marks what is actionable or active, and it is deliberately quieter than the brand hue.
+Exactly one per theme, governed by the One Accent Rule.
+
+- **Signal Moss** (`#4a9d5b`): links, list bullets, active glyphs, and the dashed borders that frame every panel. AA-text-safe on the dark ground (≈5.9:1). Used sparingly; its scarcity is the signal.
+
+The brand hue and the accent are intentionally different families in every theme — violet against moss, terracotta against sage, navy against brass. A theme whose accent drifts toward its brand hue loses the distinction between "this is the app" and "this is clickable."
+
+### Outside the token system
+- **Chalk White** (`#ffffff`): headings and interactive text at rest. **This has no token** — `@theme` defines six colors and white is not among them, so it reaches components as Tailwind's `text-white`. It is therefore the one palette entry that is identical in all three themes and cannot be re-tinted. That is a deliberate constant, not an oversight, but treat it as fixed when designing a new theme.
 
 ### Theme Variants
-The same token names are overridden per app. Each variant keeps the One-Accent and Dark-Ground rules.
+`[data-theme]` overrides the same six token names and nothing else, in the same four roles. Each variant keeps the One-Accent and Dark-Ground rules.
 
-- **Canteen** (`[data-theme="canteen"]`) — a warm kitchen palette. Ground **Roast Umber** (`#2a1b15`), field **Terracotta Clay** (`#6b3e2e`), accent **Sage Olive** (`#b2b67f`, ≈7.8:1 on ground), plus **Kitchen Ash** (`#9c9482`), **Oat** (`#dcd5ca`), **Warm Parchment** (`#f2ebd9`).
-- **Netbook** (`[data-theme="netbook"]`) — a cool desk-lamp palette. Ground **Midnight Slate** (`#131824`), field **Ink Navy** (`#1e3a5f`), accent **Lamplight Brass** (`#ad8a43`, ≈5.5:1 on ground), plus **Slate Ash** (`#7a8194`), **Fog** (`#c0c7d6`), **Paper Blue** (`#eaeef7`).
+| Role | Token | Midden (default) | Canteen | Netbook |
+|---|---|---|---|---|
+| Ground | `--color-dark` | Excavation Black `#060a08` | Roast Umber `#2a1b15` | Midnight Slate `#131824` |
+| **Brand** | `--color-primary` | Deep Regolith Violet `#210130` | Terracotta Clay `#6b3e2e` | Ink Navy `#1e3a5f` |
+| Ramp 1 | `--color-grey` | Ash Grey `#7d7e75` | Kitchen Ash `#9c9482` | Slate Ash `#7a8194` |
+| Ramp 2 | `--color-lightGrey` | Bone Grey `#b0b2b8` | Oat `#dcd5ca` | Fog `#c0c7d6` |
+| Ramp 3 | `--color-lightestGrey` | Cold Chalk `#cfd6ea` | Warm Parchment `#f2ebd9` | Paper Blue `#eaeef7` |
+| Accent | `--color-accent` | Signal Moss `#4a9d5b` | Sage Olive `#b2b67f` | Lamplight Brass `#ad8a43` |
+
+Canteen is a warm kitchen palette, Netbook a cool desk-lamp one.
+Accent contrast on its own ground: **5.94:1** Midden, **7.81:1** Canteen, **5.49:1** Netbook — all AA-safe for text, which is a constraint a new theme must also meet.
+
+**The theme switch is not complete.** `document.body.dataset.theme` is set only by `Dashboard`, so any route outside that layout renders with the default Midden tokens. That is intentional for `/login`, which is a shared identity surface across all three apps; it is not intentional anywhere else.
 
 ### Named Rules
 **The One Accent Rule.** Each theme carries exactly one accent. It appears on borders, links, active glyphs, and bullets — never as a large fill. Adding a second accent hue breaks the world.
@@ -120,7 +161,7 @@ The same token names are overridden per app. Each variant keeps the One-Accent a
 **Character:** A collision of centuries — medieval blackletter headings over a machine-precise monospace body. The pairing is the whole personality: handmade and archival on top, terminal and exact underneath. Pixel-hinting is disabled on the display and icon faces (`-webkit-font-smoothing: none`) to keep the retro, un-antialiased edge.
 
 ### Hierarchy
-- **Display** (Jacquard 12, `clamp(2rem, 6vw, 4.5rem)`, line-height ~1.1): page titles and the app wordmark in the header. Always paired with the hard grey text-shadow.
+- **Display** (Jacquard 12, `1.875rem`–`6rem`): page titles and the app wordmark in the header. Always paired with the hard grey text-shadow. Sizing is **stepped at breakpoints** with Tailwind utilities (`text-3xl sm:text-5xl`, `text-4xl md:text-7xl`, `text-8xl`) — there is no fluid `clamp()` anywhere in the codebase, and adding one would be a change to the system, not a fix. Line-height is currently inconsistent: the three headings carrying `leading-tight` render at 1.25, the rest inherit Tailwind's per-size default of 1. Standardize on one value before treating this as settled.
 - **Headline** (Libertinus Mono, bold, ~1.25–1.5rem): section headings inside content (`h3`).
 - **Body** (Libertinus Mono, 400, 1rem, line-height ~1.6): all running text, list items, form values.
 - **Label** (Libertinus Mono, bold, 0.875rem): form labels, muted captions, uppercase status text (e.g. the loading message is uppercase, tracking-widest).
@@ -155,20 +196,28 @@ Radius is `0` everywhere; corners are cut, not rounded. The recurring silhouette
 ### Buttons
 - **Shape:** square (`0` radius), no border; solid slab.
 - **Primary:** Ash Grey fill with Excavation-Black text, `8px 16px` padding. Hover shifts the fill to Bone Grey (`bg-grey → bg-lightGrey`). Used for form submits and primary actions.
-- **Nav / auth:** Ash Grey fill with white text (`4px 12px`); the login button hovers toward a translucent accent.
+- **Nav / auth:** Ash Grey fill with **Excavation-Black text** (`4px 12px`); the login button hovers toward a translucent accent.
 - **Icon buttons:** Ash Grey slab rendering a `Midden Icons` glyph in dark, with the hard text-shadow (settings `T`, logout `uJ`). These read as adventure-game verbs.
-- **Focus:** must stay clearly visible — see Do's & Don'ts; do not rely on hover alone.
+- **Focus:** handled globally — see Inputs / Fields.
 
-### Cards / Containers
+### Containers
+
+Two distinct things, often conflated. They are not the same component.
+
+**`MiddenCard` — the page wrapper.** No border, no background, no accent. It is a padding and width container only: `24px` (`p-6`) padding, full-width on mobile, `w-4/5` from `md` up, with the Cold-Chalk-on-monospace text defaults. Almost every page is wrapped in one. It corresponds to the `card-panel` entry in the frontmatter.
+
+**The dashed panel — the framing motif.** The 2px-dashed-accent rectangle that gives the system its look. It is *not* built into `MiddenCard`; it is applied per use in twelve places (`MiddenModal`, `AppCard`, `RecipeCard`, `NoteList`, `Note`, and others).
+
 - **Corner style:** square (`0` radius).
 - **Border:** 2px dashed in the theme accent; internal dividers are 1px dashed `white/10`.
 - **Background:** transparent on desktop, faint `white/5` on mobile; hover raises a `primary/20` wash.
-- **Padding:** `24px` (`p-6`) typical.
+
+Because the motif is hand-applied rather than owned by a component, it drifts. Promoting it into a shared panel primitive is the standing fix.
 
 ### Inputs / Fields
 - **Style:** Excavation-Black fill, 1px Ash-Grey border, Cold-Chalk text, square corners, `8px` padding.
-- **Focus:** border shifts to the lightest neutral. **Note:** the current `focus:outline-none` weakens keyboard focus and must be strengthened to meet WCAG 2.2 (see Don'ts).
-- **Error / info:** flat bordered banners — red border + `red-900/50` fill for errors, blue for info.
+- **Focus:** an unlayered `:focus-visible` rule in `index.css` paints a 2px Cold-Chalk outline at 2px offset on every interactive element. It wins on cascade layer rather than `!important`, and stays keyboard-only. This is why the 34 `focus:outline-none` declarations across the codebase are safe — they suppress mouse focus only. **Do not remove that rule**, and note its selector is a fixed allowlist of tags and roles: a focusable element outside that list which also clears its outline would lose its ring silently.
+- **Error / info:** flat bordered banners — red border + `red-900/50` fill for errors, blue for info. **These colors have no tokens** and are improvised per call site; see Known Gaps.
 
 ### Navigation
 - **Desktop:** monospace text links in the header, white at rest → Cold Chalk on hover; the blackletter wordmark doubles as the home link, carrying the hard shadow.
@@ -189,12 +238,29 @@ The suite's one authored motion moment, and its loading indicator everywhere. A 
 - **Do** use `Midden Icons` glyphs for all iconography; map single letters to symbols as the existing components do.
 - **Do** apply the hard `2px 2px 0` (zero-blur) text-shadow to white display headings as the signature depth.
 - **Do** meet **WCAG 2.2 Level AA**: body/placeholder text ≥4.5:1, large text and non-text UI (borders, glyphs used as controls) ≥3:1, measured against the active theme's `--color-dark`. The accent is now AA-text-safe on the dark ground in all three themes — preserve that when retheming.
-- **Do** tint secondary text from the neutral ramp (Cold Chalk / Bone Grey); never drop below 4.5:1 with a mid-grey.
+- **Do** tint secondary text from the text ramp (Cold Chalk / Bone Grey); never drop below 4.5:1 with a mid-grey.
+- **Do** define the hard-shadow utilities against `var(--color-*)` so the signature depth re-tints with the theme.
 - **Do** gate every looping animation behind `motion-safe:` / `prefers-reduced-motion`, with a static fallback that keeps the meaning — the moon loader rests on a full moon, pulses stop, nothing disappears.
 
 ### Don't:
 - **Don't** introduce border-radius, blurred drop shadows, gradients, gradient text, or glassmorphism — each breaks the Excavated Console.
 - **Don't** use `--color-accent` as a button background behind white text unless the pair clears 4.5:1; back accent fills with dark text instead.
-- **Don't** ship `focus:outline-none` without an equally visible replacement — WCAG 2.2 (2.4.11 Focus Not Obscured, 2.4.13 Focus Appearance) requires a clear focus indicator; strengthen the input/nav focus states.
+- **Don't** delete or narrow the global `:focus-visible` rule in `index.css`. `focus:outline-none` is safe *only* because that rule exists; removing it silently strips the focus indicator from 34 call sites at once.
 - **Don't** add a second accent hue to any theme; one accent, used sparingly.
+- **Don't** hardcode a hex in a `@utility` or component when a token exists — that is how the shadow utilities came to ignore the theme.
 - **Don't** reach for post-2.0 polish (soft shadows, rounded pills, glossy gradients). The aesthetic is deliberately pre-2.0 and handmade.
+
+## Known Gaps
+
+This system specifies color, type, shape, and depth, and does **not** yet specify the things below.
+Each was consequently improvised per app, which is the documented root cause of the cross-app inconsistency found in the 2026-07-29 critique.
+Treat this list as binding scope, not as a wishlist: adding one of these patterns means adding its spec here in the same change.
+
+- **No danger/destructive color.** Nine distinct raw `red-*` classes are in use across 21 occurrences, and the confirm button measures 3.76:1 with white text.
+- **No error-surface spec.** Nine list views cannot distinguish "you have no data" from "the server is down."
+- **No empty-state spec.** Three competing voices are in use.
+- **No pagination spec.** Two divergent implementations exist; the shared-looking one lives inside one app.
+- **No spec for the icon vocabulary.** `Midden Icons` is mandated for "all iconography," but 21 Unicode substitutions and inline SVG are in use, and the glyph `[` is bound to two different meanings.
+
+Sequenced remediation lives in `docs/design-remediation.md`.
+Findings deliberately rejected rather than fixed are recorded in `.impeccable/critique/ignore.md`.

@@ -1,37 +1,185 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-26T00:00:00Z",
+  "generatedAt": "2026-07-29T05:18:59Z",
   "title": "Design System: Midden Hub",
   "extensions": {
     "colorMeta": {
-      "dark": { "role": "neutral", "displayName": "Excavation Black", "canonical": "#060a08", "tonalRamp": ["#020403", "#060a08", "#0d1712", "#16241d", "#24382e", "#3a5548", "#5f8071", "#9db8ac"] },
-      "primary": { "role": "neutral", "displayName": "Deep Regolith Violet", "canonical": "#210130", "tonalRamp": ["#0a0110", "#12021b", "#1a0126", "#210130", "#3a1a4c", "#573369", "#7d5a8c", "#a98cb4"] },
-      "accent": { "role": "primary", "displayName": "Signal Moss", "canonical": "#4a9d5b", "tonalRamp": ["#0c1f12", "#163a1f", "#21572e", "#2d743d", "#3a8b49", "#4a9d5b", "#74b781", "#a8d4b0"] },
-      "grey": { "role": "neutral", "displayName": "Ash Grey", "canonical": "#7d7e75", "tonalRamp": ["#1a1a18", "#2f2f2b", "#474741", "#5f5f58", "#7d7e75", "#97988f", "#b4b5ad", "#d6d7d0"] },
-      "light-grey": { "role": "neutral", "displayName": "Bone Grey", "canonical": "#b0b2b8", "tonalRamp": ["#1e1f22", "#34363a", "#4d4f54", "#6a6c72", "#8a8c92", "#b0b2b8", "#cbccd1", "#e6e7ea"] },
-      "lightest-grey": { "role": "neutral", "displayName": "Cold Chalk", "canonical": "#cfd6ea", "tonalRamp": ["#1f2430", "#333a4a", "#4c5568", "#6b7488", "#8f97a9", "#b3bacb", "#cfd6ea", "#e8ecf5"] },
-      "chalk-white": { "role": "neutral", "displayName": "Chalk White", "canonical": "#ffffff", "tonalRamp": ["#2a2a2a", "#454545", "#616161", "#808080", "#a3a3a3", "#c7c7c7", "#e6e6e6", "#ffffff"] }
+      "dark": {
+        "role": "ground",
+        "displayName": "Excavation Black",
+        "canonical": "#060a08",
+        "tonalRamp": [
+          "#020403",
+          "#060a08",
+          "#0d1712",
+          "#16241d",
+          "#24382e",
+          "#3a5548",
+          "#5f8071",
+          "#9db8ac"
+        ]
+      },
+      "primary": {
+        "role": "brand",
+        "displayName": "Deep Regolith Violet",
+        "canonical": "#210130",
+        "tonalRamp": [
+          "#0a0110",
+          "#12021b",
+          "#1a0126",
+          "#210130",
+          "#3a1a4c",
+          "#573369",
+          "#7d5a8c",
+          "#a98cb4"
+        ],
+        "purpose": "The identity colour and the most saturated token in every theme. Fills the header bar on every page, and the login panel. Not a neutral, and not a mere raised surface."
+      },
+      "accent": {
+        "role": "accent",
+        "displayName": "Signal Moss",
+        "canonical": "#4a9d5b",
+        "tonalRamp": [
+          "#0c1f12",
+          "#163a1f",
+          "#21572e",
+          "#2d743d",
+          "#3a8b49",
+          "#4a9d5b",
+          "#74b781",
+          "#a8d4b0"
+        ],
+        "purpose": "The interaction colour, not the brand colour. Marks what is actionable or active, and is deliberately quieter than the brand hue."
+      },
+      "grey": {
+        "role": "ramp",
+        "displayName": "Ash Grey",
+        "canonical": "#7d7e75",
+        "tonalRamp": [
+          "#1a1a18",
+          "#2f2f2b",
+          "#474741",
+          "#5f5f58",
+          "#7d7e75",
+          "#97988f",
+          "#b4b5ad",
+          "#d6d7d0"
+        ]
+      },
+      "light-grey": {
+        "role": "ramp",
+        "displayName": "Bone Grey",
+        "canonical": "#b0b2b8",
+        "tonalRamp": [
+          "#1e1f22",
+          "#34363a",
+          "#4d4f54",
+          "#6a6c72",
+          "#8a8c92",
+          "#b0b2b8",
+          "#cbccd1",
+          "#e6e7ea"
+        ]
+      },
+      "lightest-grey": {
+        "role": "ramp",
+        "displayName": "Cold Chalk",
+        "canonical": "#cfd6ea",
+        "tonalRamp": [
+          "#1f2430",
+          "#333a4a",
+          "#4c5568",
+          "#6b7488",
+          "#8f97a9",
+          "#b3bacb",
+          "#cfd6ea",
+          "#e8ecf5"
+        ]
+      },
+      "chalk-white": {
+        "role": "fixed",
+        "displayName": "Chalk White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#2a2a2a",
+          "#454545",
+          "#616161",
+          "#808080",
+          "#a3a3a3",
+          "#c7c7c7",
+          "#e6e6e6",
+          "#ffffff"
+        ],
+        "purpose": "Has no token. @theme defines six colours and white is not among them, so it reaches components as Tailwind's text-white and is identical in all three themes."
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Blackletter page titles and the app wordmark; always with the hard grey text-shadow." },
-      "body": { "displayName": "Body / Label", "purpose": "Monospace running text, list items, form values, and labels — the whole product's body voice." },
-      "icon": { "displayName": "Icon Glyphs", "purpose": "The Midden Icons OpenType font; single letters map to symbols used as iconography and verbs." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "Blackletter page titles and the app wordmark; always with the hard text-shadow. Sized by stepped Tailwind utilities (text-3xl to text-8xl), not a fluid clamp(). Line-height is unsettled: 1.25 where leading-tight is applied, otherwise Tailwind's per-size default of 1 — pending a Phase 1 decision."
+      },
+      "body": {
+        "displayName": "Body / Label",
+        "purpose": "Monospace running text, list items, form values, and labels — the whole product's body voice."
+      },
+      "icon": {
+        "displayName": "Icon Glyphs",
+        "purpose": "The Midden Icons OpenType font; single letters map to symbols used as iconography and verbs."
+      }
     },
     "themeVariants": {
-      "canteen": { "displayName": "Canteen (warm kitchen)", "dark": "#2a1b15", "primary": "#6b3e2e", "accent": "#b2b67f", "grey": "#9c9482", "light-grey": "#dcd5ca", "lightest-grey": "#f2ebd9" },
-      "netbook": { "displayName": "Netbook (cool desk-lamp)", "dark": "#131824", "primary": "#1e3a5f", "accent": "#ad8a43", "grey": "#7a8194", "light-grey": "#c0c7d6", "lightest-grey": "#eaeef7" }
+      "canteen": {
+        "displayName": "Canteen (warm kitchen)",
+        "dark": "#2a1b15",
+        "primary": "#6b3e2e",
+        "accent": "#b2b67f",
+        "grey": "#9c9482",
+        "light-grey": "#dcd5ca",
+        "lightest-grey": "#f2ebd9"
+      },
+      "netbook": {
+        "displayName": "Netbook (cool desk-lamp)",
+        "dark": "#131824",
+        "primary": "#1e3a5f",
+        "accent": "#ad8a43",
+        "grey": "#7a8194",
+        "light-grey": "#c0c7d6",
+        "lightest-grey": "#eaeef7"
+      }
     },
     "shadows": [
-      { "name": "letterpress-grey", "value": "2px 2px 0 #7d7e75", "purpose": "Signature hard cast shadow on white display headings. Zero blur — a letterpress/8-bit artifact, not elevation." },
-      { "name": "letterpress-dark", "value": "2px 2px 0 #060a08", "purpose": "Hard shadow variant used on lighter glyphs/controls against pale fills." }
+      {
+        "name": "letterpress-grey",
+        "value": "2px 2px 0 #7d7e75",
+        "purpose": "Signature hard cast shadow on white display headings. Zero blur — a letterpress/8-bit artifact, not elevation. Known defect: this utility is defined with a literal hex, so it does not re-tint per theme (Phase 1)."
+      },
+      {
+        "name": "letterpress-dark",
+        "value": "2px 2px 0 #060a08",
+        "purpose": "Hard shadow variant used on lighter glyphs/controls against pale fills. Known defect: this utility is defined with a literal hex, so it does not re-tint per theme (Phase 1)."
+      }
     ],
     "motion": [
-      { "name": "state-color", "value": "color 0.2s, background-color 0.2s", "purpose": "Default transition for hover/active color and background shifts on links, buttons, and rows." },
-      { "name": "moon-cycle", "value": "8 discrete phase frames, ~160ms each (~1.3s loop), JS-driven", "purpose": "The loading indicator: a Midden Icons moon cycling its eight phases; rests on a static full moon under prefers-reduced-motion." }
+      {
+        "name": "state-color",
+        "value": "color 0.2s, background-color 0.2s",
+        "purpose": "Default transition for hover/active color and background shifts on links, buttons, and rows."
+      },
+      {
+        "name": "moon-cycle",
+        "value": "8 discrete phase frames, ~160ms each (~1.3s loop), JS-driven",
+        "purpose": "The loading indicator: a Midden Icons moon cycling its eight phases; rests on a static full moon under prefers-reduced-motion."
+      }
     ],
     "breakpoints": [
-      { "name": "md", "value": "768px" },
-      { "name": "xl", "value": "1280px" }
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
     ]
   },
   "components": [
@@ -95,19 +243,43 @@
     "northStar": "The Excavated Console",
     "overview": "One design language serves the whole Midden family — Midden, Canteen, and Netbook draw from a single shared/ui layer and one stylesheet, re-tinted per app through [data-theme] overrides. The world it builds fuses an archaeological dig-site (the midden, excavated and laid out for inspection), a 1990s point-and-click adventure interface (chunky clickable slabs, a glyph font that acts like a verb list, a CRT-terminal calm), and a handmade bulletin (dashed cut-outs pinned to a dark board, deliberately un-slick). Nothing here is Web 2.0 or later: no rounded pills, no soft glass, no gloss. The result is brutalist in spirit but never hostile — near-black grounds, a blackletter gothic display against a monospace body, everything squared-off and framed in dashed excavation tape in the app's single accent. Depth is a hard, zero-blur letterpress shadow, an intentional artifact rather than naturalistic elevation. Information is surfaced, not hidden; density is welcome as long as hierarchy keeps it legible. The one thing this system refuses is the generic SaaS register it is defined against.",
     "keyCharacteristics": [
-      "Near-black grounds, one saturated accent per theme, no light mode.",
+      "Near-black grounds; one saturated brand hue and one quieter accent per theme; no light mode.",
       "Blackletter display + monospace body; no third typeface.",
       "Zero border-radius; dashed borders are the form language.",
-      "Hard 2px/2px zero-blur text-shadows as the only depth.",
+      "Hard 2px/2px zero-blur text-shadows as the only \"depth.\"",
       "A bespoke Midden Icons glyph font supplies all iconography."
     ],
     "rules": [
-      { "name": "The One Accent Rule", "body": "Each theme carries exactly one accent. It appears on borders, links, active glyphs, and bullets — never as a large fill. Adding a second accent hue breaks the world.", "section": "colors" },
-      { "name": "The Dark-Ground Rule", "body": "Every surface descends from --color-dark. There is no light mode. Earn contrast by lightening text, not by inverting the ground.", "section": "colors" },
-      { "name": "The Two-Face Rule", "body": "Blackletter display, monospace everything-else. There is no third family, ever — and monospace here is the body voice of the whole product, not a code costume.", "section": "typography" },
-      { "name": "The Hard-Shadow Rule", "body": "The signature shadow is offset 2px 2px with zero blur. It is a stylistic artifact, not an elevation cue. If a shadow has blur, it does not belong to this system.", "section": "elevation" },
-      { "name": "The Flat-Ground Rule", "body": "Surfaces are flat at rest. The only lift is a tonal wash (white/5, primary/20) that appears on hover — never a soft shadow.", "section": "elevation" },
-      { "name": "The Square-Cut Rule", "body": "No border-radius, anywhere. Forms are cut and framed in dashed tape.", "section": "shapes" }
+      {
+        "name": "The One Accent Rule",
+        "body": "Each theme carries exactly one accent. It appears on borders, links, active glyphs, and bullets — never as a large fill. Adding a second accent hue breaks the world.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dark-Ground Rule",
+        "body": "Every surface descends from --color-dark. There is no light mode. Earn contrast by lightening text, not by inverting the ground.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Face Rule",
+        "body": "Blackletter display, monospace everything-else. There is no third family, ever — and monospace here is the body voice of the whole product, not a code costume.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hard-Shadow Rule",
+        "body": "The signature shadow is offset 2px 2px with zero blur. It is a stylistic artifact, not an elevation cue. If a shadow has blur, it does not belong to this system.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Flat-Ground Rule",
+        "body": "Surfaces are flat at rest. The only lift is a tonal wash (white/5, primary/20) that appears on hover — never a soft shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Square-Cut Rule",
+        "body": "No border-radius, anywhere. Forms are cut and framed in dashed tape.",
+        "section": "shapes"
+      }
     ],
     "dos": [
       "Do keep every corner square (0 radius); the form language is cut, not rounded.",
@@ -115,15 +287,17 @@
       "Do pair Jacquard 12 display with Libertinus Mono body, and nothing else.",
       "Do use Midden Icons glyphs for all iconography; map single letters to symbols as the existing components do.",
       "Do apply the hard 2px 2px 0 (zero-blur) text-shadow to white display headings as the signature depth.",
-      "Do meet WCAG 2.2 Level AA: body/placeholder text >=4.5:1, large text and non-text UI (borders, glyphs used as controls) >=3:1, measured against the active theme's --color-dark. The accent is now AA-text-safe on the dark ground in all three themes — preserve that when retheming.",
-      "Do tint secondary text from the neutral ramp (Cold Chalk / Bone Grey); never drop below 4.5:1 with a mid-grey.",
-      "Do gate every looping animation behind motion-safe / prefers-reduced-motion, with a static fallback that keeps the meaning — the moon loader rests on a full moon, pulses stop, nothing disappears."
+      "Do meet WCAG 2.2 Level AA: body/placeholder text ≥4.5:1, large text and non-text UI (borders, glyphs used as controls) ≥3:1, measured against the active theme's --color-dark. The accent is now AA-text-safe on the dark ground in all three themes — preserve that when retheming.",
+      "Do tint secondary text from the text ramp (Cold Chalk / Bone Grey); never drop below 4.5:1 with a mid-grey.",
+      "Do define the hard-shadow utilities against var(--color-) so the signature depth re-tints with the theme.",
+      "Do gate every looping animation behind motion-safe: / prefers-reduced-motion, with a static fallback that keeps the meaning — the moon loader rests on a full moon, pulses stop, nothing disappears."
     ],
     "donts": [
       "Don't introduce border-radius, blurred drop shadows, gradients, gradient text, or glassmorphism — each breaks the Excavated Console.",
       "Don't use --color-accent as a button background behind white text unless the pair clears 4.5:1; back accent fills with dark text instead.",
-      "Don't ship focus:outline-none without an equally visible replacement — WCAG 2.2 (2.4.11 Focus Not Obscured, 2.4.13 Focus Appearance) requires a clear focus indicator.",
+      "Don't delete or narrow the global :focus-visible rule in index.css. focus:outline-none is safe only because that rule exists; removing it silently strips the focus indicator from 34 call sites at once.",
       "Don't add a second accent hue to any theme; one accent, used sparingly.",
+      "Don't hardcode a hex in a @utility or component when a token exists — that is how the shadow utilities came to ignore the theme.",
       "Don't reach for post-2.0 polish (soft shadows, rounded pills, glossy gradients). The aesthetic is deliberately pre-2.0 and handmade."
     ]
   }
