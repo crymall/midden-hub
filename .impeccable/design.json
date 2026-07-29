@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-29T05:18:59Z",
+  "title": "Design System: Midden Hub",
+  "extensions": {
+    "colorMeta": {
+      "dark": {
+        "role": "ground",
+        "displayName": "Excavation Black",
+        "canonical": "#060a08",
+        "tonalRamp": [
+          "#020403",
+          "#060a08",
+          "#0d1712",
+          "#16241d",
+          "#24382e",
+          "#3a5548",
+          "#5f8071",
+          "#9db8ac"
+        ]
+      },
+      "primary": {
+        "role": "brand",
+        "displayName": "Deep Regolith Violet",
+        "canonical": "#210130",
+        "tonalRamp": [
+          "#0a0110",
+          "#12021b",
+          "#1a0126",
+          "#210130",
+          "#3a1a4c",
+          "#573369",
+          "#7d5a8c",
+          "#a98cb4"
+        ],
+        "purpose": "The identity colour and the most saturated token in every theme. Fills the header bar on every page, and the login panel. Not a neutral, and not a mere raised surface."
+      },
+      "accent": {
+        "role": "accent",
+        "displayName": "Signal Moss",
+        "canonical": "#4a9d5b",
+        "tonalRamp": [
+          "#0c1f12",
+          "#163a1f",
+          "#21572e",
+          "#2d743d",
+          "#3a8b49",
+          "#4a9d5b",
+          "#74b781",
+          "#a8d4b0"
+        ],
+        "purpose": "The interaction colour, not the brand colour. Marks what is actionable or active, and is deliberately quieter than the brand hue."
+      },
+      "grey": {
+        "role": "ramp",
+        "displayName": "Ash Grey",
+        "canonical": "#7d7e75",
+        "tonalRamp": [
+          "#1a1a18",
+          "#2f2f2b",
+          "#474741",
+          "#5f5f58",
+          "#7d7e75",
+          "#97988f",
+          "#b4b5ad",
+          "#d6d7d0"
+        ]
+      },
+      "light-grey": {
+        "role": "ramp",
+        "displayName": "Bone Grey",
+        "canonical": "#b0b2b8",
+        "tonalRamp": [
+          "#1e1f22",
+          "#34363a",
+          "#4d4f54",
+          "#6a6c72",
+          "#8a8c92",
+          "#b0b2b8",
+          "#cbccd1",
+          "#e6e7ea"
+        ]
+      },
+      "lightest-grey": {
+        "role": "ramp",
+        "displayName": "Cold Chalk",
+        "canonical": "#cfd6ea",
+        "tonalRamp": [
+          "#1f2430",
+          "#333a4a",
+          "#4c5568",
+          "#6b7488",
+          "#8f97a9",
+          "#b3bacb",
+          "#cfd6ea",
+          "#e8ecf5"
+        ]
+      },
+      "chalk-white": {
+        "role": "fixed",
+        "displayName": "Chalk White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#2a2a2a",
+          "#454545",
+          "#616161",
+          "#808080",
+          "#a3a3a3",
+          "#c7c7c7",
+          "#e6e6e6",
+          "#ffffff"
+        ],
+        "purpose": "Has no token. @theme defines six colours and white is not among them, so it reaches components as Tailwind's text-white and is identical in all three themes."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Blackletter page titles and the app wordmark; always with the hard text-shadow. Sized by stepped Tailwind utilities (text-3xl to text-8xl), not a fluid clamp(). Line-height is unsettled: 1.25 where leading-tight is applied, otherwise Tailwind's per-size default of 1 — pending a Phase 1 decision."
+      },
+      "body": {
+        "displayName": "Body / Label",
+        "purpose": "Monospace running text, list items, form values, and labels — the whole product's body voice."
+      },
+      "icon": {
+        "displayName": "Icon Glyphs",
+        "purpose": "The Midden Icons OpenType font; single letters map to symbols used as iconography and verbs."
+      }
+    },
+    "themeVariants": {
+      "canteen": {
+        "displayName": "Canteen (warm kitchen)",
+        "dark": "#2a1b15",
+        "primary": "#6b3e2e",
+        "accent": "#b2b67f",
+        "grey": "#9c9482",
+        "light-grey": "#dcd5ca",
+        "lightest-grey": "#f2ebd9"
+      },
+      "netbook": {
+        "displayName": "Netbook (cool desk-lamp)",
+        "dark": "#131824",
+        "primary": "#1e3a5f",
+        "accent": "#ad8a43",
+        "grey": "#7a8194",
+        "light-grey": "#c0c7d6",
+        "lightest-grey": "#eaeef7"
+      }
+    },
+    "shadows": [
+      {
+        "name": "letterpress-grey",
+        "value": "2px 2px 0 #7d7e75",
+        "purpose": "Signature hard cast shadow on white display headings. Zero blur — a letterpress/8-bit artifact, not elevation. Known defect: this utility is defined with a literal hex, so it does not re-tint per theme (Phase 1)."
+      },
+      {
+        "name": "letterpress-dark",
+        "value": "2px 2px 0 #060a08",
+        "purpose": "Hard shadow variant used on lighter glyphs/controls against pale fills. Known defect: this utility is defined with a literal hex, so it does not re-tint per theme (Phase 1)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-color",
+        "value": "color 0.2s, background-color 0.2s",
+        "purpose": "Default transition for hover/active color and background shifts on links, buttons, and rows."
+      },
+      {
+        "name": "moon-cycle",
+        "value": "8 discrete phase frames, ~160ms each (~1.3s loop), JS-driven",
+        "purpose": "The loading indicator: a Midden Icons moon cycling its eight phases; rests on a static full moon under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Square grey slab with dark text for form submits and primary actions; hover lifts the fill to bone grey.",
+      "html": "<button class=\"ds-btn-primary\">Login</button>",
+      "css": ".ds-btn-primary { background: var(--color-grey, #7d7e75); color: var(--color-dark, #060a08); font-family: 'Libertinus Mono', monospace; font-weight: 700; padding: 8px 16px; border: none; border-radius: 0; cursor: pointer; transition: background-color 0.2s; } .ds-btn-primary:hover { background: var(--color-lightGrey, #b0b2b8); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-lightestGrey, #cfd6ea); outline-offset: 2px; }"
+    },
+    {
+      "name": "Icon Button",
+      "kind": "button",
+      "refersTo": "button-icon",
+      "description": "Grey slab rendering a Midden Icons glyph with the hard shadow — reads as an adventure-game verb (settings, logout). Production uses the icon font; the SVG here stands in for render.",
+      "html": "<button class=\"ds-btn-icon\" aria-label=\"Settings\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1\"/></svg></button>",
+      "css": ".ds-btn-icon { display: inline-flex; align-items: center; justify-content: center; background: var(--color-grey, #7d7e75); color: var(--color-dark, #060a08); padding: 6px 12px; border: none; border-radius: 0; cursor: pointer; filter: drop-shadow(2px 2px 0 rgba(176,178,184,0.9)); transition: background-color 0.2s; } .ds-btn-icon:hover { background: var(--color-lightGrey, #b0b2b8); } .ds-btn-icon:focus-visible { outline: 2px solid var(--color-lightestGrey, #cfd6ea); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Dark fill, thin grey border, square corners; focus shifts the border to the lightest neutral plus a visible ring (strengthened for WCAG 2.2).",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Your username\" />",
+      "css": ".ds-input { width: 100%; background: var(--color-dark, #060a08); color: var(--color-lightestGrey, #cfd6ea); font-family: 'Libertinus Mono', monospace; border: 1px solid var(--color-grey, #7d7e75); border-radius: 0; padding: 8px; } .ds-input::placeholder { color: var(--color-grey, #7d7e75); } .ds-input:focus { outline: none; border-color: var(--color-lightestGrey, #cfd6ea); box-shadow: 0 0 0 2px var(--color-lightestGrey, #cfd6ea); }"
+    },
+    {
+      "name": "Dashed Panel Card",
+      "kind": "card",
+      "refersTo": "card-panel",
+      "description": "The framed rectangle motif: 2px dashed accent border, transparent fill, square corners.",
+      "html": "<div class=\"ds-card\"><h3 class=\"ds-card-title\">Curate your own recipe book.</h3><p class=\"ds-card-body\">Need all your favorite gluten-free breakfasts in one place? Make a list.</p></div>",
+      "css": ".ds-card { border: 2px dashed var(--color-accent, #4a9d5b); border-radius: 0; padding: 24px; background: transparent; color: var(--color-lightestGrey, #cfd6ea); font-family: 'Libertinus Mono', monospace; } .ds-card-title { color: #fff; font-weight: 700; font-size: 1.25rem; margin: 0 0 12px; } .ds-card-body { margin: 0; line-height: 1.6; }"
+    },
+    {
+      "name": "Directory Row",
+      "kind": "custom",
+      "refersTo": "card-panel",
+      "description": "Signature component (AppCard): a dashed-bordered hotspot pairing a glyph, label, description, and trailing chevron; hover washes the row and brightens text — a point-and-click hotspot lighting up.",
+      "html": "<a class=\"ds-row\" href=\"#\"><span class=\"ds-row-main\"><span class=\"ds-row-glyph\" aria-hidden=\"true\">✦</span><span class=\"ds-row-text\"><span class=\"ds-row-label\">Netbook</span><span class=\"ds-row-desc\">A minimalist notes app, synced to your Midden account.</span></span></span><svg class=\"ds-row-chevron\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M9 6l6 6-6 6\"/></svg></a>",
+      "css": ".ds-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; border: 2px dashed var(--color-accent, #4a9d5b); border-radius: 0; padding: 24px; text-decoration: none; color: var(--color-lightestGrey, #cfd6ea); font-family: 'Libertinus Mono', monospace; transition: background-color 0.2s, color 0.2s; } .ds-row:hover { background: color-mix(in srgb, var(--color-primary, #210130) 20%, transparent); } .ds-row-main { display: flex; align-items: center; gap: 24px; } .ds-row-glyph { color: #fff; font-size: 2rem; text-shadow: 2px 2px 0 var(--color-grey, #7d7e75); } .ds-row-label { display: block; color: #fff; font-weight: 700; font-size: 1.5rem; } .ds-row-desc { display: block; font-size: 0.875rem; } .ds-row-chevron { color: var(--color-accent, #4a9d5b); flex-shrink: 0; transition: color 0.2s; } .ds-row:hover .ds-row-chevron, .ds-row:hover .ds-row-desc { color: #fff; } .ds-row:focus-visible { outline: 2px solid var(--color-lightestGrey, #cfd6ea); outline-offset: 2px; }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "button-nav",
+      "description": "Monospace header link, white at rest, brightening to the lightest neutral on hover.",
+      "html": "<a class=\"ds-nav-link\" href=\"#\">Recipe Search</a>",
+      "css": ".ds-nav-link { font-family: 'Libertinus Mono', monospace; color: #fff; text-decoration: none; transition: color 0.2s; } .ds-nav-link:hover { color: var(--color-lightestGrey, #cfd6ea); } .ds-nav-link:focus-visible { outline: 2px solid var(--color-lightestGrey, #cfd6ea); outline-offset: 4px; }"
+    },
+    {
+      "name": "Moon-Phase Loader",
+      "kind": "custom",
+      "description": "The suite's loading indicator and one authored motion moment: a Midden Icons moon cycling its eight lunar phases (glyphs 1-7,0) above a pulsing label. Production uses the icon font; this snippet approximates the moon with CSS so it renders standalone. Reduced motion holds a full moon and stops the pulse.",
+      "html": "<div class=\"ds-loader\"><div class=\"ds-loader-moon\" aria-hidden=\"true\"></div><p class=\"ds-loader-label\" role=\"status\">Loading…</p></div>",
+      "css": ".ds-loader { display: flex; flex-direction: column; align-items: center; gap: 32px; font-family: 'Libertinus Mono', monospace; } .ds-loader-moon { width: 72px; height: 72px; border-radius: 50%; background: radial-gradient(circle at 36% 34%, #eaeef7 0 54%, #8f97a9 55% 100%); filter: drop-shadow(2px 2px 0 var(--color-grey, #7d7e75)); } .ds-loader-label { color: var(--color-lightestGrey, #cfd6ea); font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; animation: ds-pulse 2s ease-in-out infinite; } @keyframes ds-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } } @media (prefers-reduced-motion: reduce) { .ds-loader-label { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Excavated Console",
+    "overview": "One design language serves the whole Midden family — Midden, Canteen, and Netbook draw from a single shared/ui layer and one stylesheet, re-tinted per app through [data-theme] overrides. The world it builds fuses an archaeological dig-site (the midden, excavated and laid out for inspection), a 1990s point-and-click adventure interface (chunky clickable slabs, a glyph font that acts like a verb list, a CRT-terminal calm), and a handmade bulletin (dashed cut-outs pinned to a dark board, deliberately un-slick). Nothing here is Web 2.0 or later: no rounded pills, no soft glass, no gloss. The result is brutalist in spirit but never hostile — near-black grounds, a blackletter gothic display against a monospace body, everything squared-off and framed in dashed excavation tape in the app's single accent. Depth is a hard, zero-blur letterpress shadow, an intentional artifact rather than naturalistic elevation. Information is surfaced, not hidden; density is welcome as long as hierarchy keeps it legible. The one thing this system refuses is the generic SaaS register it is defined against.",
+    "keyCharacteristics": [
+      "Near-black grounds; one saturated brand hue and one quieter accent per theme; no light mode.",
+      "Blackletter display + monospace body; no third typeface.",
+      "Zero border-radius; dashed borders are the form language.",
+      "Hard 2px/2px zero-blur text-shadows as the only \"depth.\"",
+      "A bespoke Midden Icons glyph font supplies all iconography."
+    ],
+    "rules": [
+      {
+        "name": "The One Accent Rule",
+        "body": "Each theme carries exactly one accent. It appears on borders, links, active glyphs, and bullets — never as a large fill. Adding a second accent hue breaks the world.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dark-Ground Rule",
+        "body": "Every surface descends from --color-dark. There is no light mode. Earn contrast by lightening text, not by inverting the ground.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Face Rule",
+        "body": "Blackletter display, monospace everything-else. There is no third family, ever — and monospace here is the body voice of the whole product, not a code costume.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hard-Shadow Rule",
+        "body": "The signature shadow is offset 2px 2px with zero blur. It is a stylistic artifact, not an elevation cue. If a shadow has blur, it does not belong to this system.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Flat-Ground Rule",
+        "body": "Surfaces are flat at rest. The only lift is a tonal wash (white/5, primary/20) that appears on hover — never a soft shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Square-Cut Rule",
+        "body": "No border-radius, anywhere. Forms are cut and framed in dashed tape.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do keep every corner square (0 radius); the form language is cut, not rounded.",
+      "Do delineate with dashed borders in the theme accent — 2px for cards/panels, 4px for structural edges.",
+      "Do pair Jacquard 12 display with Libertinus Mono body, and nothing else.",
+      "Do use Midden Icons glyphs for all iconography; map single letters to symbols as the existing components do.",
+      "Do apply the hard 2px 2px 0 (zero-blur) text-shadow to white display headings as the signature depth.",
+      "Do meet WCAG 2.2 Level AA: body/placeholder text ≥4.5:1, large text and non-text UI (borders, glyphs used as controls) ≥3:1, measured against the active theme's --color-dark. The accent is now AA-text-safe on the dark ground in all three themes — preserve that when retheming.",
+      "Do tint secondary text from the text ramp (Cold Chalk / Bone Grey); never drop below 4.5:1 with a mid-grey.",
+      "Do define the hard-shadow utilities against var(--color-) so the signature depth re-tints with the theme.",
+      "Do gate every looping animation behind motion-safe: / prefers-reduced-motion, with a static fallback that keeps the meaning — the moon loader rests on a full moon, pulses stop, nothing disappears."
+    ],
+    "donts": [
+      "Don't introduce border-radius, blurred drop shadows, gradients, gradient text, or glassmorphism — each breaks the Excavated Console.",
+      "Don't use --color-accent as a button background behind white text unless the pair clears 4.5:1; back accent fills with dark text instead.",
+      "Don't delete or narrow the global :focus-visible rule in index.css. focus:outline-none is safe only because that rule exists; removing it silently strips the focus indicator from 34 call sites at once.",
+      "Don't add a second accent hue to any theme; one accent, used sparingly.",
+      "Don't hardcode a hex in a @utility or component when a token exists — that is how the shadow utilities came to ignore the theme.",
+      "Don't reach for post-2.0 polish (soft shadows, rounded pills, glossy gradients). The aesthetic is deliberately pre-2.0 and handmade."
+    ]
+  }
+}

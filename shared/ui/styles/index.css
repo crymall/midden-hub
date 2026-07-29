@@ -40,7 +40,7 @@
   --color-lightGrey: #b0b2b8;
   --color-lightestGrey: #cfd6ea;
   --color-primary: #210130;
-  --color-accent: #10511d;
+  --color-accent: #4a9d5b;
 
   --font-mono: "Libertinus Mono", monospace;
   --font-gothic: "Jacquard 12", cursive;
@@ -67,7 +67,7 @@
     --color-lightGrey: #c0c7d6;
     --color-lightestGrey: #eaeef7;
     --color-primary: #1e3a5f;
-    --color-accent: #8a6d2f;
+    --color-accent: #ad8a43;
   }
 }
 
@@ -90,4 +90,24 @@
 
 @utility text-shadow-hard-lightestGrey {
   text-shadow: 2px 2px 0 #cfd6ea;
+}
+
+/* Guarantee a visible keyboard-focus ring even on controls that clear the
+   outline for mouse focus. Left unlayered so it wins over Tailwind's utilities
+   layer without !important; :focus-visible keeps it keyboard-only. */
+:where(
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary,
+  [tabindex],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  [role="button"]
+):focus-visible {
+  outline: 2px solid var(--color-lightestGrey);
+  outline-offset: 2px;
 }

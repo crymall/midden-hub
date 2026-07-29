@@ -5,7 +5,9 @@ const ListList = ({ fetchingLists, userLists, handleDeleteList, emptyMessage }) 
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {fetchingLists ? (
         <div className="col-span-full flex justify-center p-12">
-          <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading lists...</p>
+          <p className="text-lightestGrey motion-safe:animate-pulse font-mono text-xl">
+            Loading lists...
+          </p>
         </div>
       ) : userLists.length === 0 ? (
         <div className="col-span-full flex flex-col items-center justify-center border-2 border-dashed border-grey p-12 text-center">

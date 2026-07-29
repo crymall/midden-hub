@@ -586,7 +586,7 @@ const RecipeForm = ({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="bg-accent hover:bg-accent/80 px-6 py-2 font-bold text-white transition-colors disabled:opacity-50"
+            className="bg-accent hover:bg-accent/80 px-6 py-2 font-bold text-dark transition-colors disabled:opacity-50"
           >
             {isSubmitting ? "Saving..." : submitLabel}
           </Button>
@@ -616,7 +616,7 @@ const RecipeForm = ({
             <Button
               onClick={handleConfirmCreateTag}
               disabled={createTagMutation.isPending}
-              className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
+              className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-dark disabled:opacity-50"
             >
               {createTagMutation.isPending ? "Creating..." : "Create"}
             </Button>
@@ -643,7 +643,7 @@ const RecipeForm = ({
           <Button
             onClick={handleConfirmCreateIngredient}
             disabled={createIngredientMutation.isPending}
-            className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-white disabled:opacity-50"
+            className="bg-accent hover:bg-accent/80 px-4 py-2 font-bold text-dark disabled:opacity-50"
           >
             {createIngredientMutation.isPending ? "Creating..." : "Create"}
           </Button>

@@ -71,7 +71,9 @@ const RecipeDetail = () => {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
-          <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading recipe...</p>
+          <p className="text-lightestGrey motion-safe:animate-pulse font-mono text-xl">
+            Loading recipe...
+          </p>
         </div>
       </MiddenCard>
     );
@@ -160,7 +162,7 @@ const RecipeDetail = () => {
                   disabled={toggleLikeMutation.isPending}
                   className={`flex h-8 items-center justify-center gap-2.5 border px-3 text-sm font-bold transition-colors disabled:opacity-50 ${
                     isLiked
-                      ? "bg-accent border-accent text-white"
+                      ? "bg-accent border-accent text-dark"
                       : "text-lightestGrey border-grey hover:border-lightestGrey bg-transparent"
                   }`}
                 >

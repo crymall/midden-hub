@@ -122,7 +122,9 @@ const UserProfile = () => {
     return (
       <MiddenCard>
         <div className="flex justify-center p-8">
-          <p className="text-lightestGrey animate-pulse font-mono text-xl">Loading profile...</p>
+          <p className="text-lightestGrey motion-safe:animate-pulse font-mono text-xl">
+            Loading profile...
+          </p>
         </div>
       </MiddenCard>
     );
@@ -185,7 +187,7 @@ const UserProfile = () => {
               className={`px-3 py-1 text-sm font-bold transition-colors ${
                 isFollowing
                   ? "border-grey text-lightGrey hover:border-lightestGrey hover:text-white border bg-transparent"
-                  : "bg-accent hover:bg-accent/80 text-white disabled:opacity-50"
+                  : "bg-accent hover:bg-accent/80 text-dark disabled:opacity-50"
               }`}
             >
               {isFollowing ? "Unfollow" : "Follow"}
@@ -195,12 +197,12 @@ const UserProfile = () => {
             <>
               <Button
                 onClick={() => setIsCreateListOpen(true)}
-                className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors"
+                className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-dark transition-colors"
               >
                 + List
               </Button>
               <Link to="/recipes/new">
-                <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">
+                <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-dark transition-colors">
                   + Recipe
                 </Button>
               </Link>

@@ -132,14 +132,16 @@ const Conversation = () => {
         className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-scroll p-4"
       >
         {conversationLoading && (
-          <div className="text-lightGrey animate-pulse text-center text-sm">Loading...</div>
+          <div className="text-lightGrey motion-safe:animate-pulse text-center text-sm">
+            Loading...
+          </div>
         )}
         {displayConversation.map((msg) => {
           const isMe = String(msg.sender_id) === String(user.canteenId);
           return (
             <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-[75%] p-3 ${isMe ? "bg-accent text-white" : "bg-grey text-dark"}`}
+                className={`max-w-[75%] p-3 ${isMe ? "bg-accent text-dark" : "bg-grey text-dark"}`}
               >
                 {msg.recipe && (
                   <div className="mb-2 max-w-sm sm:min-w-64">
@@ -179,7 +181,7 @@ const Conversation = () => {
           <Button
             type="submit"
             disabled={!newMessage.trim()}
-            className="bg-accent hover:bg-accent/80 h-12 px-4 font-bold text-white transition-colors disabled:opacity-50"
+            className="bg-accent hover:bg-accent/80 h-12 px-4 font-bold text-dark transition-colors disabled:opacity-50"
           >
             Send
           </Button>

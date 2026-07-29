@@ -49,7 +49,7 @@ const RecipeSearch = () => {
         <h2 className="font-gothic text-4xl font-bold text-white">Find Recipes</h2>
         <Can perform={PERMISSIONS.writeData}>
           <Link to="/recipes/new">
-            <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors">
+            <Button className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-dark transition-colors">
               + Recipe
             </Button>
           </Link>

@@ -42,7 +42,7 @@ const Messages = () => {
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-gothic text-4xl font-bold text-white">Messages</h2>
         <Popover>
-          <PopoverButton className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-white transition-colors focus:outline-none">
+          <PopoverButton className="bg-accent hover:bg-accent/80 px-3 py-1 text-sm font-bold text-dark transition-colors focus:outline-none">
             + Message
           </PopoverButton>
           <PopoverPanel
@@ -73,7 +73,7 @@ const Messages = () => {
                       <ComboboxOption
                         key={friend.id}
                         value={friend}
-                        className="data-focus:bg-accent text-lightestGrey cursor-pointer px-3 py-2 font-mono select-none data-focus:text-white"
+                        className="data-focus:bg-accent text-lightestGrey cursor-pointer px-3 py-2 font-mono select-none data-focus:text-dark"
                       >
                         {friend.username}
                       </ComboboxOption>

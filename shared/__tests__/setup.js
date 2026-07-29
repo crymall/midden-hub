@@ -22,3 +22,19 @@ if (!globalThis.localStorage) {
     configurable: true,
   });
 }
+
+// jsdom does not implement matchMedia, which Loading reads to honour
+// prefers-reduced-motion. Report no preference so the animated path renders;
+// tests that need the reduced-motion branch can stub this per-case.
+if (!window.matchMedia) {
+  Object.defineProperty(window, "matchMedia", {
+    value: (query) => ({
+      media: query,
+      matches: false,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }),
+    writable: true,
+    configurable: true,
+  });
+}

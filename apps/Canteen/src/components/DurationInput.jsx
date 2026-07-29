@@ -84,7 +84,7 @@ export default function DurationInput({ label, onChange, value }) {
                   key={unit.id}
                   className={({ active }) =>
                     `relative cursor-default select-none py-2 px-4 ${
-                      active ? "bg-accent text-white" : "text-lightestGrey"
+                      active ? "bg-accent text-dark" : "text-lightestGrey"
                     }`
                   }
                   value={unit}
