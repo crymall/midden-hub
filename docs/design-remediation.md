@@ -48,9 +48,15 @@ Mechanical, low visual risk, and it unblocks Phase 2.
 - [ ] Replace `bg-black` with `bg-dark` in `MobileBurgerMenu.jsx:33`, and `bg-black/20` in `AppCard.jsx:81`.
 - [ ] Set an explicit themed placeholder colour and stop relying on the Tailwind Preflight default.
 - [ ] Remove the 11 blurred drop shadows listed below.
+- [ ] **Decide the display line-height, then apply it everywhere.** This is a decision, not a bug fix, and it blocks the typography work in the surface track.
 
 The shadow utilities are currently hardcoded to Midden's palette, so the design system's signature depth device does not re-tint.
 Verified live on themed Canteen: `--color-grey` is `#9c9482` but the rendered `text-shadow` is `rgb(125, 126, 117)`, which is Midden's `#7d7e75`.
+
+**Display line-height has no settled value.** Three headings carry `leading-tight` and render at **1.25**; every other display heading inherits Tailwind's per-size default of **1**.
+`DESIGN.md` previously claimed **1.1**, which was true nowhere — that claim has been removed, and the frontmatter now records 1.25 as the observed value rather than an endorsed one.
+Pick one number, write it into the `typography.display.lineHeight` frontmatter, and apply it to every `font-gothic` heading.
+At 72px the difference between 1 and 1.25 is 18px of leading per line, so this is a visible change to every page title in the suite, not a rounding detail.
 
 Placeholder text measured at **4.0:1** against the input fill, below the 4.5:1 AA threshold, suite-wide.
 Tailwind Preflight resolves `::placeholder` to `color-mix(in oklab, currentColor 50%, transparent)`, which composites to `rgb(107, 112, 121)`.
@@ -156,7 +162,7 @@ Affected: `NetbookSplash.jsx:68`, `RecipeDetail.jsx:139`, `CanteenHome.jsx:27,79
 - [ ] Add a `max-width` to `MiddenCard`, which currently runs to roughly 2048px of monospace on a 2560px display.
 - [ ] Replace the magic header heights at `Dashboard.jsx:22` and `Conversation.jsx:117` with a `--header-height` custom property.
 - [ ] Reduce `ml-24` and `gap-16` at `Header.jsx:84` so the desktop nav can appear at `lg` rather than `xl`.
-- [ ] Bring display leading to the specified 1.1; it currently renders at 1.25.
+- [ ] Apply the display line-height decided in Phase 1 to every `font-gothic` heading. Do not start this before that decision is made.
 
 Measured at an 857px viewport: `main` reserves 777px while `MiddenCard` demands 857px.
 With 633px of content that produced 224px of dead space and 72px of empty overflow scroll, on every mobile page in all three apps.
