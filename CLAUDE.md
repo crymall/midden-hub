@@ -76,9 +76,8 @@ Vitest config lives in the **root** `vite.config.js` (jsdom, globals, setup file
 ESLint enforces `simple-import-sort` with custom groups (react/external → `@shared/core` hooks/services → gateways → pages → `@shared/ui`/relative → css) and Prettier at `printWidth: 100`. Run `npm run lint:fix` after writing code; hand-written imports in the wrong order will fail CI.
 
 ### Comments
-Prefer self-explanatory code over comments: clear names and small functions should carry the intent.
-Only add a comment when it states something the code cannot — a non-obvious "why", an external contract or workaround, or a subtle correctness constraint.
-Do not write comments that restate what the code does or narrate the steps.
+See the Code style section of the root `CLAUDE.md`, which governs.
+Prefer self-explanatory code: clear names and small functions should carry the intent, and a fact that fits in an identifier belongs there rather than in a comment.
 Keep the ones you do write short.
 
 ### CI/CD
