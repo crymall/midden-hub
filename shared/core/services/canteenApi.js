@@ -56,54 +56,6 @@ export const unlikeRecipe = async (id) => {
   return response.data;
 };
 
-export const addRecipeIngredient = async (recipeId, ingredientData) => {
-  const response = await canteenApi.post(`/recipes/${recipeId}/ingredients`, ingredientData);
-  return response.data;
-};
-
-export const addRecipeTag = async (recipeId, tagId) => {
-  const response = await canteenApi.post(`/recipes/${recipeId}/tags`, {
-    tag_id: tagId,
-  });
-  return response.data;
-};
-
-export const removeRecipeTag = async (recipeId, tagId) => {
-  const response = await canteenApi.delete(`/recipes/${recipeId}/tags/${tagId}`);
-  return response.data;
-};
-
-export const removeRecipeIngredient = async (recipeId, ingredientId, groupName = "Main") => {
-  const response = await canteenApi.delete(`/recipes/${recipeId}/ingredients/${ingredientId}`, {
-    params: { group: groupName },
-  });
-  return response.data;
-};
-
-export const removeRecipeGroup = async (recipeId, groupId) => {
-  const response = await canteenApi.delete(`/recipes/${recipeId}/groups/${groupId}`);
-  return response.data;
-};
-
-export const updateRecipeGroup = async (recipeId, groupId, name) => {
-  const response = await canteenApi.put(`/recipes/${recipeId}/groups/${groupId}`, { name });
-  return response.data;
-};
-
-export const reorderRecipeGroups = async (recipeId, orderedGroupIds) => {
-  const response = await canteenApi.put(`/recipes/${recipeId}/groups/reorder`, {
-    ordered_group_ids: orderedGroupIds,
-  });
-  return response.data;
-};
-
-export const reorderRecipeIngredients = async (recipeId, orderedIngredientIds) => {
-  const response = await canteenApi.put(`/recipes/${recipeId}/ingredients/reorder`, {
-    ordered_ingredient_ids: orderedIngredientIds,
-  });
-  return response.data;
-};
-
 export const fetchIngredients = async (limit, offset, name) => {
   const response = await canteenApi.get("/ingredients", {
     params: { limit, offset, name },

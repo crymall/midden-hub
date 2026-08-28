@@ -95,55 +95,6 @@ describe("canteenApi", () => {
       await api.unlikeRecipe("123");
       expect(mockDelete).toHaveBeenCalledWith("/recipes/123/likes");
     });
-
-    it("addRecipeIngredient calls post", async () => {
-      const data = { name: "Salt" };
-      await api.addRecipeIngredient("123", data);
-      expect(mockPost).toHaveBeenCalledWith("/recipes/123/ingredients", data);
-    });
-
-    it("addRecipeTag calls post", async () => {
-      await api.addRecipeTag("123", "tag1");
-      expect(mockPost).toHaveBeenCalledWith("/recipes/123/tags", {
-        tag_id: "tag1",
-      });
-    });
-
-    it("removeRecipeTag calls delete", async () => {
-      await api.removeRecipeTag("123", "tag1");
-      expect(mockDelete).toHaveBeenCalledWith("/recipes/123/tags/tag1");
-    });
-
-    it("removeRecipeIngredient calls delete", async () => {
-      await api.removeRecipeIngredient("123", "ing1", "Side");
-      expect(mockDelete).toHaveBeenCalledWith("/recipes/123/ingredients/ing1", {
-        params: { group: "Side" },
-      });
-    });
-
-    it("removeRecipeGroup calls delete", async () => {
-      await api.removeRecipeGroup("123", "g1");
-      expect(mockDelete).toHaveBeenCalledWith("/recipes/123/groups/g1");
-    });
-
-    it("updateRecipeGroup calls put", async () => {
-      await api.updateRecipeGroup("123", "g1", "Garnish");
-      expect(mockPut).toHaveBeenCalledWith("/recipes/123/groups/g1", { name: "Garnish" });
-    });
-
-    it("reorderRecipeGroups calls put", async () => {
-      await api.reorderRecipeGroups("123", ["g2", "g1"]);
-      expect(mockPut).toHaveBeenCalledWith("/recipes/123/groups/reorder", {
-        ordered_group_ids: ["g2", "g1"],
-      });
-    });
-
-    it("reorderRecipeIngredients calls put", async () => {
-      await api.reorderRecipeIngredients("123", ["i2", "i1"]);
-      expect(mockPut).toHaveBeenCalledWith("/recipes/123/ingredients/reorder", {
-        ordered_ingredient_ids: ["i2", "i1"],
-      });
-    });
   });
 
   describe("Ingredients", () => {

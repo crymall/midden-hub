@@ -83,13 +83,9 @@ describe("EditRecipe", () => {
       },
     });
     canteenApi.fetchRecipe.mockResolvedValue(mockRecipe);
-    canteenApi.updateRecipe.mockResolvedValue({});
+    canteenApi.updateRecipe.mockResolvedValue(mockRecipe);
     canteenApi.fetchTags.mockResolvedValue([]);
     canteenApi.fetchIngredients.mockResolvedValue([]);
-    canteenApi.removeRecipeGroup.mockResolvedValue({});
-    canteenApi.updateRecipeGroup.mockResolvedValue({});
-    canteenApi.reorderRecipeGroups.mockResolvedValue({});
-    canteenApi.reorderRecipeIngredients.mockResolvedValue({});
   });
 
   const renderComponent = () =>
@@ -133,6 +129,31 @@ describe("EditRecipe", () => {
     });
 
     expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  it("sends the whole recipe graph in a single request", async () => {
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Original Recipe")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Save Changes"));
+
+    await waitFor(() => {
+      expect(canteenApi.updateRecipe).toHaveBeenCalledTimes(1);
+    });
+
+    const [, payload] = canteenApi.updateRecipe.mock.calls[0];
+    expect(payload.tags).toEqual(["t1"]);
+    expect(payload.ingredient_groups).toEqual([
+      expect.objectContaining({
+        name: "Main",
+        ingredients: [expect.objectContaining({ id: "i1", quantity: 1, unit: "tsp" })],
+      }),
+    ]);
+
+    expect(canteenApi.fetchRecipe).toHaveBeenCalledTimes(1);
   });
 
   it("uses cached recipe data if available without fetching", async () => {
