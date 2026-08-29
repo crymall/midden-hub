@@ -74,12 +74,6 @@ Keep the ones you do write short.
 ### CI/CD
 GitHub Actions: `ci.yml` runs lint + tests on every push/PR to main; `deploy.yml` on merge to main runs tests, builds per-app Docker images (build context is the **repo root** so Dockerfiles can copy `shared/`), pushes to Docker Hub, and applies the `k8s/` manifests. Lazy-loaded pages require a reload prompt after redeploys (see recent commit history).
 
-## Claude Code tooling
-
-`.claude/` is **gitignored and not part of the repo**.
-It holds vendored agent tooling and machine-local settings, both of which are environment setup rather than project source.
-A fresh clone will not have it, and nothing in the build, test, lint, or deploy path depends on it.
-
 ### The `impeccable` design skill
 
 A user-invocable skill vendored at `.claude/skills/impeccable/` (v4.0.2, Apache 2.0).
