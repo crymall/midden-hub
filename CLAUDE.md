@@ -53,16 +53,7 @@ All pages are `lazy()` imports. Both `main.jsx` files register a `vite:preloadEr
 
 ### Logging in locally
 
-Login is two steps — password, then a six-digit code — and locally there is no mail server.
-**The second factor is printed to the iam-service console**, in the terminal running its `npm start`:
-
-```
-[DEV] Verification code for someone@example.com: 481920
-```
-
-That branch is gated on `SKIP_EMAIL_VERIFICATION=true` in iam-service's `.env`; with the flag set, `POST /auth/login` also returns the same code as `dev_code` in its response body.
-Codes expire after 10 minutes.
-See `midden-services/iam-service/CLAUDE.md`.
+Login takes a password and then a six-digit code. Locally that code is printed to the iam-service console — see the "Logging in locally" section of `midden-services/iam-service/CLAUDE.md`.
 
 ### App shell & theming
 `@shared/core/pages/Dashboard` is the layout route for both apps, parameterized by `navMeta`: it renders the shared `Header`, an `<Outlet />` inside its own second-level `<Suspense>`, and — key detail — sets `document.body.dataset.theme` to the lowercased app title. Theming is Tailwind v4 (CSS-first, no tailwind config file): `shared/ui/styles/index.css` defines default color/font tokens in `@theme` and overrides them under `[data-theme="canteen"]` etc., so the same shared components restyle per app. That file also declares `@source` globs for both apps' `src` — a new app or moved directory must be added there or its classes won't be generated. Custom fonts (including the `Midden Icons` icon font used for glyphs like the `symbol` fields in constants.js) load from `shared/ui/assets/fonts`, and each app's Vite `publicDir` points at `shared/ui/assets`.
