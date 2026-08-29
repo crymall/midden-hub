@@ -270,7 +270,7 @@ const RecipeDetail = () => {
                     <li key={ing.id} className="flex items-start gap-2">
                       <span className="text-accent">•</span>
                       <span>
-                        {ing.quantity} {ing.unit} <strong>{ing.name}</strong>
+                        {ing.quantity} {ing.display_unit} <strong>{ing.display_name}</strong>
                         {ing.notes && (
                           <span className="text-grey text-sm italic"> ({ing.notes})</span>
                         )}

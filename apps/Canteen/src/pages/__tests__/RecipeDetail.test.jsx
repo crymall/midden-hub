@@ -80,7 +80,17 @@ describe("RecipeDetail", () => {
         id: "g1",
         name: "Main",
         position: 0,
-        ingredients: [{ id: "ri1", quantity: "1", unit: "cup", name: "Flour", notes: "sifted" }],
+        ingredients: [
+          {
+            id: "ri1",
+            quantity: "1",
+            unit: "cup",
+            name: "Flour",
+            display_unit: "cup",
+            display_name: "Flour",
+            notes: "sifted",
+          },
+        ],
       },
     ],
     instructions: "Mix and bake.",
