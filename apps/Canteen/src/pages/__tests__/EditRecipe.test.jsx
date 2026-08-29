@@ -164,6 +164,42 @@ describe("EditRecipe", () => {
     });
   });
 
+  it("shows the server's explanation when the save is rejected", async () => {
+    canteenApi.updateRecipe.mockRejectedValue({
+      response: {
+        data: {
+          error: 'Two ingredient groups are both named "Main". Give each group its own name.',
+        },
+      },
+    });
+
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Original Recipe")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Save Changes"));
+
+    await waitFor(() => {
+      expect(screen.getByText(/both named "Main"/)).toBeInTheDocument();
+    });
+  });
+
+  it("falls back to a generic message when the server sends none", async () => {
+    canteenApi.updateRecipe.mockRejectedValue(new Error("Network Error"));
+
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Original Recipe")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Save Changes"));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to update recipe/)).toBeInTheDocument();
+    });
+  });
+
   it("navigates to recipe detail with replace if not from detail page", async () => {
     mockLocation = { state: null };
     renderComponent();

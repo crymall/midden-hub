@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { serverMessageOr } from "@shared/core/utils/apiErrors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { createRecipe } from "@shared/core/services/canteenApi";
@@ -23,7 +24,9 @@ const NewRecipe = () => {
     },
     onError: (err) => {
       console.error(err);
-      setError("Failed to create recipe. Please check your inputs and try again.");
+      setError(
+        serverMessageOr(err, "Failed to create recipe. Please check your inputs and try again."),
+      );
     },
   });
 

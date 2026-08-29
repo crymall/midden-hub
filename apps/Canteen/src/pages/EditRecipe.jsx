@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { serverMessageOr } from "@shared/core/utils/apiErrors";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchRecipe, updateRecipe } from "@shared/core/services/canteenApi";
@@ -34,7 +35,9 @@ const EditRecipe = () => {
     },
     onError: (err) => {
       console.error(err);
-      setError("Failed to update recipe. Please check your inputs and try again.");
+      setError(
+        serverMessageOr(err, "Failed to update recipe. Please check your inputs and try again."),
+      );
     },
   });
 
