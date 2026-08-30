@@ -2,7 +2,10 @@ import { StrictMode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { UserEnrichmentContext } from "@shared/core/hooks/userEnrichment";
+
 import App from "../App";
+import { attachCanteenId } from "../auth/attachCanteenId";
 
 vi.mock("@grafana/faro-react", () => ({
   initializeFaro: vi.fn(),
@@ -35,14 +38,7 @@ describe("main.jsx", () => {
   });
 
   it("renders App component into root element", async () => {
-    vi.resetModules();
-
     await import("../main.jsx");
-
-    // Both modules are project source, so vi.resetModules gave main.jsx fresh copies;
-    // re-importing here is what makes the element types compare equal.
-    const { UserEnrichmentContext } = await import("@shared/core/hooks/userEnrichment");
-    const { attachCanteenId } = await import("../auth/attachCanteenId");
 
     const rootElement = document.getElementById("root");
     expect(createRootMock).toHaveBeenCalledWith(rootElement);

@@ -35,8 +35,6 @@ describe("main.jsx", () => {
   });
 
   it("renders App component into root element", async () => {
-    vi.resetModules();
-
     await import("../main.jsx");
 
     const rootElement = document.getElementById("root");
