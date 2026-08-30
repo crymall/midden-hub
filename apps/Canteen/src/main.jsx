@@ -16,7 +16,10 @@ import {
 import { TracingInstrumentation } from "@grafana/faro-web-tracing";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import { UserEnrichmentContext } from "@shared/core/hooks/userEnrichment";
+
 import App from "./App.jsx";
+import { attachCanteenId } from "./auth/attachCanteenId";
 
 import "@shared/ui/styles/index.css";
 
@@ -59,7 +62,9 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <UserEnrichmentContext.Provider value={attachCanteenId}>
+        <App />
+      </UserEnrichmentContext.Provider>
     </QueryClientProvider>
   </StrictMode>,
 );

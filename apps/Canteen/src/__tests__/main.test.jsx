@@ -2,7 +2,10 @@ import { StrictMode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { UserEnrichmentContext } from "@shared/core/hooks/userEnrichment";
+
 import App from "../App";
+import { attachCanteenId } from "../auth/attachCanteenId";
 
 vi.mock("@grafana/faro-react", () => ({
   initializeFaro: vi.fn(),
@@ -35,8 +38,6 @@ describe("main.jsx", () => {
   });
 
   it("renders App component into root element", async () => {
-    vi.resetModules();
-
     await import("../main.jsx");
 
     const rootElement = document.getElementById("root");
@@ -44,7 +45,9 @@ describe("main.jsx", () => {
     expect(renderMock).toHaveBeenCalledWith(
       <StrictMode>
         <QueryClientProvider client={expect.any(QueryClient)}>
-          <App />
+          <UserEnrichmentContext.Provider value={attachCanteenId}>
+            <App />
+          </UserEnrichmentContext.Provider>
         </QueryClientProvider>
       </StrictMode>,
     );

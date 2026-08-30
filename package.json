@@ -3,12 +3,14 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "shared"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev -w apps/Midden\" \"npm run dev -w apps/Canteen\" \"npm run dev -w apps/Netbook\"",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
+    "check:singleton-deps": "node scripts/check-singleton-deps.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --ext .js,jsx,ts,tsx --fix"
   },
