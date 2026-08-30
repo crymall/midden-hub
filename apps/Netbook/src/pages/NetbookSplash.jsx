@@ -10,7 +10,7 @@ const NetbookSplash = ({ preview = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const showCta = preview || !user || user.username === "guest";
+  const showCta = preview || !user;
 
   return (
     <MiddenCard>

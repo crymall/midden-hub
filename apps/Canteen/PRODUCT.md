@@ -28,7 +28,7 @@ This stands against ad-choked, SEO-bloated recipe sites; the differentiator is "
 ## Operating Context
 
 - Public routes: home, recipe search, recipe detail, user profiles.
-- Guarded routes (require a non-guest account): create/edit recipe, my-lists and list detail, messages and conversations, a user's follower/following network.
+- Guarded routes (require a signed-in account): create/edit recipe, my-lists and list detail, messages and conversations, a user's follower/following network.
 - Cookie-based SSO shared with the Midden suite; a Canteen identity (`canteenId`) is enriched onto the current user from canteen-service (its failure is non-fatal).
 - Two-step login (password + 2FA), identical to the rest of the suite.
 

@@ -3,7 +3,7 @@ import { BrowserRouter, Route } from "react-router-dom";
 import { FaroRoutes } from "@grafana/faro-react";
 import { navMeta } from "@shared/core/utils/constants";
 
-import RequireNotGuest from "@shared/core/gateways/RequireNotGuest";
+import RequireAuth from "@shared/core/gateways/RequireAuth";
 
 import Dashboard from "@shared/core/pages/Dashboard";
 import Login from "@shared/core/pages/Login";
@@ -36,7 +36,7 @@ function App() {
             <Route path="recipes/:id" element={<RecipeDetail />} />
             <Route path="user/:id" element={<UserProfile />} />
 
-            <Route element={<RequireNotGuest />}>
+            <Route element={<RequireAuth />}>
               <Route path="recipes/new" element={<NewRecipe />} />
               <Route path="recipes/:id/edit" element={<EditRecipe />} />
               <Route path="my-lists" element={<MyLists />} />

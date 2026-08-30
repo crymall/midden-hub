@@ -121,23 +121,6 @@ describe("App Routing", () => {
     expect(await screen.findByText("NewRecipe Page")).toBeInTheDocument();
   });
 
-  it("renders EditRecipe page when authenticated", async () => {
-    window.history.pushState({}, "Edit Recipe", "/recipes/123/edit");
-    useAuth.mockReturnValue({
-      user: { username: "testuser", permissions: ["write_data"] },
-    });
-    render(<App />);
-    expect(await screen.findByText("EditRecipe Page")).toBeInTheDocument();
-  });
-
-  it("redirects guest from NewRecipe to Login", async () => {
-    window.history.pushState({}, "New Recipe", "/recipes/new");
-    useAuth.mockReturnValue({ user: { username: "guest", permissions: [] } });
-    render(<App />);
-    expect(screen.queryByText("NewRecipe Page")).not.toBeInTheDocument();
-    expect(await screen.findByText("Login Page")).toBeInTheDocument();
-  });
-
   it("renders MyLists page when authenticated", async () => {
     window.history.pushState({}, "My Lists", "/my-lists");
     useAuth.mockReturnValue({

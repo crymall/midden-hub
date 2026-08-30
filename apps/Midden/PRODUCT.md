@@ -28,7 +28,7 @@ Unified SSO across a family of genuinely separate, independently useful apps dis
 ## Operating Context
 
 - Public routes: Explorer (home directory), About, Professional Showcase, Experiments.
-- Guarded route: Settings (self-gates via `RequireNotGuest`; the shared `guest` account is treated as logged-out).
+- Guarded route: Settings (gated by `RequireAuth`, which redirects visitors without a session to `/login`).
 - Two-step login: password returns a temp token, then a 2FA code seeds the session; auth is cookie-based, no client-stored tokens.
 - Outbound links are part of the experience: reedgaines.com (bio/contact), the GitHub repos, and standalone experiments (a Bluesky "100 years ago" newspaper bot, Chutes Resolver, Revolutionary Date converter, Midnight Info).
 

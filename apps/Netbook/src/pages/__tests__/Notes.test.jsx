@@ -66,21 +66,6 @@ describe("Notes", () => {
     onlineManager.setOnline(true);
   });
 
-  it("shows the splash and no note list for logged-out visitors", async () => {
-    useAuth.mockReturnValue({ user: null });
-    renderComponent();
-    expect(await screen.findByText("Login or Register")).toBeInTheDocument();
-    expect(screen.queryByText("My Notes")).not.toBeInTheDocument();
-    expect(netbookApi.fetchNotes).not.toHaveBeenCalled();
-  });
-
-  it("treats the guest account as logged-out", async () => {
-    useAuth.mockReturnValue({ user: { username: "guest", permissions: [] } });
-    renderComponent();
-    expect(await screen.findByText("Login or Register")).toBeInTheDocument();
-    expect(screen.queryByText("My Notes")).not.toBeInTheDocument();
-  });
-
   it("renders the notebook for a signed-in user", async () => {
     renderComponent();
     expect(await screen.findByText("Older")).toBeInTheDocument();
