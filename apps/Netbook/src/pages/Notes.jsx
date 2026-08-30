@@ -22,7 +22,7 @@ const Notes = () => {
   const [showNewForm, setShowNewForm] = useState(() => !!getDraft(NEW_NOTE_DRAFT_KEY));
   const [noteToDelete, setNoteToDelete] = useState(null);
 
-  const enabled = !!user && user.username !== "guest";
+  const enabled = !!user;
   const { notes, totalPages, isLoading, pendingCount } = useNotes(page, enabled);
 
   const kickFlush = () => {
@@ -152,7 +152,7 @@ const Notes = () => {
     setNoteToDelete(noteId);
   };
 
-  if (!user || user.username === "guest") {
+  if (!user) {
     return <NetbookSplash />;
   }
 

@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Loading from "../../ui/components/Loading";
 import { useAuth } from "../hooks/useAuth";
 
-const RequireNotGuest = () => {
+const RequireAuth = () => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
 
@@ -11,11 +11,11 @@ const RequireNotGuest = () => {
     return <Loading message="Verifying session..." />;
   }
 
-  if (!user || user.username === "guest") {
+  if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   return <Outlet />;
 };
 
-export default RequireNotGuest;
+export default RequireAuth;

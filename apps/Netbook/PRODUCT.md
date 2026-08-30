@@ -25,7 +25,7 @@ The backend is intentionally polyglot (C#/ASP.NET Core, distinct from the suite'
 
 ## Operating Context
 
-- A single public route that self-gates: signed-out visitors and the shared `guest` account see a splash; signed-in users see the notebook. No route guard, no `/notes/*` sub-routes.
+- A single public route that self-gates: signed-out visitors see a splash; signed-in users see the notebook. No route guard, no `/notes/*` sub-routes.
 - Notebook interactions: inline "+ New note" form, numbered Prev/Next pagination (page size 10), expand-a-card to read then edit in place, delete-confirm modal.
 - Offline behavior: a coalescing queue under the `["pendingNotes"]` query key persists to localStorage; repeated offline edits to one note collapse to a single write; in-progress form text is saved per keystroke so a refresh or post-deploy reload loses nothing.
 

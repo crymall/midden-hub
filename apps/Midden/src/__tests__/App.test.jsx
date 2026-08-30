@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAuth } from "@shared/core/hooks/useAuth";
@@ -60,23 +60,6 @@ describe("App Routing", () => {
     render(<App />);
     expect(screen.getByText("Header Component")).toBeInTheDocument();
     expect(await screen.findByText("Explorer Page")).toBeInTheDocument();
-  });
-
-  it("renders Settings page when authenticated and not guest", async () => {
-    window.history.pushState({}, "Settings", "/settings");
-    useAuth.mockReturnValue({ user: { username: "testuser" } });
-    render(<App />);
-    expect(await screen.findByText("Settings Page")).toBeInTheDocument();
-  });
-
-  it("redirects guest user from Settings to Login", async () => {
-    window.history.pushState({}, "Settings", "/settings");
-    useAuth.mockReturnValue({ user: { username: "guest" } });
-    render(<App />);
-    await waitFor(() => {
-      expect(screen.queryByText("Settings Page")).not.toBeInTheDocument();
-      expect(screen.getByText("Login Page")).toBeInTheDocument();
-    });
   });
 
   it("renders Experiments page", async () => {

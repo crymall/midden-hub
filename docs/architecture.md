@@ -30,7 +30,7 @@ This monorepo uses NPM Workspaces to manage shared dependencies and configuratio
 
 Netbook makes a few choices that set it apart from Midden and Canteen. The full frontend design is written up in [offline-notes.md](offline-notes.md).
 
-On the frontend, the notebook lives on a single public route that gates itself. Signed-out visitors and the shared `guest` account see a splash; signed-in users see the notebook, both at `/`, with no route guard in front. This fits an app that is one page rather than a tree of protected routes.
+On the frontend, the notebook lives on a single public route that gates itself. Signed-out visitors see a splash; signed-in users see the notebook, both at `/`, with no route guard in front. This fits an app that is one page rather than a tree of protected routes.
 
 Editing is local-first rather than request-per-action. Creates, edits, and deletes made offline are held in a state-based queue inside the TanStack Query cache, persisted to `localStorage`, and flushed oldest-first when connectivity returns.
 Repeated offline edits to the same note collapse into a single write, so the queue never holds two operations for one note and there is no operation-replay ordering to get wrong. In-progress form text is saved on each keystroke, so a refresh or a post-deploy reload does not lose what was being typed.

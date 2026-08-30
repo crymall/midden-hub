@@ -3,18 +3,18 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { useAuth } from "../../hooks/useAuth";
-import RequireNotGuest from "../RequireNotGuest";
+import RequireAuth from "../RequireAuth";
 
 vi.mock("../../hooks/useAuth");
 
-describe("RequireNotGuest Gateway", () => {
+describe("RequireAuth Gateway", () => {
   it("renders loading component when isLoading is true", () => {
     useAuth.mockReturnValue({ isLoading: true, user: null });
 
     render(
       <MemoryRouter initialEntries={["/restricted"]}>
         <Routes>
-          <Route element={<RequireNotGuest />}>
+          <Route element={<RequireAuth />}>
             <Route path="/restricted" element={<div>Restricted Content</div>} />
           </Route>
         </Routes>
@@ -25,7 +25,7 @@ describe("RequireNotGuest Gateway", () => {
     expect(screen.queryByText("Restricted Content")).not.toBeInTheDocument();
   });
 
-  it("renders outlet content if user is authenticated and not guest", () => {
+  it("renders outlet content if user is signed in", () => {
     useAuth.mockReturnValue({
       user: { username: "regularUser" },
       isLoading: false,
@@ -34,7 +34,7 @@ describe("RequireNotGuest Gateway", () => {
     render(
       <MemoryRouter initialEntries={["/restricted"]}>
         <Routes>
-          <Route element={<RequireNotGuest />}>
+          <Route element={<RequireAuth />}>
             <Route path="/restricted" element={<div>Restricted Content</div>} />
           </Route>
         </Routes>
@@ -44,8 +44,8 @@ describe("RequireNotGuest Gateway", () => {
     expect(screen.getByText("Restricted Content")).toBeInTheDocument();
   });
 
-  it("redirects to login with state if user is guest", () => {
-    useAuth.mockReturnValue({ user: { username: "guest" }, isLoading: false });
+  it("redirects to login with the origin in route state if user is null", () => {
+    useAuth.mockReturnValue({ user: null, isLoading: false });
 
     const Login = () => {
       const location = useLocation();
@@ -61,7 +61,7 @@ describe("RequireNotGuest Gateway", () => {
       <MemoryRouter initialEntries={["/restricted"]}>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route element={<RequireNotGuest />}>
+          <Route element={<RequireAuth />}>
             <Route path="/restricted" element={<div>Restricted Content</div>} />
           </Route>
         </Routes>
@@ -70,21 +70,5 @@ describe("RequireNotGuest Gateway", () => {
 
     expect(screen.getByText("Login Page")).toBeInTheDocument();
     expect(screen.getByTestId("from-state")).toHaveTextContent("/restricted");
-  });
-
-  it("redirects to login if user is null", () => {
-    useAuth.mockReturnValue({ user: null, isLoading: false });
-
-    render(
-      <MemoryRouter initialEntries={["/restricted"]}>
-        <Routes>
-          <Route path="/login" element={<div>Login Page</div>} />
-          <Route element={<RequireNotGuest />}>
-            <Route path="/restricted" element={<div>Restricted Content</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>,
-    );
-    expect(screen.getByText("Login Page")).toBeInTheDocument();
   });
 });
