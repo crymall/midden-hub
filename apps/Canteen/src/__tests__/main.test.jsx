@@ -39,12 +39,19 @@ describe("main.jsx", () => {
 
     await import("../main.jsx");
 
+    // Both modules are project source, so vi.resetModules gave main.jsx fresh copies;
+    // re-importing here is what makes the element types compare equal.
+    const { UserEnrichmentContext } = await import("@shared/core/hooks/userEnrichment");
+    const { attachCanteenId } = await import("../auth/attachCanteenId");
+
     const rootElement = document.getElementById("root");
     expect(createRootMock).toHaveBeenCalledWith(rootElement);
     expect(renderMock).toHaveBeenCalledWith(
       <StrictMode>
         <QueryClientProvider client={expect.any(QueryClient)}>
-          <App />
+          <UserEnrichmentContext.Provider value={attachCanteenId}>
+            <App />
+          </UserEnrichmentContext.Provider>
         </QueryClientProvider>
       </StrictMode>,
     );

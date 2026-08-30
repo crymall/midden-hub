@@ -1,13 +1,14 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import * as canteenApi from "../services/canteenApi";
 import * as iamApi from "../services/iamApi";
+import { useUserEnrichment } from "./userEnrichment";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
+  const enrichUser = useUserEnrichment();
 
   const {
     data: user,
@@ -17,14 +18,7 @@ export const useAuth = () => {
     queryKey: ["currentUser"],
     queryFn: async () => {
       const data = await iamApi.verify();
-      let canteenId = null;
-      try {
-        const canteenUser = await canteenApi.fetchMe();
-        canteenId = canteenUser?.id;
-      } catch (err) {
-        console.error("Failed to fetch Canteen user", err);
-      }
-      return { ...data.user, canteenId };
+      return enrichUser(data.user);
     },
     staleTime: Infinity,
     retry: false,
@@ -37,14 +31,7 @@ export const useAuth = () => {
   const verifyLoginMutation = useMutation({
     mutationFn: async ({ tempToken, code, rememberMe }) => {
       const data = await iamApi.verify2FA(tempToken, code, rememberMe);
-      let canteenId = null;
-      try {
-        const canteenUser = await canteenApi.fetchMe();
-        canteenId = canteenUser?.id;
-      } catch (err) {
-        console.error("Failed to fetch Canteen user", err);
-      }
-      return { ...data.user, canteenId };
+      return enrichUser(data.user);
     },
     onSuccess: (user) => {
       queryClient.setQueryData(["currentUser"], user);
